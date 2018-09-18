@@ -1,4 +1,4 @@
-# Plasma Block Verifier
+# Plasma Block Explorer
 
 This is branch for Plasma Block Verifier 
 
