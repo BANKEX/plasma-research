@@ -10,8 +10,10 @@ block:
 	previousBlockHash (uint256),
 	merkleRoot (uint256),
 	signature (65 bytes secp256k1),
-	transaction1, ..., transactionN
-l
+	transaction 1,
+	...,
+	transaction N
+]
 ```
 
 transaction:
@@ -22,7 +24,7 @@ transaction:
 	output1, ..., output6,
 	metadata,
 	signature1, signature2 (65 bytes secp256k1)
-l
+]
 ```
 
 input:
@@ -35,7 +37,7 @@ input:
 	outputIndex (uint8), 
 	assetId (uint160), 
 	amount (uint256)
-l
+]
 ```
 
 output:
@@ -45,7 +47,7 @@ output:
 	owner (uint160), 
 	assetId (uint160), 
 	amount (uint256)
-l
+]
 ```
 
 metadata:
@@ -53,5 +55,5 @@ metadata:
 ```
 [
 	max_block_id (uint32)
-l
+]
 ```
