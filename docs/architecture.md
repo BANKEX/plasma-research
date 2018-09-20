@@ -16,7 +16,8 @@ IMPORTANT
 Plasma owner application, i.e., block producer, is the core part of Plasma.
 It receives signed transactions from plasma clients and builds blocks contains non-controversial transactions with the high speed.
 Headers of that blocks are published on the smart contract with a certain frequency that is lower than a frequency of block producing in plasma.
-- TODO: Specify frequency 
+- TODO: Some notions or specifications of block creations frequency in Plasma
+ 
 Headers of the block include the root hash of Merkle tree that has the hash of transaction objects in the leaves.
 - TODO: describe block header structure in details
 Our implementation of block producer apps has written in Go and available in open source
@@ -36,7 +37,7 @@ The detailed structure of the block is provided [here](https://github.com/BANKEX
 The client-side app is an integral part of Plasma Protocol it entrusted with functions of blocks verification that published by plasma owner.
 In case of violations like double spend, plasma client can launch exit game procedure via triggering method on the smart contract.
 
-- TODO: describe cheks that verifier do, or put a reference to the standard verification algorithms that we had implemented
+- TODO: describe checks that verifier do, or put a reference to the standard verification algorithms that we had implemented
 - TODO: describe the behavior of the plasma client if blocks are no published at all (no updates on smart contract)
 - TODO: describe the behavior of the plasma client if blocks header are published on the smart contact but block itself no published in the plasma network
 - TODO: describe withdraw and deposit from client-side point of view
