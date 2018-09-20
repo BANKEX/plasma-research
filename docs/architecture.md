@@ -7,6 +7,10 @@ Another goal is to provide support of multi assets features in plasma. It means 
 
 Below we are going to describe technical decisions and trade-offs that we take in our Plasma Implementation.
 
+IMPORTANT
+- TODO: describe process of creation different type of assets
+- TODO: describe rules and process of exchange different type of assets
+ 
 
 ## Plasma owner application
 Plasma owner application, i.e., block producer, is the core part of Plasma.

@@ -1,21 +1,33 @@
 # Plasma blockchain specifications
 
-## block structure
+## Block structure
+We expect that you are familiar with notion of Input and Output in UTXO based model.     
 
-block:
-
+Block is JSON object that consist of two fields header of the block and array of transaction 
 ```
-[
+{
+	header: Blockheader,
+	transactions: Array<Transaction>
+}
+```
+
+Block header:
+- TODO: we can't encode uint256 in JSON directly. What encoding we are going to use here base64?
+- TODO: the same for signature
+```
+{
 	blockNumber (uint32),
 	previousBlockHash (uint256),
 	merkleRoot (uint256),
 	signature (65 bytes secp256k1),
 	rootMerkleHash (uint256, based on keccak256)
-]
+	transactions: Array<Transaction>
+}
 ```
 
-transaction:
-
+#### Transaction
+Transaction RLP encoded object that has standard standard structure in terms of UTXO model.
+- TODO: describe what metadata contains
 ```
 [
 	input1, ..., input6,
@@ -25,8 +37,9 @@ transaction:
 ]
 ```
 
-input:
-
+#### Input
+Input is standard input object in terms of UTXO model extended with assetId property.
+`assetId` is identifier of asset in our multi asset plasma.
 ```
 [
 	owner (uint160), 
@@ -38,8 +51,9 @@ input:
 ]
 ```
 
-output:
-
+#### Output:
+Output is RLP encoded object extended with assetId property.
+`assetId` is identifier of asset in our multi asset plasma.
 ```
 [
 	owner (uint160), 
@@ -48,8 +62,9 @@ output:
 ]
 ```
 
-metadata:
-
+Metadata
+- TODO: describe why we need max_block_id
+- TODO: if it's only shell we include id directly to the transaction object 
 ```
 [
 	max_block_id (uint32)
