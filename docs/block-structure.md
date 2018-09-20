@@ -10,9 +10,7 @@ block:
 	previousBlockHash (uint256),
 	merkleRoot (uint256),
 	signature (65 bytes secp256k1),
-	transaction 1,
-	...,
-	transaction N
+	rootMerkleHash (uint256, based on keccak256)
 ]
 ```
 
