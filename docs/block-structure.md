@@ -14,13 +14,13 @@ Block is JSON object that consist of two fields header of the block and array of
 Block header:
 - TODO: we can't encode uint256 in JSON directly. What encoding we are going to use here base64?
 - TODO: the same for signature
+MetaInfo: rootMerkleHash (uint256, based on keccak256) was removed by @EnoRage
 ```
 {
 	blockNumber (uint32),
 	previousBlockHash (uint256),
 	merkleRoot (uint256),
 	signature (65 bytes secp256k1),
-	rootMerkleHash (uint256, based on keccak256)
 	transactions: Array<Transaction>
 }
 ```
@@ -28,6 +28,8 @@ Block header:
 #### Transaction
 Transaction RLP encoded object that has standard standard structure in terms of UTXO model.
 - TODO: describe what metadata contains
+- TODO: describe type of input1...
+- TODO: describe type of output1...
 ```
 [
 	input1, ..., input6,
