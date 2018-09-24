@@ -17,14 +17,14 @@ type BlockHeader struct {
 	BlockNumber       uint32         `json:"blockNumber"`
 	PreviousBlockHash big.Int        `json:"previousBlockHash"`
 	MerkleRoot        big.Int        `json:"merkleRoot"`
-	Signature         *signatue      `json:"signature"`
+	Signature         *signature     `json:"signature"`
 	Transactions      *[]Transaction `json:"transactions"`
 }
 
 type Transaction struct {
-	Input      *[5]Input    `json:"inputs"`     // maybe we need input1, input2 ...
-	Output     *[5]Output   `json:"outputs"`    // maybe we need output1, output2 ...
-	Signatures *[1]signatue `json:"signatures"` // maybe we need signature1, ...
+	Input      *[]Input     `json:"inputs"`     // maybe we need input1, input2 ...
+	Output     *[]Output    `json:"outputs"`    // maybe we need output1, output2 ...
+	Signatures *[]signature `json:"signatures"` // maybe we need signature1, ...
 }
 
 type Input struct {
@@ -42,7 +42,7 @@ type Output struct {
 	Amount  big.Int      `json:"amount"`
 }
 
-type signatue struct {
+type signature struct {
 	Signature [64]byte `json:"signature"`
 }
 
