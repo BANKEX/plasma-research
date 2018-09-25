@@ -42,6 +42,7 @@ Transaction RLP encoded object that has standard standard structure in terms of 
 #### Input
 Input is standard input object in terms of UTXO model extended with assetId property.
 `assetId` is identifier of asset in our multi asset plasma.
+TODO: add signature
 ```
 [
 	owner (uint160), 
