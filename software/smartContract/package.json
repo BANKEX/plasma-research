@@ -1,0 +1,46 @@
+{
+  "name": "bankex-plasma-ethereum-smart-contract",
+  "version": "1.0.0",
+  "description": "BANKEX Plasma Ethereum Smart Contract",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "chai-bignumber": "^2.0.2",
+    "eslint": "^5.5.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "ethereumjs-util": "^5.2.0",
+    "ethjs-abi": "^0.2.1",
+    "openzeppelin-solidity": "^1.12.0",
+    "solidity-coverage": "^0.5.11",
+    "solium": "^1.1.8",
+    "truffle": "^4.1.14",
+    "truffle-flattener": "^1.2.8",
+    "web3-utils": "^1.0.0-beta.34"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/truffle test",
+    "dist": "./node_modules/.bin/truffle-flattener ./contracts/PlasmaMain.sol | pbcopy",
+    "lint:js": "eslint .",
+    "lint:js:fix": "eslint . --fix",
+    "lint:sol": "solium -d .",
+    "lint:sol:fix": "solium -d . --fix",
+    "lint": "npm run lint:js && npm run lint:sol",
+    "lint:fix": "npm run lint:js:fix && npm run lint:sol:fix",
+    "coverage": "./node_modules/.bin/solidity-coverage",
+    "rpc": "scripts/rpc.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BANKEX/plasma-research.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/BANKEX/plasma-research/issues"
+  },
+  "homepage": "https://github.com/BANKEX/plasma-research/tree/master/software/smartContract#readme"
+}
