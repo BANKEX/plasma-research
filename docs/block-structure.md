@@ -23,10 +23,10 @@ Transaction RLP encoded object that has standard standard structure in terms of 
 - TODO: describe type of output1...
 ```
 {
-	input1, ..., input6,
-	output1, ..., output6,
-	metadata,
-	signature1, signature2 (65 bytes secp256k1)
+	inputs (array of input),
+	outputs (array of output),
+	metadata (array of blobs. First blob is maxBlockNumber uint32),
+	signatures (array of uint65 secp256k1)
 }
 ```
 
