@@ -18,17 +18,25 @@ Block is RLP Encoded object with the following structrue:
 
 #### Transaction
 Transaction RLP encoded object that has standard standard structure in terms of UTXO model.
-- TODO: describe what metadata contains
-- TODO: describe type of input1...
-- TODO: describe type of output1...
 ```
 {
 	inputs (array of input),
 	outputs (array of output),
-	metadata (array of blobs. First blob is maxBlockNumber uint32),
+	metadata (metadata),
 	signatures (array of uint65 secp256k1)
 }
 ```
+
+#### Metadata
+At the moment, that object contains only one field `max_block_id`. 
+That field says that transaction should be included into the block which number is less or equal to `max_block_id`.
+```
+{
+	max_block_id (uint32)
+}
+```
+That field will protect the end user in the following scenario:
+Plasma operator keep transaction for a long time, put it into block withheld and challenge exit of honest user.
 
 #### Input
 Input is standard input object in terms of UTXO model extended with assetId property.
@@ -56,12 +64,4 @@ Output is RLP encoded object extended with assetId property.
 }
 ```
 
-#### Metadata
-At the moment, that object contains only one field `max_block_id`. 
-That field says that transaction should be included into the block which number is less or equal to `max_block_id`.
-```
-{
-	max_block_id (uint32)
-}
-```
-That field will protect the end user in the following scenario:
+
