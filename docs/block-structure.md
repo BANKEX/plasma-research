@@ -6,8 +6,6 @@ We expect that you are familiar with notion of Input and Output in UTXO based mo
 Block is RLP Encoded object with the following structrue:
 
 ![block](https://raw.githubusercontent.com/BANKEX/plasma-research/master/docs/assets/block.svg?sanitize=true)
-- TODO: the same for signature
-MetaInfo: rootMerkleHash (uint256, based on keccak256) was removed by @EnoRage
 ```
 {
 	blockNumber (uint32),
