@@ -12,11 +12,11 @@ Block is RLP Encoded object with the following structrue:
 	previousBlockHash (uint256),
 	merkleRoot (uint256),
 	signature (65 bytes secp256k1),
-	transactions: Array<Transaction>
+	transactions: (array of Transaction)
 }
 ```
 
-#### Transaction
+## Transaction structure
 Transaction RLP encoded object that has standard standard structure in terms of UTXO model.
 ```
 {
@@ -26,7 +26,6 @@ Transaction RLP encoded object that has standard standard structure in terms of 
 	signatures (array of uint65 secp256k1)
 }
 ```
-
 #### Metadata
 At the moment, that object contains only one field `max_block_id`. 
 That field says that transaction should be included into the block which number is less or equal to `max_block_id`.
@@ -36,7 +35,11 @@ That field says that transaction should be included into the block which number 
 }
 ```
 That field will protect the end user in the following scenario:
-Plasma operator keep transaction for a long time, put it into block withheld and challenge exit of honest user.
+1) User send valid signed transaction
+2) Plasma operator keep transaction for a long time
+3) User see that transaction wasn't included in a block for a long time
+4) User send exit request on the smart contract
+5) Plasma operator sees that and put the transaction into a block that was withheld and challenge exit of the honest user.
 
 #### Input
 Input is standard input object in terms of UTXO model extended with assetId property.
@@ -64,4 +67,5 @@ Output is RLP encoded object extended with assetId property.
 }
 ```
 
+#### Signatures
 
