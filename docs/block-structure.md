@@ -22,12 +22,12 @@ Transaction RLP encoded object that has standard standard structure in terms of 
 - TODO: describe type of input1...
 - TODO: describe type of output1...
 ```
-[
+{
 	input1, ..., input6,
 	output1, ..., output6,
 	metadata,
 	signature1, signature2 (65 bytes secp256k1)
-]
+}
 ```
 
 #### Input
@@ -35,32 +35,33 @@ Input is standard input object in terms of UTXO model extended with assetId prop
 `assetId` is identifier of asset in our multi asset plasma.
 TODO: add signature
 ```
-[
+{
 	owner (uint160), 
 	blockIndex (uint32), 
 	txIndex (uint32), 
 	outputIndex (uint8), 
 	assetId (uint160), 
 	amount (uint256)
-]
+}
 ```
 
 #### Output:
 Output is RLP encoded object extended with assetId property.
 `assetId` is identifier of asset in our multi asset plasma.
 ```
-[
+{
 	owner (uint160), 
 	assetId (uint160), 
 	amount (uint256)
-]
+}
 ```
 
-Metadata
-- TODO: describe why we need max_block_id
-- TODO: if it's only shell we include id directly to the transaction object 
+#### Metadata
+At the moment, that object contains only one field `max_block_id`. 
+That field says that transaction should be included into the block which number is less or equal to `max_block_id`.
 ```
-[
+{
 	max_block_id (uint32)
-]
+}
 ```
+That field will protect the end user in the following scenario:
