@@ -3,16 +3,9 @@
 ## Block structure
 We expect that you are familiar with notion of Input and Output in UTXO based model.     
 
-Block is JSON object that consist of two fields header of the block and array of transaction 
-```
-{
-	header: Blockheader,
-	transactions: Array<Transaction>
-}
-```
+Block is RLP Encoded object with the following structrue:
 
-Block header:
-- TODO: we can't encode uint256 in JSON directly. What encoding we are going to use here base64?
+![block](https://raw.githubusercontent.com/BANKEX/plasma-research/master/docs/assets/block.svg?sanitize=true)
 - TODO: the same for signature
 MetaInfo: rootMerkleHash (uint256, based on keccak256) was removed by @EnoRage
 ```
