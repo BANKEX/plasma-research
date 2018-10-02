@@ -31,14 +31,14 @@ contract PlasmaBlocks is Ownable {
     function submitBlocksSigned(uint256 fromIndex, uint256[] newBlocks, bytes32 r, bytes32 s, uint8 v) public returns(uint) {
         bytes32 messageHash = keccak256(abi.encodePacked(fromIndex, newBlocks));
         bytes32 signedHash = ECRecovery.toEthSignedMessageHash(messageHash);
-        require(owner == ecrecover(signedHash, v + 27, r, s), "Invalid signature");
+        require(owner == ecrecover(signedHash, v < 27 ? v + 27 : v, r, s), "Invalid signature");
         return _submitBlocks(fromIndex, newBlocks);
     }
 
     function _submitBlocks(uint256 fromIndex, uint256[] newBlocks) internal returns(uint) {
         uint256 begin = _blocks.length.sub(fromIndex);
         uint256 end = newBlocks.length.sub(begin);
-        _blocks.length = fromIndex + newBlocks.length;
+        _blocks.length = fromIndex.add(newBlocks.length);
         for (uint i = begin; i < end; i++) {
             _blocks[fromIndex + i] = newBlocks[i];
         }
