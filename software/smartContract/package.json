@@ -4,7 +4,7 @@
   "description": "BANKEX Plasma Ethereum Smart Contract",
   "devDependencies": {
     "bn.js": "^4.11.8",
-    "chai": "^4.1.2",
+    "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^2.0.2",
     "eslint": "^5.6.1",
@@ -23,15 +23,15 @@
     "web3-utils": "^1.0.0-beta.34"
   },
   "scripts": {
-    "test": "./node_modules/.bin/truffle test",
-    "dist": "./node_modules/.bin/truffle-flattener ./contracts/PlasmaMain.sol | pbcopy",
-    "lint:js": "./node_modules/.bin/eslint .",
-    "lint:js:fix": "./node_modules/.bin/eslint . --fix",
-    "lint:sol": "./node_modules/.bin/solium -d .",
-    "lint:sol:fix": "./node_modules/.bin/solium -d . --fix",
+    "test": "truffle test",
+    "dist": "truffle-flattener ./contracts/PlasmaMain.sol | pbcopy",
+    "lint:js": "eslint .",
+    "lint:js:fix": "eslint . --fix",
+    "lint:sol": "solium -d .",
+    "lint:sol:fix": "solium -d . --fix",
     "lint": "npm run lint:js && npm run lint:sol",
     "lint:fix": "npm run lint:js:fix && npm run lint:sol:fix",
-    "coverage": "./node_modules/.bin/solidity-coverage",
+    "coverage": "solidity-coverage",
     "rpc": "scripts/rpc.sh"
   },
   "repository": {
