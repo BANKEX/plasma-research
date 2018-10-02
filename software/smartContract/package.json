@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "BANKEX Plasma Ethereum Smart Contract",
   "devDependencies": {
+    "bn.js": "^4.11.8",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^2.0.2",
