@@ -2,6 +2,8 @@
 
 ## Transaction processor:
 
+Acepts signed transactions from clients using the REST API, validates them, and stores in DB
+
 ```
       / processor
 users - ...         --> DB
@@ -15,14 +17,13 @@ users - ...         --> DB
 3. Check in DB that inputs are valid and unspent
 4. Add transaction to DB
 
-3 + 4 are atomic
-
 
 ## Block generator
 
+Periodically assembles pending transactions into a block and uploads them to the durable storage
+
 ```
 DB -> block generator --> S3
-                       \-> Smart Contract
 
      (assemble block)
 ```
@@ -31,6 +32,17 @@ DB -> block generator --> S3
 2. Assemble the block
 3. Upload to a public durable storage (AWS S3 / DO Dpaces)
 4. Upload block header to the Plasma contract on Ethereum
+
+## Block submitter
+
+Watches for new blocks uploaded to the durable storage and submits their headers to Plasma smart contract
+
+```
+S3 -> block generator --> Smart Contract
+
+     (submit block)
+```
+
 
 ## UTXO uploader
 
@@ -42,8 +54,14 @@ S3 -> block watcher -> DB
  (put new utxos into db)
 ```
 
-
 ## Event listener
+
+Listens for events on Plasma smart contract and processes them
+
+* Creates `Deposit` transactions to the plasma chain
+* Removes Withdrawn UTXOs from the plasma chain
+* Submits challenges (TODO)
+
 
 ```
 Smart Contract -> event listener --> DB
@@ -51,9 +69,3 @@ Smart Contract -> event listener --> DB
 
          (process deposit/withdraw/challenge events)
 ```
-
-1. Get new events from Plasma contract
-2. Add new deposits to the plasma chain
-3. Flag (censor) UTXOs withdrawed in the contract
-4. Challenge invalid withdrawals
-
