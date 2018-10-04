@@ -10,7 +10,7 @@ contract PlasmaBlocks is Ownable {
 
     uint256[] private _blocks;
 
-    event BlocksSubmitted(uint256 indexed length);
+    event BlocksSubmitted(uint256 indexed length, uint256 time);
 
     function blocksLength() public view returns(uint) {
         return _blocks.length;
@@ -43,7 +43,9 @@ contract PlasmaBlocks is Ownable {
         }
 
         if (begin < newBlocks.length) {
-            emit BlocksSubmitted(_blocks.length);
+            // solium-disable-next-line security/no-block-members
+            emit BlocksSubmitted(_blocks.length, block.timestamp);
         }
+        return newBlocks.length - begin;
     }
 }
