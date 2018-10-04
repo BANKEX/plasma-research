@@ -37,13 +37,12 @@ contract PlasmaBlocks is Ownable {
 
     function _submitBlocks(uint256 fromIndex, uint256[] newBlocks) internal returns(uint) {
         uint256 begin = _blocks.length.sub(fromIndex);
-        uint256 end = newBlocks.length.sub(begin);
         _blocks.length = fromIndex.add(newBlocks.length);
-        for (uint i = begin; i < end; i++) {
+        for (uint i = begin; i < newBlocks.length; i++) {
             _blocks[fromIndex + i] = newBlocks[i];
         }
 
-        if (begin < end) {
+        if (begin < newBlocks.length) {
             emit BlocksSubmitted(_blocks.length);
         }
     }

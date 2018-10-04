@@ -49,16 +49,18 @@ contract('PlasmaBlocks', function ([_, wallet1, wallet2, wallet3, wallet4, walle
         await plasma.submitBlocks(5, [5, 6, 7, 8, 9]);
     });
 
-    it('should fail to submit old blocks', async function () {
+    it('should ignore old blocks', async function () {
         //
         // [1] [2] [3] [4]
         //     [2] [3]
+        //     [8] [9]
         //
         await plasma.submitBlocks(0, [1, 2, 3, 4]);
-        await plasma.submitBlocks(1, [2, 3]).should.be.rejectedWith(EVMThrow);
+        await plasma.submitBlocks(1, [2, 3]);
+        await plasma.submitBlocks(1, [8, 9]);
     });
 
-    it('should ignore blocks after gap', async function () {
+    it('should deny blocks after gap', async function () {
         //
         // [1] [2] [3]
         //             [ ]
@@ -66,6 +68,61 @@ contract('PlasmaBlocks', function ([_, wallet1, wallet2, wallet3, wallet4, walle
         //
         await plasma.submitBlocks(0, [1, 2, 3]);
         await plasma.submitBlocks(4, [5, 6]).should.be.rejectedWith(EVMThrow);
+    });
+
+    describe('getters', async function () {
+        it('should work fine for blocks(i)', async function () {
+            //
+            // [1] [2] [3]
+            //         [3] [4] [5]
+            //
+
+            await plasma.blocks.call(0).should.be.rejectedWith(EVMThrow);
+
+            await plasma.submitBlocks(0, [1, 2, 3]);
+            (await plasma.blocks.call(0)).should.be.bignumber.equal(1);
+            (await plasma.blocks.call(1)).should.be.bignumber.equal(2);
+            (await plasma.blocks.call(2)).should.be.bignumber.equal(3);
+            await plasma.blocks.call(3).should.be.rejectedWith(EVMThrow);
+
+            await plasma.submitBlocks(2, [3, 4, 5]);
+            (await plasma.blocks.call(0)).should.be.bignumber.equal(1);
+            (await plasma.blocks.call(1)).should.be.bignumber.equal(2);
+            (await plasma.blocks.call(2)).should.be.bignumber.equal(3);
+            (await plasma.blocks.call(3)).should.be.bignumber.equal(4);
+            (await plasma.blocks.call(4)).should.be.bignumber.equal(5);
+            await plasma.blocks.call(5).should.be.rejectedWith(EVMThrow);
+        });
+
+        it('should work fine for allBlocks()', async function () {
+            //
+            // [1] [2] [3]
+            //         [3] [4] [5]
+            //
+
+            (await plasma.allBlocks.call()).should.be.deep.equal([]);
+
+            await plasma.submitBlocks(0, [1, 2, 3]);
+            (await plasma.allBlocks.call()).map(a => a.toNumber()).should.be.deep.equal([1, 2, 3]);
+
+            await plasma.submitBlocks(2, [3, 4, 5]);
+            (await plasma.allBlocks.call()).map(a => a.toNumber()).should.be.deep.equal([1, 2, 3, 4, 5]);
+        });
+
+        it('should work fine for blocksLength()', async function () {
+            //
+            // [1] [2] [3]
+            //         [3] [4] [5]
+            //
+
+            (await plasma.blocksLength.call()).should.be.bignumber.equal(0);
+
+            await plasma.submitBlocks(0, [1, 2, 3]);
+            (await plasma.blocksLength.call()).should.be.bignumber.equal(3);
+
+            await plasma.submitBlocks(2, [3, 4, 5]);
+            (await plasma.blocksLength.call()).should.be.bignumber.equal(5);
+        });
     });
 
     describe('malformed operator signature', async function () {
