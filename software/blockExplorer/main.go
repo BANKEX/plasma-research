@@ -7,9 +7,9 @@ import (
 
 func main() {
 	block := types.BlockInit()
-
 	val := rlp.EncodeBlock(&block)
 
-	println(val)
+	t:= rlp.DecodeBlock(val)
 
+	println(t.BlockHeader.BlockNumber)
 }

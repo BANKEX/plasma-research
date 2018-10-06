@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cf7b6d43-673b-497f-b6be-701700b4b9f3" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/software/blockExplorer/rlp/encoding.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/software/blockExplorer/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/software/blockExplorer/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/software/blockExplorer/types/types.go" beforeDir="false" afterPath="$PROJECT_DIR$/software/blockExplorer/types/types.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/software/blockExplorer/rlp/encoding.go" beforeDir="false" afterPath="$PROJECT_DIR$/software/blockExplorer/rlp/encoding.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -47,13 +45,13 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="gitignore" value="25" />
-          <entry key="go" value="2154" />
+          <entry key="go" value="2327" />
           <entry key="md" value="27" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Go" value="2154" />
+          <entry key="Go" value="2327" />
           <entry key="Markdown" value="27" />
           <entry key="PLAIN_TEXT" value="25" />
         </counts>
@@ -83,11 +81,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/software/blockExplorer/main.go">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="225">
-              <caret line="15" selection-start-line="15" selection-end-line="15" />
+              <caret line="15" lean-forward="true" selection-start-line="15" selection-end-line="15" />
               <folding>
                 <element signature="e#14#28#0" expanded="true" />
               </folding>
@@ -95,11 +93,14 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/software/blockExplorer/rlp/encoding.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="8" selection-start-line="2" selection-start-column="8" selection-end-line="2" selection-end-column="8" />
+            <state relative-caret-position="210">
+              <caret line="14" column="16" selection-start-line="14" selection-start-column="5" selection-end-line="14" selection-end-column="16" />
+              <folding>
+                <element signature="e#13#76#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -158,9 +159,9 @@
         <option value="$PROJECT_DIR$/plasma-research/software/blockExplorer/types/types.go" />
         <option value="$PROJECT_DIR$/software/blockExplorer/api/handlers.go" />
         <option value="$PROJECT_DIR$/software/blockExplorer/eth/connect.go" />
-        <option value="$PROJECT_DIR$/software/blockExplorer/rlp/encoding.go" />
-        <option value="$PROJECT_DIR$/software/blockExplorer/main.go" />
         <option value="$PROJECT_DIR$/software/blockExplorer/types/types.go" />
+        <option value="$PROJECT_DIR$/software/blockExplorer/main.go" />
+        <option value="$PROJECT_DIR$/software/blockExplorer/rlp/encoding.go" />
       </list>
     </option>
   </component>
@@ -200,6 +201,13 @@
               <item name="plasma-research" type="462c0819:PsiDirectoryNode" />
               <item name="software" type="462c0819:PsiDirectoryNode" />
               <item name="blockExplorer" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="plasma-research" type="b2602c69:ProjectViewProjectNode" />
+              <item name="plasma-research" type="462c0819:PsiDirectoryNode" />
+              <item name="software" type="462c0819:PsiDirectoryNode" />
+              <item name="blockExplorer" type="462c0819:PsiDirectoryNode" />
+              <item name="rlp" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="plasma-research" type="b2602c69:ProjectViewProjectNode" />
@@ -536,13 +544,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/software/blockExplorer/rlp/encoding.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="8" selection-start-line="2" selection-start-column="8" selection-end-line="2" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/software/blockExplorer/types/types.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-518">
@@ -556,9 +557,19 @@
     <entry file="file://$PROJECT_DIR$/software/blockExplorer/main.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="225">
-          <caret line="15" selection-start-line="15" selection-end-line="15" />
+          <caret line="15" lean-forward="true" selection-start-line="15" selection-end-line="15" />
           <folding>
             <element signature="e#14#28#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/software/blockExplorer/rlp/encoding.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="16" selection-start-line="14" selection-start-column="5" selection-end-line="14" selection-end-column="16" />
+          <folding>
+            <element signature="e#13#76#0" expanded="true" />
           </folding>
         </state>
       </provider>
