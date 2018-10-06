@@ -22,8 +22,9 @@ type BlockHeader struct {
 }
 
 type Transaction struct {
-	Input      *[]Input     `json:"inputs"`     // maybe we need input1, input2 ...
-	Output     *[]Output    `json:"outputs"`    // maybe we need output1, output2 ...
+	Input      *[]Input     `json:"inputs"`  // maybe we need input1, input2 ...
+	Output     *[]Output    `json:"outputs"` // maybe we need output1, output2 ...
+	Metadata   *Metadata    `json:"metadata"`
 	Signatures *[]signature `json:"signatures"` // maybe we need signature1, ...
 }
 
@@ -49,4 +50,3 @@ type signature struct {
 type Metadata struct {
 	Max_block_id uint32 `json:"max_block_id"`
 }
-
