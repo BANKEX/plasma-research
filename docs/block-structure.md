@@ -46,7 +46,6 @@ That field will protect the end user in the following scenario:
 #### Input
 Input is standard input object in terms of UTXO model extended with the assetId property.
 `assetId` is the identifier of an asset in our multi-asset plasma.
-TODO: add the signature
 ```
 {
     owner (uint160), 
