@@ -23,7 +23,7 @@ library PlasmaDecoder {
     }
 
     struct Metadata {
-        uint32 max_block_id;
+        uint32 maxBlockId;
     }
 
     struct Signature {
@@ -110,7 +110,7 @@ library PlasmaDecoder {
 
     function _decodeMetadata(RLPReader.RLPItem[] memory items) private pure returns(Metadata) {
         return Metadata({
-            max_block_id: uint32(items[0].toUint())
+            maxBlockId: uint32(items[0].toUint())
         });
     }
 

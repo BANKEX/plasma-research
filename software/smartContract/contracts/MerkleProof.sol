@@ -5,6 +5,7 @@ pragma solidity ^0.4.24;
 // https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/cryptography/MerkleProof.sol
 //
 
+
 /**
  * @title MerkleProof
  * @dev Merkle proof verification based on
@@ -30,10 +31,11 @@ library MerkleProof {
     {
         bytes32 computedHash = leaf;
 
+        uint256 currentIndex = index;
         for (uint256 i = 0; i < proof.length; i++) {
             bytes32 proofElement = proof[i];
 
-            if ((index & 1) == 0) {
+            if ((currentIndex & 1) == 0) {
                 // Hash(current computed hash + current element of the proof)
                 computedHash = keccak256(abi.encodePacked(computedHash, proofElement));
             } else {
@@ -41,7 +43,7 @@ library MerkleProof {
                 computedHash = keccak256(abi.encodePacked(proofElement, computedHash));
             }
 
-            index = index / 2;
+            currentIndex = currentIndex / 2;
         }
 
         // Check if the computed hash (root) is equal to the provided root
