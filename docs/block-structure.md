@@ -5,14 +5,23 @@ We expect that you are familiar with the notion of Input and Output in UTXO base
 
 Block is RLP Encoded object with the following structure:
 
+```
+{
+    BlockHeader  BlockHeader
+    Transactions (array of Transaction)
+}
+```
+## BlockHeader structure
+<!--
 ![block](https://raw.githubusercontent.com/BANKEX/plasma-research/master/docs/assets/block.svg?sanitize=true)
+-->
+
 ```
 {
     blockNumber (uint32),
     previousBlockHash (uint256),
     merkleRoot (uint256),
     signature (Signature),
-    transactions (array of Transaction)
 }
 ```
 
