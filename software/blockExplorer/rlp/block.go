@@ -25,10 +25,15 @@ type BlockHeader struct {
 
 // Signatures may only contain one or two signatures
 type Transaction struct {
+	UnsignedContent UnsignedTransactionContent
+	Signatures []Signature
+}
+
+// Actual content of transaction in terms of UTXO model
+type UnsignedTransactionContent struct {
 	Inputs      []TransactionInput
 	Outputs     []TransactionOutput
 	Metadata   Metadata
-	Signatures []Signature
 }
 
 // Represents transaction input in terms of UTXO model
@@ -73,9 +78,10 @@ type Metadata struct {
 	MaxBlockId uint32
 }
 
-func EncodeBlock(block interface{}) ([]byte, error) {
+
+func EncodeToRLP(obj interface{}) ([]byte, error) {
 	b := new(bytes.Buffer)
-	err := rlp.Encode(b, block)
+	err := rlp.Encode(b, obj)
 	return b.Bytes(), err
 }
 
