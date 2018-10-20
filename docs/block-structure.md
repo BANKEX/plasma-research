@@ -20,13 +20,18 @@ Block is RLP Encoded object with the following structure:
 Transaction RLP encoded object that has a standard structure in terms of UTXO model.
 ```
 {
-    inputs (array of input),
-    outputs (array of output),
-    metadata (metadata),
+    UnsignedContent (UnsignedTransactionContent),
     signatures (array of signatures)
 }
 ```
-Note: Lenght of signatures array must be equal to 1 or two. A single transaction can't include inputs from more than two different owners
+Note: Lenght of signatures array must be equal to 1 or two. A single transaction can't include inputs from more than two different owners.
+
+#### UnsignedTransactionContent
+```
+    inputs (array of input),
+    outputs (array of output),
+    metadata (metadata),
+```
 
 #### Metadata
 At the moment, that object contains only one field `max_block_id`. 
