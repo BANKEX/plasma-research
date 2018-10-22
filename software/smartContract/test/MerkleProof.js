@@ -12,15 +12,11 @@ function ds(size) {
     for (var i = 0; i < size; i += 1) {
       elements.push(`a${i}`)
     }
-    while ((elements.length & (elements.length - 1)) != 0) {
-      elements.push('');
-    }
     const merkleTree = new MerkleTree(elements);
     const root = merkleTree.getHexRoot();
-
     for (var i = 0; i < size; i += 1) {
-      const proof = merkleTree.getHexProof(elements[i]);
-      const leaf = bufferToHex(merkleTree.elements[i]);
+      const proof = merkleTree.getHexProof(i);
+      const leaf = bufferToHex(merkleTree.layers[0][i]);
       (await this.merkleProof.verify(proof, root, leaf, i)).should.equal(true);
     }
   });
