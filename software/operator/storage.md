@@ -2,21 +2,21 @@ Schema
 ======
 
 This documents describes the storage structure and operations on it. Schema and operations are expressed in generic language, 
-assuming we are working with ACID compliant NoSQL storage
+assuming we are working with ACID compliant NoSQL storage, our current chioce is FoundationDB
 
 UTXOs
 -----
 
 This directory contains only valid unspent outputs
 
-`/utxo/block:id:output -> { owner, assetId, amount }`
+`/utxo/block:id:output -> BLOB { owner, assetId, amount }`
 
 Transactions
 ------------
 
 Transaction blobs for inclusion in the next block:
 
-`/tx/blockId:hash -> raw tx bytes`
+`/tx/blockId:hash -> BLOB { raw RLP tx bytes }`
 
 Deposits
 --------
@@ -30,11 +30,12 @@ Deposit objects corresponding to deposits on smart contract
 Misc
 ----
 
-`/currentBlock -> int32 (current block counter)`
-`/lastUploadedBlock -> int32 (last block that was uploaded to S3)`
-`/lastProcessedBlock -> int32 (last block which utxos were added to the db)`
-`/lastProcessedEthereumBlock -> int32 (last block from which all ethereum events were successfully processed, 
-on DB creation initialize this with PlasmaParent contract creation block)` 
+```
+/currentBlock -> int32 (current block counter)
+/lastUploadedBlock -> int32 (last block that was uploaded to S3)
+/lastProcessedBlock -> int32 (last block which utxos were added to the db)
+/lastProcessedEthereumBlock -> int32 (last block from which all ethereum events were successfully processed, on DB creation initialize this with PlasmaParent contract creation block)
+```
 
 
 DB Operations
@@ -101,3 +102,4 @@ Cleanup old tx after the block is successfully uploaded to the storage
 ```
 DELETE /tx/<past block tx range>
 ```
+

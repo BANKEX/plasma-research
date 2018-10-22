@@ -29,9 +29,10 @@ DB -> block generator --> S3
 ```
 
 1. Periodically pull all transactions to be included in the next block
-2. Assemble the block
-3. Upload to a public durable storage (AWS S3 / DO Dpaces)
-4. Upload block header to the Plasma contract on Ethereum
+2. Sort transactions by hash
+3. Assemble the block
+4. Upload to a public durable storage (AWS S3 / DO Dpaces)
+5. Upload block header to the Plasma contract on Ethereum
 
 ## Block submitter
 
@@ -61,6 +62,8 @@ Listens for events on Plasma smart contract and processes them
 * Creates `Deposit` transactions to the plasma chain
 * Removes Withdrawn UTXOs from the plasma chain
 * Submits challenges (TODO)
+  * Challenge `Withdraw` events when UTXO is not present in DB
+  * Challenge `WithdrawDeposit` when the deposit transaction is present
 
 
 ```
