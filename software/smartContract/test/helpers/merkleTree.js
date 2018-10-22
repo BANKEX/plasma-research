@@ -3,12 +3,7 @@ const { sha3, bufferToHex } = require('ethereumjs-util');
 class MerkleTree {
   constructor (elements) {
     // Filter empty strings and hash elements
-    this.elements = elements.filter(el => el).map(el => sha3(el));
-
-    // Deduplicate elements
-    this.elements = this.bufDedup(this.elements);
-    // Sort elements
-    this.elements.sort(Buffer.compare);
+    this.elements = elements.map(el => sha3(el));
 
     // Create layers
     this.layers = this.getLayers(this.elements);
@@ -62,24 +57,20 @@ class MerkleTree {
     if (idx === -1) {
       throw new Error('Element does not exist in Merkle tree');
     }
-
     return this.layers.reduce((proof, layer) => {
       const pairElement = this.getPairElement(idx, layer);
-
       if (pairElement) {
         proof.push(pairElement);
       }
 
       idx = Math.floor(idx / 2);
-
       return proof;
     }, []);
   }
 
   getHexProof (el) {
-    const proof = this.getProof(el);
-
-    return this.bufArrToHexArr(proof);
+    const result = this.getProof(el);
+    return this.bufArrToHexArr(result);
   }
 
   getPairElement (idx, layer) {
@@ -126,7 +117,7 @@ class MerkleTree {
   }
 
   sortAndConcat (...args) {
-    return Buffer.concat([...args].sort(Buffer.compare));
+    return Buffer.concat([...args]);
   }
 }
 
