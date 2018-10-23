@@ -6,47 +6,39 @@ class MerkleTree {
   constructor (elements) {
     // Create layers
     elements = elements.map(el => sha3(el))
-    while (elements.length < 32) {
-      elements.push(empty)
-    }
     this.layers = this.getLayers(elements);
   }
 
   getLayers (elements) {
-    if (elements.length === 0) {
-      return [['']];
+    var emptyLeveled = sha3('');
+    if (elements.length & 1 == 1) {
+      elements.push(emptyLeveled)
     }
 
-    const layers = [];
-    layers.push(elements);
+    let n = elements.length
+    var tree = [elements]
+    let maxLevel = 31
+    for (let level = 1; level <= maxLevel; level++) {
+        var current = []
+        for (let i = 0; i < tree[level-1].length / 2; i++) {
+          let a = tree[level-1][i*2]
+          let b = tree[level-1][i*2+1]
+          if (!b) {
+            b = sha3(Buffer.concat([emptyLeveled, emptyLeveled]))
+          }
+          let hash = sha3(Buffer.concat([a, b]))
+          current.push(hash)
+        }
 
-    // Get next layer until we reach the root
-    while (layers[layers.length - 1].length > 1) {
-      layers.push(this.getNextLayer(layers[layers.length - 1]));
-    }
+        if (current.length & 1 && level != maxLevel) {
+          current.push(emptyLeveled)
+        }
+        emptyLeveled = sha3(Buffer.concat([emptyLeveled, emptyLeveled]))
 
-    return layers;
-  }
-
-  
-
-  getNextLayer (elements) {
-    return elements.reduce((layer, el, idx, arr) => {
-      if (idx % 2 === 0) {
-        // Hash the current element with its pair element
-        layer.push(this.combinedHash(el, arr[idx + 1]));
+        tree.push(current)
       }
-
-      return layer;
-    }, []);
-  }
-
-  combinedHash (first, second) {
-    if (!first) { return second; }
-    if (!second) { return first; }
-
-    return sha3(Buffer.concat([first, second]));
-  }
+      return tree;
+    }
 
   getRoot () {
     return this.layers[this.layers.length - 1][0];
@@ -78,7 +70,6 @@ class MerkleTree {
 
   getPairElement (idx, layer) {
     const pairIdx = idx % 2 === 0 ? idx + 1 : idx - 1;
-
     if (pairIdx < layer.length) {
       return layer[pairIdx];
     } else {
