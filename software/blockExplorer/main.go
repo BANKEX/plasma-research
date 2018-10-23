@@ -42,15 +42,15 @@ func sampleInputs() []rlp.TransactionInput {
 	input2.Owner = samplePubKey
 	input2.OutputIndex = 0
 
-	return []rlp.TransactionInput{input1, input2};
+	return []rlp.TransactionInput{input1, input2}
 }
 
-func sampleOutputs() [] rlp.TransactionOutput {
-	output := rlp.TransactionOutput{};
+func sampleOutputs() []rlp.TransactionOutput {
+	output := rlp.TransactionOutput{}
 	output.Owner = samplePubKey
 	output.AssetId = someAssetId
 	output.Amount = sum.Bytes()
-	return []rlp.TransactionOutput{output};
+	return []rlp.TransactionOutput{output}
 }
 
 func sampleTransaction() rlp.Transaction {
