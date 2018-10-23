@@ -5,10 +5,10 @@ import (
 )
 
 type Input struct {
-	BlockIndex  uint32  `json:"blockIndex"`
-	TxIndex     uint32  `json:"txIndex"`
-	OutputIndex uint8   `json:"outputIndex"`
-	Owner       big.Int `json:"owner"`
-	AssetId     big.Int `json:"assetId"`
-	Amount      big.Int `json:"amount"`
+	BlockNumber  uint32  `json:"blockNumber"`
+	TxNumber     uint32  `json:"txNumber"`
+	OutputNumber uint8   `json:"outputNumber"`
+	Owner        big.Int `json:"owner"`
+	AssetID      big.Int `json:"assetId"`
+	Amount       big.Int `json:"amount"`
 }

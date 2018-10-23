@@ -6,6 +6,6 @@ import (
 
 type Output struct {
 	Owner   big.Int `json:"owner"`
-	AssetId big.Int `json:"assetId"`
+	AssetID big.Int `json:"assetId"`
 	Amount  big.Int `json:"amount"`
 }

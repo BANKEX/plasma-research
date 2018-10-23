@@ -5,5 +5,5 @@ func HandleNewTransaction(tx []byte) (bool, error) {
 	// validate
 	// check utxo
 	// check inputs
-
+	return false, nil
 }

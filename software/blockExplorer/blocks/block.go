@@ -15,3 +15,15 @@ type BlockHeader struct {
 	MerkleRoot        big.Int  `json:"merkleRoot"`
 	Signature         [65]byte `json:"signature"`
 }
+
+func (b *Block) Sign(key []byte) error {
+	// b.Header.Signature =
+	return nil
+}
+
+func (b *Block) CalculateMerkleRoot() error {
+	// b.Header.MerkleRoot =
+	return nil
+}
+
+// === validation ===
