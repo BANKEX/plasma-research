@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-import "openzeppelin-solidity/contracts/ECRecovery.sol";
+import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
@@ -28,10 +28,10 @@ contract PlasmaBlocks is Ownable {
         return _submitBlocks(fromIndex, newBlocks);
     }
 
-    function submitBlocksSigned(uint256 fromIndex, uint256[] newBlocks, bytes32 r, bytes32 s, uint8 v) public returns(uint) {
+    function submitBlocksSigned(uint256 fromIndex, uint256[] newBlocks, bytes rsv) public returns(uint) {
         bytes32 messageHash = keccak256(abi.encodePacked(fromIndex, newBlocks));
-        bytes32 signedHash = ECRecovery.toEthSignedMessageHash(messageHash);
-        require(owner == ecrecover(signedHash, v < 27 ? v + 27 : v, r, s), "Invalid signature");
+        bytes32 signedHash = ECDSA.toEthSignedMessageHash(messageHash);
+        require(owner() == ECDSA.recover(signedHash, rsv), "Invalid signature");
         return _submitBlocks(fromIndex, newBlocks);
     }
 

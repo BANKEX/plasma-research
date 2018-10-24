@@ -129,73 +129,73 @@ contract('PlasmaBlocks', function ([_, wallet1, wallet2, wallet3, wallet4, walle
         it('should fail to submit blocks with malformed R', async function () {
             const messageHash = web3.sha3('0x' + [0, 1, 2, 3].map(a => new BigNumber(a).toString(16, 64)).reduce((a, b) => a + b), { encoding: 'hex' });
             const rsv = await web3.eth.sign(_, messageHash).substr(2);
-            const r = '0x' + new BigNumber(rsv.substr(0, 64), 16).addn(1).toString(16, 64);
-            const s = '0x' + rsv.substr(64, 64);
-            const v = '0x' + rsv.substr(128, 2);
-            await plasma.submitBlocksSigned(0, [1, 2, 3], r, s, v, { from: wallet1 }).should.be.rejectedWith(EVMThrow);
+            const r = new BigNumber(rsv.substr(0, 64), 16).addn(1).toString(16, 64);
+            const s = rsv.substr(64, 64);
+            const v = rsv.substr(128, 2);
+            await plasma.submitBlocksSigned(0, [1, 2, 3], '0x' + r + s + v, { from: wallet1 }).should.be.rejectedWith(EVMThrow);
         });
 
         it('should fail to submit blocks with malformed S', async function () {
             const messageHash = web3.sha3('0x' + [0, 1, 2, 3].map(a => new BigNumber(a).toString(16, 64)).reduce((a, b) => a + b), { encoding: 'hex' });
             const rsv = await web3.eth.sign(_, messageHash).substr(2);
-            const r = '0x' + new BigNumber(rsv.substr(0, 64), 16).addn(1).toString(16, 64);
-            const s = '0x' + rsv.substr(64, 64);
-            const v = '0x' + rsv.substr(128, 2);
-            await plasma.submitBlocksSigned(0, [1, 2, 3], r, s, v, { from: wallet1 }).should.be.rejectedWith(EVMThrow);
+            const r = new BigNumber(rsv.substr(0, 64), 16).addn(1).toString(16, 64);
+            const s = rsv.substr(64, 64);
+            const v = rsv.substr(128, 2);
+            await plasma.submitBlocksSigned(0, [1, 2, 3], '0x' + r + s + v, { from: wallet1 }).should.be.rejectedWith(EVMThrow);
         });
 
         it('should fail to submit blocks with malformed V', async function () {
             const messageHash = web3.sha3('0x' + [0, 1, 2, 3].map(a => new BigNumber(a).toString(16, 64)).reduce((a, b) => a + b), { encoding: 'hex' });
             const rsv = await web3.eth.sign(_, messageHash).substr(2);
-            const r = '0x' + rsv.substr(0, 64);
-            const s = '0x' + new BigNumber(rsv.substr(64, 128), 16).addn(1).toString(16, 64);
-            const v = '0x' + rsv.substr(128, 2);
-            await plasma.submitBlocksSigned(0, [1, 2, 3], r, s, v, { from: wallet1 }).should.be.rejectedWith(EVMThrow);
+            const r = rsv.substr(0, 64);
+            const s = new BigNumber(rsv.substr(64, 128), 16).addn(1).toString(16, 64);
+            const v = rsv.substr(128, 2);
+            await plasma.submitBlocksSigned(0, [1, 2, 3], '0x' + r + s + v, { from: wallet1 }).should.be.rejectedWith(EVMThrow);
         });
 
         it('should fail to submit blocks with malformed R and S', async function () {
             const messageHash = web3.sha3('0x' + [0, 1, 2, 3].map(a => new BigNumber(a).toString(16, 64)).reduce((a, b) => a + b), { encoding: 'hex' });
             const rsv = await web3.eth.sign(_, messageHash).substr(2);
-            const r = '0x' + rsv.substr(0, 64);
-            const s = '0x' + rsv.substr(64, 64);
-            const v = '0x' + rsv.substr(128, 2);
-            await plasma.submitBlocksSigned(0, [1, 2, 3], s, r, v, { from: wallet1 }).should.be.rejectedWith(EVMThrow);
+            const r = rsv.substr(0, 64);
+            const s = rsv.substr(64, 64);
+            const v = rsv.substr(128, 2);
+            await plasma.submitBlocksSigned(0, [1, 2, 3], '0x' + s + r + v, { from: wallet1 }).should.be.rejectedWith(EVMThrow);
         });
 
         it('should fail to submit blocks with malformed short DATA', async function () {
             const messageHash = web3.sha3('0x' + [0, 1, 2, 3].map(a => new BigNumber(a).toString(16, 64)).reduce((a, b) => a + b), { encoding: 'hex' });
             const rsv = await web3.eth.sign(_, messageHash).substr(2);
-            const r = '0x' + rsv.substr(0, 64);
-            const s = '0x' + rsv.substr(64, 64);
-            const v = '0x' + rsv.substr(128, 2);
-            await plasma.submitBlocksSigned(0, [1, 2], r, s, v, { from: wallet1 }).should.be.rejectedWith(EVMThrow);
+            const r = rsv.substr(0, 64);
+            const s = rsv.substr(64, 64);
+            const v = rsv.substr(128, 2);
+            await plasma.submitBlocksSigned(0, [1, 2], '0x' + r + s + v, { from: wallet1 }).should.be.rejectedWith(EVMThrow);
         });
 
         it('should fail to submit blocks with malformed long DATA', async function () {
             const messageHash = web3.sha3('0x' + [0, 1, 2, 3].map(a => new BigNumber(a).toString(16, 64)).reduce((a, b) => a + b), { encoding: 'hex' });
             const rsv = await web3.eth.sign(_, messageHash).substr(2);
-            const r = '0x' + rsv.substr(0, 64);
-            const s = '0x' + rsv.substr(64, 64);
-            const v = '0x' + rsv.substr(128, 2);
-            await plasma.submitBlocksSigned(0, [1, 2, 3, 4], r, s, v, { from: wallet1 }).should.be.rejectedWith(EVMThrow);
+            const r = rsv.substr(0, 64);
+            const s = rsv.substr(64, 64);
+            const v = rsv.substr(128, 2);
+            await plasma.submitBlocksSigned(0, [1, 2, 3, 4], '0x' + r + s + v, { from: wallet1 }).should.be.rejectedWith(EVMThrow);
         });
 
         it('should fail to submit blocks with malformed reordered DATA', async function () {
             const messageHash = web3.sha3('0x' + [0, 1, 2, 3].map(a => new BigNumber(a).toString(16, 64)).reduce((a, b) => a + b), { encoding: 'hex' });
             const rsv = await web3.eth.sign(_, messageHash).substr(2);
-            const r = '0x' + rsv.substr(0, 64);
-            const s = '0x' + rsv.substr(64, 64);
-            const v = '0x' + rsv.substr(128, 2);
-            await plasma.submitBlocksSigned(0, [1, 3, 2], r, s, v, { from: wallet1 }).should.be.rejectedWith(EVMThrow);
+            const r = rsv.substr(0, 64);
+            const s = rsv.substr(64, 64);
+            const v = rsv.substr(128, 2);
+            await plasma.submitBlocksSigned(0, [1, 3, 2], '0x' + r + s + v, { from: wallet1 }).should.be.rejectedWith(EVMThrow);
         });
 
         it('should fail to submit blocks with malformed DATA with different offset', async function () {
             const messageHash = web3.sha3('0x' + [0, 1, 2, 3].map(a => new BigNumber(a).toString(16, 64)).reduce((a, b) => a + b), { encoding: 'hex' });
             const rsv = await web3.eth.sign(_, messageHash).substr(2);
-            const r = '0x' + rsv.substr(0, 64);
-            const s = '0x' + rsv.substr(64, 64);
-            const v = '0x' + rsv.substr(128, 2);
-            await plasma.submitBlocksSigned(1, [1, 2, 3], r, s, v, { from: wallet1 }).should.be.rejectedWith(EVMThrow);
+            const r = rsv.substr(0, 64);
+            const s = rsv.substr(64, 64);
+            const v = rsv.substr(128, 2);
+            await plasma.submitBlocksSigned(1, [1, 2, 3], '0x' + r + s + v, { from: wallet1 }).should.be.rejectedWith(EVMThrow);
         });
     });
 
@@ -209,28 +209,28 @@ contract('PlasmaBlocks', function ([_, wallet1, wallet2, wallet3, wallet4, walle
         {
             const messageHash = web3.sha3('0x' + [0, 1, 2, 3].map(a => new BigNumber(a).toString(16, 64)).reduce((a, b) => a + b), { encoding: 'hex' });
             const rsv = await web3.eth.sign(_, messageHash).substr(2);
-            const r = '0x' + rsv.substr(0, 64);
-            const s = '0x' + rsv.substr(64, 64);
-            const v = '0x' + rsv.substr(128, 2);
-            await plasma.submitBlocksSigned(0, [1, 2, 3], r, s, v, { from: wallet1 });
+            const r = rsv.substr(0, 64);
+            const s = rsv.substr(64, 64);
+            const v = rsv.substr(128, 2);
+            await plasma.submitBlocksSigned(0, [1, 2, 3], '0x' + r + s + v, { from: wallet1 });
         }
 
         {
             const messageHash = web3.sha3('0x' + [2, 3, 4, 5].map(a => new BigNumber(a).toString(16, 64)).reduce((a, b) => a + b), { encoding: 'hex' });
             const rsv = await web3.eth.sign(_, messageHash).substr(2);
-            const r = '0x' + rsv.substr(0, 64);
-            const s = '0x' + rsv.substr(64, 64);
-            const v = '0x' + rsv.substr(128, 2);
-            await plasma.submitBlocksSigned(2, [3, 4, 5], r, s, v, { from: wallet2 });
+            const r = rsv.substr(0, 64);
+            const s = rsv.substr(64, 64);
+            const v = rsv.substr(128, 2);
+            await plasma.submitBlocksSigned(2, [3, 4, 5], '0x' + r + s + v, { from: wallet2 });
         }
 
         {
             const messageHash = web3.sha3('0x' + [3, 4, 5, 6, 7].map(a => new BigNumber(a).toString(16, 64)).reduce((a, b) => a + b), { encoding: 'hex' });
             const rsv = await web3.eth.sign(_, messageHash).substr(2);
-            const r = '0x' + rsv.substr(0, 64);
-            const s = '0x' + rsv.substr(64, 64);
-            const v = '0x' + rsv.substr(128, 2);
-            await plasma.submitBlocksSigned(3, [4, 5, 6, 7], r, s, v, { from: wallet3 });
+            const r = rsv.substr(0, 64);
+            const s = rsv.substr(64, 64);
+            const v = rsv.substr(128, 2);
+            await plasma.submitBlocksSigned(3, [4, 5, 6, 7], '0x' + r + s + v, { from: wallet3 });
         }
     });
 });
