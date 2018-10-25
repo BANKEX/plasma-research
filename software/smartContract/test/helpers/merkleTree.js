@@ -1,44 +1,40 @@
 const { keccak256, bufferToHex } = require('ethereumjs-util');
 
-let empty = keccak256('')
+const empty = keccak256('');
 
 class MerkleTree {
   constructor (elements) {
     // Create layers
-    elements = elements.map(el => keccak256(el))
+    elements = elements.map(el => keccak256(el));
     this.layers = this.getLayers(elements);
   }
 
   getLayers (elements) {
-    var emptyLeveled = keccak256('');
+    let emptyLeveled = empty;
     if (elements.length & 1 == 1) {
-      elements.push(emptyLeveled)
+      elements.push(emptyLeveled);
     }
 
-    let n = elements.length
-    var tree = [elements]
-    let maxLevel = 31
+    const tree = [elements];
+    const maxLevel = 31;
     for (let level = 1; level <= maxLevel; level++) {
-        var current = []
-        for (let i = 0; i < tree[level-1].length / 2; i++) {
-          let a = tree[level-1][i*2]
-          let b = tree[level-1][i*2+1]
-          if (!b) {
-            b = keccak256(Buffer.concat([emptyLeveled, emptyLeveled]))
-          }
-          let hash = keccak256(Buffer.concat([a, b]))
-          current.push(hash)
-        }
-
-        if (current.length & 1 && level != maxLevel) {
-          current.push(emptyLeveled)
-        }
-        emptyLeveled = keccak256(Buffer.concat([emptyLeveled, emptyLeveled]))
-
-        tree.push(current)
+      const current = [];
+      for (let i = 0; i < tree[level - 1].length / 2; i++) {
+        const a = tree[level - 1][i*2];
+        const b = tree[level - 1][i*2 + 1];
+        const hash = keccak256(Buffer.concat([a, b]));
+        current.push(hash);
       }
-      return tree;
+
+      if (current.length & 1 && level < maxLevel) {
+        current.push(emptyLeveled);
+      }
+      emptyLeveled = keccak256(Buffer.concat([emptyLeveled, emptyLeveled]));
+
+      tree.push(current);
     }
+    return tree;
+  }
 
   getRoot () {
     return this.layers[this.layers.length - 1][0];
