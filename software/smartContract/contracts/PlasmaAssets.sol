@@ -13,11 +13,29 @@ contract PlasmaAssets {
     address constant public MAIN_COIN_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
     address private _expectedAssetId;
+    mapping (address => bytes32[]) private _allDepositHashes;
 
     event AssetDeposited(
         address indexed token,
         address indexed who,
         uint256 amount
+    );
+
+    event CoinDeposited(
+        address indexed who,
+        uint256 amount
+    );
+
+    event ERC20Deposited(
+        address indexed token,
+        address indexed who,
+        uint256 amount
+    );
+
+    event ERC721Deposited(
+        address indexed token,
+        address indexed who,
+        uint256 indexed tokenId
     );
 
     function calculateAssetId(address token, uint256 tokenId) public pure returns(address) {
@@ -27,7 +45,10 @@ contract PlasmaAssets {
     // Deposits
 
     function deposit() public payable {
+        emit CoinDeposited(msg.sender, msg.value);
         emit AssetDeposited(MAIN_COIN_ADDRESS, msg.sender, msg.value);
+        bytes32 hash = keccak256(abi.encodePacked(msg.sender, msg.value));
+        _allDepositHashes[msg.sender].push(hash);
     }
 
     function depositERC20(IERC20 token, uint256 amount) public {
@@ -35,16 +56,22 @@ contract PlasmaAssets {
         token.safeTransferFrom(msg.sender, this, amount);
         uint256 deposited = token.balanceOf(this).sub(preBalance);
 
+        emit ERC20Deposited(token, msg.sender, deposited);
         emit AssetDeposited(token, msg.sender, deposited);
+        bytes32 hash = keccak256(abi.encodePacked(token, msg.sender, deposited));
+        _allDepositHashes[msg.sender].push(hash);
     }
 
-    function depositERC721(IERC721 token, uint256 tokenId) public payable {
+    function depositERC721(IERC721 token, uint256 tokenId) public {
         address assetId = calculateAssetId(token, tokenId);
         _expectedAssetId = assetId;
         token.safeTransferFrom(msg.sender, this, tokenId);
         require(_expectedAssetId == address(0), "ERC721 token not received");
 
+        emit ERC721Deposited(token, msg.sender, tokenId);
         emit AssetDeposited(assetId, msg.sender, tokenId);
+        bytes32 hash = keccak256(abi.encodePacked(assetId, token, msg.sender, tokenId));
+        _allDepositHashes[msg.sender].push(hash);
     }
 
     function onERC721Received(
