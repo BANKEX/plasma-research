@@ -19,7 +19,7 @@ library MerkleProof {
     * @param root Merkle root
     * @param leaf Leaf of Merkle tree
     */
-    function verify(
+    function verifyAtIndex(
         bytes32[] proof,
         bytes32 root,
         bytes32 leaf,
@@ -56,7 +56,7 @@ library MerkleProof {
     * @param root Merkle root
     * @param leaf Leaf of Merkle tree
     */
-    function verify160(
+    function verifyAtIndex160(
         bytes proof, 
         address root, 
         address leaf,

@@ -17,7 +17,7 @@ function ds (size) {
         for (let i = 0; i < size; i += 1) {
             const proof = merkleTree.getHexProof(i);
             const leaf = bufferToHex(merkleTree.layers[0][i]);
-            (await this.merkleProof.verify(proof, root, leaf, i)).should.equal(true);
+            (await this.merkleProof.verifyAtIndex(proof, root, leaf, i)).should.equal(true);
         }
     });
 }
@@ -27,7 +27,7 @@ contract('MerkleProof', function () {
         this.merkleProof = await MerkleProofWrapper.new();
     });
 
-    describe('verify', function () {
+    describe('verifyAtIndex', function () {
         for (let i = 1; i < 32; i += 1) {
             ds(i);
         }
@@ -45,7 +45,7 @@ contract('MerkleProof', function () {
 
             const badProof = badMerkleTree.getHexProof(badElements[0]);
 
-            (await this.merkleProof.verify(badProof, correctRoot, correctLeaf, 0)).should.equal(false);
+            (await this.merkleProof.verifyAtIndex(badProof, correctRoot, correctLeaf, 0)).should.equal(false);
         });
 
         it('should return false for a Merkle proof of invalid length', async function () {
@@ -59,7 +59,7 @@ contract('MerkleProof', function () {
 
             const leaf = bufferToHex(keccak256(elements[0]));
 
-            (await this.merkleProof.verify(badProof, root, leaf, 0)).should.equal(false);
+            (await this.merkleProof.verifyAtIndex(badProof, root, leaf, 0)).should.equal(false);
         });
     });
 });
