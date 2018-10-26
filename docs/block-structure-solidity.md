@@ -3,7 +3,7 @@
 Cut hashes up to 160 bits. It provides us 80bit reliability.
 
 ```solidity
-record MerkleProof {
+struct MerkleProof {
     uint160 from,
     bytes proof,
     uint index
@@ -28,7 +28,7 @@ So, maximal outputNumber is limited by 31 (must checked on the contract for inpu
 ``` leaf = keccak256(concat(datatype_byte, abi.encode(data)) ```
 
 
-### Simple exit challages
+### Simple exit challenges
 
 Use following requests:
 
