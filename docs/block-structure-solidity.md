@@ -35,9 +35,14 @@ Use following requests:
 ```
 
 struct SimpleExit {
-  Input point,
-  uint SFT 
+  Input point
 }
+
+struct ExitQueueItem {
+  uint160 exitHash,
+  uint SFT
+}
+
 
 function withdrawal(Input point, address queuePtr) external payable returns (bool);
 
