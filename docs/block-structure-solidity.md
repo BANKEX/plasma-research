@@ -18,7 +18,7 @@ Use following structure of transactions:
 
 1. 32 bits for  block to tx merkle proof
 1. 1 bit for tx netto proof (must be zero for outputs, inputs, max_blockid and must be one for signatures)
-1. 5 bits for merkle proof for outputs, inputs and max_block_id or for signatures.
+1. 5 bits for merkle proof for outputs, inputs and max_block_id
 1. 3 bits for merkle proof for signatures.
 
 So, maximal outputNumber is limited by 31 (must checked on the contract for input structures).
