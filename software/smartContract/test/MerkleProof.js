@@ -34,7 +34,8 @@ function verifyTree160 (size) {
         for (let i = 0; i < size; i += 1) {
             var proof = merkleTree.getProof(i);
             proof = bufferToHex(Buffer.concat(proof));
-            const leaf = bufferToHex(merkleTree.layers[0][i]);erkleProof.verifyAtIndex160(proof, root, leaf, i)).should.equal(true);
+            const leaf = bufferToHex(merkleTree.layers[0][i]);
+            (await this.merkleProof.verifyAtIndex160(proof, root, leaf, i)).should.equal(true);
         }
     });
 }
