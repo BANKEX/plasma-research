@@ -22,7 +22,7 @@ contract PlasmaBlocks is Ownable {
 
     function submitBlocks(
         uint256 fromIndex,
-        address[] newBlocks,
+        bytes newBlocks,
         uint256 protectedBlockNumber,
         address protectedBlockHash
     )
@@ -35,7 +35,7 @@ contract PlasmaBlocks is Ownable {
 
     function submitBlocksSigned(
         uint256 fromIndex,
-        address[] newBlocks,
+        bytes newBlocks,
         uint256 protectedBlockNumber,
         address protectedBlockHash,
         bytes rsv
@@ -58,27 +58,37 @@ contract PlasmaBlocks is Ownable {
 
     function _submitBlocks(
         uint256 fromIndex,
-        address[] newBlocks,
+        bytes newBlocks,
         uint256 protectedBlockNumber,
         address protectedBlockHash
     )
         internal
         returns(uint256)
     {
+        uint256 newBlocksLength = newBlocks.length / 20;
+
         require(fromIndex == _blocks.length, "Invalid fromIndex");
         require(fromIndex == 0 || _blocks[protectedBlockNumber] == protectedBlockHash, "Wrong protected block number");
 
         uint256 begin = _blocks.length.sub(fromIndex);
-        _blocks.length = fromIndex.add(newBlocks.length);
-        for (uint i = begin; i < newBlocks.length; i++) {
-            _blocks[fromIndex + i] = newBlocks[i];
+        _blocks.length = fromIndex.add(newBlocksLength);
+        for (uint i = begin; i < newBlocksLength; i++) {
+            address newBlock;
+            uint256 offset = 32 + i * 20;
+            // solium-disable-next-line security/no-inline-assembly
+            assembly {
+                // Load the current element of the proof
+                newBlock := div(mload(add(newBlocks, offset)), 0x1000000000000000000000000)
+            }
+
+            _blocks[fromIndex + i] = newBlock;
         }
 
-        if (begin < newBlocks.length) {
+        if (begin < newBlocksLength) {
             // solium-disable-next-line security/no-block-members
             emit BlocksSubmitted(_blocks.length, block.timestamp);
         }
 
-        return newBlocks.length - begin;
+        return newBlocksLength - begin;
     }
 }
