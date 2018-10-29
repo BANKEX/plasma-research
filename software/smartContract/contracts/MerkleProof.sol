@@ -57,11 +57,11 @@ library MerkleProof {
     * @param leaf Leaf of Merkle tree
     */
     function verifyAtIndex160(
-        bytes proof, 
-        address root, 
+        bytes proof,
+        address root,
         address leaf,
         uint256 index
-    ) 
+    )
         internal
         pure
         returns (bool)

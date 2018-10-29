@@ -1,14 +1,19 @@
 const { keccak256, bufferToHex } = require('ethereumjs-util');
 
-class MerkleTree {
+
+function keccak160(element) {
+  return keccak256(element).slice(12,32)
+}
+
+class MerkleTree160 {
   constructor (elements) {
     // Create layers
-    elements = elements.map(el => keccak256(el));
+    elements = elements.map(el => keccak160(el));
     this.layers = this.getLayers(elements);
   }
 
   getLayers (elements) {
-    let emptyLeveled = keccak256('');
+    let emptyLeveled = keccak160('');
     if (elements.length & 1 == 1) {
       elements.push(emptyLeveled);
     }
@@ -20,14 +25,14 @@ class MerkleTree {
       for (let i = 0; i < tree[level - 1].length / 2; i++) {
         const a = tree[level - 1][i*2];
         const b = tree[level - 1][i*2 + 1];
-        const hash = keccak256(Buffer.concat([a, b]));
+        const hash = keccak160(Buffer.concat([a, b]));
         current.push(hash);
       }
 
       if (current.length & 1 && level < maxLevel) {
         current.push(emptyLeveled);
       }
-      emptyLeveled = keccak256(Buffer.concat([emptyLeveled, emptyLeveled]));
+      emptyLeveled = keccak160(Buffer.concat([emptyLeveled, emptyLeveled]));
 
       tree.push(current);
     }
@@ -76,7 +81,7 @@ class MerkleTree {
 
     // Convert element to 32 byte hash if it is not one already
     if (el.length !== 32 || !Buffer.isBuffer(el)) {
-      hash = keccak256(el);
+      hash = keccak160(el);
     } else {
       hash = el;
     }
@@ -100,5 +105,5 @@ class MerkleTree {
 }
 
 module.exports = {
-  MerkleTree,
+  MerkleTree160,
 };
