@@ -23,10 +23,6 @@ function verifyTree (size) {
     });
 }
 
-function layerMap(element, index, array) {
-  return `layer ${index}\n${element.map(bufferToHex).join(' ')}`
-}
-
 function verifyTree160 (size) {
     it(`should return true for a valid Merkle proof with ${size} elements`, async function () {
         const elements = [];
@@ -37,20 +33,8 @@ function verifyTree160 (size) {
         const root = merkleTree.getHexRoot();
         for (let i = 0; i < size; i += 1) {
             var proof = merkleTree.getProof(i);
-            proof = bufferToHex(Buffer.concat(proof))
-            const leaf = bufferToHex(merkleTree.layers[0][i]);
-//             console.log(`
-// layers:
-// ${merkleTree.layers.map(layerMap).join('\n')}
-//
-// proof:
-// ${proof}
-// leaf:
-// ${leaf}
-// root:
-// ${root}
-//               `);
-            (await this.merkleProof.verifyAtIndex160(proof, root, leaf, i)).should.equal(true);
+            proof = bufferToHex(Buffer.concat(proof));
+            const leaf = bufferToHex(merkleTree.layers[0][i]);erkleProof.verifyAtIndex160(proof, root, leaf, i)).should.equal(true);
         }
     });
 }
