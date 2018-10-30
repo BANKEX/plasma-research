@@ -33,7 +33,7 @@ Transaction RLP encoded object that has a standard structure in terms of UTXO mo
     signatures (array of signatures)
 }
 ```
-Note: Lenght of signatures array must be equal to 1 or two. A single transaction can't include inputs from more than two different owners.
+Note: length of signatures array must be equal to 1 or two. A single transaction can't include inputs from more than two different owners.
 
 #### UnsignedTransactionContent
 ```
