@@ -52,7 +52,7 @@ contract('MerkleProof', function () {
 
         it('should return false for an invalid Merkle proof', async function () {
             const correctElements = ['a', 'b', 'c'];
-            const correctMerkleTree = new MerkleTree160(correctElements);
+            const correctMerkleTree = new MerkleTree(correctElements, keccak160);
 
             const correctRoot = correctMerkleTree.getHexRoot();
 
@@ -68,7 +68,7 @@ contract('MerkleProof', function () {
 
         it('should return false for a Merkle proof of invalid length', async function () {
             const elements = ['a', 'b', 'c'];
-            const merkleTree = new MerkleTree160(elements);
+            const merkleTree = new MerkleTree(elements, keccak160);
 
             const root = merkleTree.getHexRoot();
 
