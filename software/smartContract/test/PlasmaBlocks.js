@@ -239,8 +239,8 @@ contract('PlasmaBlocks', function ([_, wallet1, wallet2, wallet3, wallet4, walle
 
     {
       const messageHash = web3.sha3(
-          '0x' + to256bits([0]) + to160bits([1, 2, 3]) + to256bits([0]) + to160bits([0]),
-          { encoding: 'hex' }
+        '0x' + to256bits([0]) + to160bits([1, 2, 3]) + to256bits([0]) + to160bits([0]),
+        { encoding: 'hex' }
       );
       const rsv = await web3.eth.sign(_, messageHash);
       await plasma.submitBlocksSigned(0, '0x' + to160bits([1, 2, 3]), 0, 0, rsv, { from: wallet1 });
@@ -248,8 +248,8 @@ contract('PlasmaBlocks', function ([_, wallet1, wallet2, wallet3, wallet4, walle
 
     {
       const messageHash = web3.sha3(
-          '0x' + to256bits([3]) + to160bits([4]) + to256bits([2]) + to160bits([3]),
-          { encoding: 'hex' }
+        '0x' + to256bits([3]) + to160bits([4]) + to256bits([2]) + to160bits([3]),
+        { encoding: 'hex' }
       );
       const rsv = await web3.eth.sign(_, messageHash);
       await plasma.submitBlocksSigned(3, '0x' + to160bits([4]), 2, 3, rsv, { from: wallet2 });
@@ -257,8 +257,8 @@ contract('PlasmaBlocks', function ([_, wallet1, wallet2, wallet3, wallet4, walle
 
     {
       const messageHash = web3.sha3(
-          '0x' + to256bits([4]) + to160bits([5, 6, 7]) + to256bits([3]) + to160bits([4]),
-          { encoding: 'hex' }
+        '0x' + to256bits([4]) + to160bits([5, 6, 7]) + to256bits([3]) + to160bits([4]),
+        { encoding: 'hex' }
       );
       const rsv = await web3.eth.sign(_, messageHash);
       await plasma.submitBlocksSigned(4, '0x' + to160bits([5, 6, 7]), 3, 4, rsv, { from: wallet3 });
