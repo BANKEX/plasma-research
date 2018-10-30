@@ -16,6 +16,7 @@
     "eslint-plugin-standard": "^4.0.0",
     "ethereumjs-util": "^6.0.0",
     "ethjs-abi": "^0.2.1",
+    "ganache-cli": "^6.1.8",
     "openzeppelin-solidity": "^2.0.0",
     "solidity-coverage": "^0.5.11",
     "solidity-rlp": "^1.1.0",
@@ -25,7 +26,8 @@
     "web3-utils": "^1.0.0-beta.34"
   },
   "scripts": {
-    "test": "truffle test",
+    "test": "scripts/test.sh",
+    "coverage": "scripts/coverage.sh",
     "dist": "truffle-flattener ./contracts/PlasmaMain.sol | pbcopy",
     "lint:js": "eslint .",
     "lint:js:fix": "eslint . --fix",
@@ -33,7 +35,6 @@
     "lint:sol:fix": "solium -d . --fix",
     "lint": "npm run lint:js && npm run lint:sol",
     "lint:fix": "npm run lint:js:fix && npm run lint:sol:fix",
-    "coverage": "solidity-coverage",
     "rpc": "scripts/rpc.sh"
   },
   "repository": {

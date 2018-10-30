@@ -10,12 +10,7 @@ node_js:
 before_install:
   - cd ./software/smartContract
 install:
-  - npm install -g truffle
-  - npm install -g ganache-cli
   - npm install
-before_script:
-  - scripts/rpc.sh > /dev/null &
-  - sleep 5
 script:
   - npm run lint
   - npm run test
