@@ -68,11 +68,7 @@ library Uint2048 {
   }
 
   function sub(uint256[LEN] a, uint256[LEN] b) internal pure returns(uint256[LEN] c) {
-    //return a.add(b.inverted().incremented());
-    c[0] = a[0] - b[0];
-    for (uint i = 1; i < LEN; i++) {
-      c[i] = a[i] - b[i] - (a[i - 1] < c[i - 1] ? 1 : 0);
-    }
+    return a.add(b.inverted().incremented());
   }
 
   function mul(uint256[LEN] a, uint256[LEN] b) internal pure returns(uint256[LEN] c) {
