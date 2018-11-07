@@ -6,10 +6,10 @@ function uint2048 (string) {
   for (var i = 0; i < 512; i += 64) {
     array.push('0x' + string.substr(i, 64));
   }
-  return array;
+  return array.reverse();
 }
 function string (uint2048) {
-  return uint2048.map(bnToHex).join('');
+  return uint2048.map(bnToHex).reverse().join('');
 }
 function bnToHex (n) {
   return n.toString(16).padStart(64, '0');
