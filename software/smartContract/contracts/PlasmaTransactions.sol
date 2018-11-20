@@ -38,9 +38,9 @@ library PlasmaTransactions {
   }
 
   struct MerkleProof {
-    bytes32[] proof;
-    bytes32 root;
-    bytes32 leaf;
+    bytes proof;
+    address root;
+    address leaf;
     uint256 index;
   }
 
@@ -96,7 +96,7 @@ library PlasmaTransactions {
   }
 
   function _verifyMerkleProof(MerkleProof p) private pure returns(bool) {
-    return MerkleProofLib.verifyAtIndex(p.proof, p.root, p.leaf, p.index);
+    return MerkleProofLib.verifyAtIndex160(p.proof, p.root, p.leaf, p.index);
   }
 
   function _validateInput(Input memory input) private pure returns(bool) {

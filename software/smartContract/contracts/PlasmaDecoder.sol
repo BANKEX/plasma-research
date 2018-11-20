@@ -125,9 +125,9 @@ library PlasmaDecoder {
 
   function _decodeMerkleProof(RLPReader.RLPItem[] memory items) private pure returns(Tx.MerkleProof) {
     return Tx.MerkleProof({
-      proof: _decodeBytes32(items[0].toList()),
-      root: _bytesToBytes32(items[1].toBytes()),
-      leaf: _bytesToBytes32(items[2].toBytes()),
+      proof: items[0].toBytes(),
+      root: items[1].toAddress(),
+      leaf: items[2].toAddress(),
       index: uint256(items[3].toUint())
     });
   }
@@ -135,17 +135,8 @@ library PlasmaDecoder {
   function _decodeBytes32(RLPReader.RLPItem[] memory items) private pure returns(bytes32[]) {
     bytes32[] memory bytesArray = new bytes32[](items.length);
     for (uint i = 0; i < items.length; i++) {
-      bytesArray[i] = _bytesToBytes32(items[i].toBytes());
+      bytesArray[i] = bytes32(items[i].toUint());
     }
-  }
-
-  function _bytesToBytes32(bytes b) private pure returns (bytes32) {
-    bytes32 out;
-
-    for (uint i = 0; i < 32; i++) {
-      out |= bytes32(b[i] & 0xFF) >> (i * 8);
-    }
-    return out;
   }
 
   function _decodeBlock(RLPReader.RLPItem[] memory items) private pure returns(Block) {
