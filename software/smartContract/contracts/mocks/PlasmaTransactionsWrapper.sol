@@ -4,16 +4,15 @@ import { PlasmaTransactions as Tx } from "../PlasmaTransactions.sol";
 
 contract PlasmaTransactionsWrapper {
 
-  // function validateTransaction(
-  //   bytes32[] proof,
-  //   bytes32 root,
-  //   bytes32 leaf,
-  //   uint256 index
-  // )
-  //   public
-  //   pure
-  //   returns (bool)
-  // {
-  //   return MerkleProof.verifyAtIndex(proof, root, leaf, index);
-  // }
+  function validateTransaction(bytes rlpTransaction) public pure returns(bool) {
+    return Tx.validateTransaction(rlpTransaction);
+  }
+
+  function validateInputOutput(bytes rlpInputOutput) public pure returns(bool) {
+    return Tx.validateInputOutput(rlpInputOutput);
+  }
+
+  function verifyMerkleProof(bytes rlpMerkleProof) public pure returns(bool) {
+    return Tx.verifyMerkleProof(rlpMerkleProof);
+  }
 }

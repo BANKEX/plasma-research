@@ -74,7 +74,7 @@ library PlasmaTransactions {
     return true;
   }
 
-  function validateInputOutput(bytes memory rlpInputOutput, bytes memory rlpMerkleProof) internal pure returns (bool) {
+  function validateInputOutput(bytes memory rlpInputOutput) internal pure returns (bool) {
     uint size = PlasmaDecoder.rlpItemSize(rlpInputOutput);
     require(size == 5 || size == 2, "Wrong input/output size");
 
@@ -87,7 +87,10 @@ library PlasmaTransactions {
       output = PlasmaDecoder.decodeOutput(rlpInputOutput);
       _validateOutput(output);
     }
+    return true;
+  }
 
+  function verifyMerkleProof(bytes memory rlpMerkleProof) internal pure returns(bool) {
     MerkleProof memory proof = PlasmaDecoder.decodeMerkleProof(rlpMerkleProof);
     return _verifyMerkleProof(proof);
   }
