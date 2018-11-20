@@ -1,5 +1,5 @@
-const PlasmaBlocks = artifacts.require('PlasmaBlocks');
+const BankexPlasma = artifacts.require('BankexPlasma');
 
 module.exports = async function (deployer) {
-  deployer.deploy(PlasmaBlocks);
+  deployer.deploy(BankexPlasma);
 };
