@@ -126,6 +126,26 @@ require('chai')
 
         })
 
+        it('should find previous element on insert if hole size more than 1', async function () {
+            await this.orderedList.append(0, 100);
+            await this.orderedList.append(100, 200);   
+            await this.orderedList.append(200, 300);  
+            await this.orderedList.append(400, 500);
+
+            await this.orderedList.remove(1)
+            await this.orderedList.remove(2)
+
+         
+            assertRevert(this.orderedList.set(2, 99, 110));
+            await this.orderedList.set(2, 101, 110);
+
+            var interval = await this.orderedList.get(2);
+            interval[0].should.be.bignumber.equal(101);
+            interval[1].should.be.bignumber.equal(110);
+
+
+        })
+
     })
 
 

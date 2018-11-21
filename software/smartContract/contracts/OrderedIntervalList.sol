@@ -48,13 +48,13 @@ library OrderedIntervalList {
         require(_begin < _end, "right bound greater than left bound");      
         require(_index <= self.intervals.length, "valid index bounds");
         uint prev = 0;
-        uint prevIndex = 0;
+        uint prevIndex = _index;
         uint next = 0;
         uint nextRawIndex = _index + 1;
         
         
-        if (_index > 0) {
-            prevIndex = _index - 1;
+        while(prevIndex > 0 && prev == 0) {
+            prevIndex = prevIndex - 1;
             prev = self.intervals[prevIndex].end;
         }        
         
