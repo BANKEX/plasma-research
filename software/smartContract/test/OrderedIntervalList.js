@@ -13,17 +13,15 @@ require('chai')
   contract('OrderedIntervalList', function () {
       beforeEach(async function() {
           this.orderedList = await OrderedIntervalList.new()
-      });      
+      });          
 
       describe('insert', function () {
-        it('check init state' , async function () {
-            
+        it('check init state' , async function () {            
             
             assertRevert(this.orderedList.get(0))      
             assertRevert(this.orderedList.get(1));
-            assertRevert(this.orderedList.get(-1));   
-
-
+            assertRevert(this.orderedList.get(-1));
+            
         })
 
         it('insert one', async function() {
@@ -65,23 +63,30 @@ require('chai')
             const interval = await this.orderedList.get(2);
             interval[0].should.be.bignumber.equal(200);
             interval[1].should.be.bignumber.equal(300);     
+
+            // zero interval size
+            assertRevert(this.orderedList.append(300, 300))
+            // begin and end swapped
+            assertRevert(this.orderedList.append(305, 302))
+
             
             
         })
     })
 
+      
     describe('remove', function () {
         it('check init state' , async function () {
             
             
-            this.orderedList.remove(0)
-            this.orderedList.remove(1);
-            this.orderedList.remove(-1);   
+           assertRevert(this.orderedList.remove(0));
+           assertRevert(this.orderedList.remove(1));
+           assertRevert(this.orderedList.remove(-1));   
 
 
         })
 
-        it('remove one', async function() {
+         it('remove one', async function() {
             await this.orderedList.append(0, 100);
             await this.orderedList.remove(0);      
             
@@ -91,7 +96,9 @@ require('chai')
             interval[1].should.be.bignumber.equal(0);
 
             (await this.orderedList.getSize()).should.be.bignumber.equal(1);
-        })
+        })       
+        
+
 
         it('make and fill hole', async function() {
             await this.orderedList.append(0, 100);
@@ -120,5 +127,9 @@ require('chai')
         })
 
     })
+
+
+
+   
 
   })
