@@ -8,84 +8,175 @@ library OrderedIntervalList {
     struct Interval {
         uint64 begin; // inclusive
         uint64 end; // exclusive
+
+        uint64 next;  
+        uint64 previous;
     }
     struct Data {
-        Interval[] intervals;
+        //Interval[] intervals;
+        mapping (uint64 => Interval) intervals;
+        uint64 first;
+        uint64 index;
     }
 
-    function getSize(Data storage self) internal view returns(uint256 size) {
-        return self.intervals.length;
-    }
+  
 
     /**
     @notice Get interval by list index
-    @param _index interval index in list
+    @param id interval index in list
     @return interval tuple
      */
-    function get(Data storage self, uint _index) internal view returns(uint64 begin, uint64 end) {
-        require(self.intervals.length > 0 && _index < self.intervals.length, "check list is non empty and index have proper bounds");
-        Interval memory interval = self.intervals[_index];        
-        return (interval.begin, interval.end);    
-    }
+    function get(Data storage self, uint64 id) internal view returns(Interval storage interval) {
+        require(id <= self.index, "interval id doesn't exists in interval set");        
+        interval = self.intervals[id];    
+        require(interval.end != 0, "interval id doesn't exsits in interval set");    
+        return interval;
+    }  
 
-    /**
-    @notice Append interval to the end of list
-    @param _begin left bound of interval (inclusive)
-    @param _end right bound of interval (exclusive)    
-     */
-    function append(Data storage self, uint64 _begin, uint64 _end) internal {       
-        insert(self, self.intervals.length, _begin, _end);
-    }
+    
 
     /**
     @notice Insert interval by specific index in list
     @dev Method also check that new interval doesn't intersect with existed intervals in list
-    @param _index target index in list
-    @param _begin left bound of interval (inclusive)
-    @param _end right bound of interval (exclusive)        
+    @param prev previous index
+    @param next next index
+    @param begin left bound of interval (inclusive)
+    @param end right bound of interval (exclusive)        
      */
-    function insert(Data storage self, uint256 _index, uint64 _begin, uint64 _end) internal {
-        require(_begin < _end, "right bound greater than left bound");      
-        require(_index <= self.intervals.length, "valid index bounds");
-        uint prev = 0;
-        uint prevIndex = _index;
-        uint next = 0;
-        uint nextRawIndex = _index + 1;
+    function insert(Data storage self, uint64 prev, uint64 next, uint64 begin, uint64 end) internal returns(uint64 id) {
+        require(begin < end, "right bound less than left bound");              
+       
+        bool concatLeft = false;
+        bool concatRight = false;
+        id = self.index + 1;
+        self.index = self.index + 1;
         
-        
-        while(prevIndex > 0 && prev == 0) {
-            prevIndex = prevIndex - 1;
-            prev = self.intervals[prevIndex].end;
-        }        
-        
-        nextRawIndex = _index + 1;        
-        while (nextRawIndex < self.intervals.length && next == 0) {
-            Interval memory nextEl = self.intervals[nextRawIndex];
-            if (nextEl.end != 0) {
-                next = nextEl.end;
-            }
-            nextRawIndex = nextRawIndex + 1;                        
-        }       
-
-        require((prev <= _begin || prev == 0) && (next == 0 || next >= _end), "valid interval bounds");
-
-        
-        if (_index == self.intervals.length) {
-            self.intervals.push(Interval({begin: _begin, end: _end}));
+        if (self.first == 0) { 
+            prev = 0;
+            next = 0;
+            self.first = id;
         } else {
-            require(self.intervals[_index].end == 0, "free slot exists");       
-            self.intervals[_index] = Interval({begin: _begin, end: _end});
+            require(prev > 0 || next > 0);
+            Interval storage prevInterval = self.intervals[prev];   
+            Interval storage nextInterval = self.intervals[next];        
+           
+            if (prev > 0 && next > 0) {
+                require(prevInterval.end != 0, "previous interval doesn't exists");     
+                require(nextInterval.end != 0, "next interval doesn't exists");       
+                require(
+                    prevInterval.end <= begin && nextInterval.begin >= end
+                );
+                if (prevInterval.end == begin) {
+                    concatLeft = true;               
+                    prevInterval.end = end;
+                }
+                if (nextInterval.begin == end) {
+                    concatRight = true;
+                    nextInterval.begin = begin;
+                }
+                if (! concatLeft && !concatRight ) {                
+
+                    nextInterval.previous = id;
+                    prevInterval.next = id;                  
+                }
+                if (concatLeft && concatRight) {
+                    prevInterval.end = nextInterval.end;
+                    prevInterval.next = nextInterval.next;                  
+                    delete self.intervals[next];
+                }
+            } else if (prev > 0 && next == 0) {
+                require(prevInterval.end != 0, "previous interval doesn't exists");     
+                require(prevInterval.next == 0, "previous element is not last element");
+                require(
+                    prevInterval.end <= begin
+                );
+
+                if (prevInterval.end == begin) {
+                    concatLeft = true;               
+                    prevInterval.end = end;
+                } else {
+                    prevInterval.next = id;
+                }
+            } else if (prev == 0 && next >= 0) {
+                require(nextInterval.end != 0, "next interval doesn't exists");     
+                require(nextInterval.previous == 0, "next element is not first element");
+                require(
+                    nextInterval.begin >= end
+                );
+                if (nextInterval.begin == end) {
+                    concatRight = true;
+                    nextInterval.begin = begin;
+                } else {
+                    self.first = id;
+                    nextInterval.previous = id;
+                }
+                
+            }
         }
-        
+ 
+        if (! concatRight && ! concatLeft) {
+            self.index = id;
+            self.intervals[id] = Interval({begin: begin, end: end, previous: prev, next: next});   
+        } else {
+            
+            if (concatLeft) {                
+                id = prev;
+            } else{          
+                if (concatRight) {      
+                    id = next;
+                }
+            }            
+        }        
+      
     } 
 
     /**
         @notice Remove interval by index
-        @param _index interval index in list        
+        @param index interval index in list        
+        @param begin left bound
+        @param end right bound
      */
-    function remove(Data storage self, uint64 _index) internal {
-        require(_index < self.intervals.length, "valid index bounds");
-        delete self.intervals[_index];        
+    function remove(Data storage self, uint64 index, uint64 begin, uint64 end) internal returns (uint64 newInterval) {
+        require(begin < end, "right bound less than left bound");        
+        require(index <= self.index, "valid index bounds");
+        
+
+        Interval storage modifiedInterval = self.intervals[index];        
+        require(modifiedInterval.end != 0, "removed interval doesn't exists");
+        require(modifiedInterval.begin <= begin && modifiedInterval.end >= end, "incorrect removed range bounds");
+
+        if (begin > modifiedInterval.begin ) {
+
+            uint64 oldEnd = modifiedInterval.end;
+            modifiedInterval.end = begin;
+            if (end < oldEnd) {
+                newInterval = insert(self, index, modifiedInterval.next, end, oldEnd);
+                modifiedInterval.next = newInterval;
+            } 
+
+        } else {
+            modifiedInterval.begin = end;
+        }
+
+        if (modifiedInterval.begin == modifiedInterval.end) {         
+            if (modifiedInterval.previous > 0) {
+                Interval storage prevInterval = self.intervals[modifiedInterval.previous];   
+                prevInterval.next = modifiedInterval.next;
+            }
+            if (modifiedInterval.next > 0) {
+                Interval storage nextInterval = self.intervals[modifiedInterval.next];                
+                nextInterval.previous = modifiedInterval.previous;
+            }
+            if (modifiedInterval.previous == 0) {
+                self.first = modifiedInterval.next;
+            }  
+            
+            delete self.intervals[index];
+        }
+
+
+       
+
     }    
     
 }
