@@ -28,10 +28,10 @@ async function validateList (listContract, size) {
     let previousIndex = await listContract.getPrevious.call(curIndex);
     let currentInterval = await listContract.get.call(curIndex);
     list.push('[' + currentInterval[0].toString() + ',' + currentInterval[1].toString() + ')');
-      
+
     if (nextIndex > 0) {
       let next = await listContract.get.call(nextIndex);
-          
+
       assert(next[0] >= currentInterval[1]);
     }
 
@@ -47,7 +47,7 @@ async function validateList (listContract, size) {
   list.push('[' + currentInterval[0].toString() + ',' + currentInterval[1].toString() + ')');
   //   console.log(list)
   assert((await listContract.getNext.call(curIndex)).equals(new BigNumber(0)));
-   
+
   currentInterval = await listContract.get.call(curIndex);
 
   (await listContract.getNext.call(curIndex)).should.be.bignumber.equal(0);
@@ -95,7 +95,7 @@ contract('OrderedIntervalList', function () {
     it('insert error', async function () {
       await this.orderedList.set(0, 0, 0, 100);
       await this.orderedList.set(1, 0, 101, 200);
-            
+
       // already inserted position
       await this.orderedList.set(2, 0, 100, 200).should.rejectedWith(EVMRevert);
 
@@ -103,7 +103,7 @@ contract('OrderedIntervalList', function () {
       await this.orderedList.set(1, 2, 150, 200).should.rejectedWith(EVMRevert);
 
       await this.orderedList.set(2, 0, 201, 300);
-            
+
       const interval = await this.orderedList.get(3);
       interval[0].should.be.bignumber.equal(201);
       interval[1].should.be.bignumber.equal(300);
@@ -116,18 +116,18 @@ contract('OrderedIntervalList', function () {
       await validateList(this.orderedList, 3);
     });
   });
-      
+
   describe('remove', function () {
     it('check init state', async function () {
       await this.orderedList.remove(0, 0, 100).should.rejectedWith(EVMRevert);
       await this.orderedList.remove(1, 0, 100).should.rejectedWith(EVMRevert);
       await this.orderedList.remove(-1, 0, 100).should.rejectedWith(EVMRevert);
     });
-      
+
     it('full remove one element', async function () {
       await this.orderedList.set(0, 0, 0, 100);
       await this.orderedList.remove(1, 0, 100);
-            
+
       await this.orderedList.get(1).should.rejectedWith(EVMRevert);
 
       await validateList(this.orderedList, 0);
@@ -137,11 +137,11 @@ contract('OrderedIntervalList', function () {
       await this.orderedList.set(0, 0, 0, 100);
       await validateList(this.orderedList, 1);
     });
-        
+
     it('make hole inside interval', async function () {
       await this.orderedList.set(0, 0, 0, 100);
       await this.orderedList.remove(1, 50, 70);
-            
+
       let interval = await this.orderedList.get(1);
 
       interval[0].should.be.bignumber.equal(0);
@@ -168,7 +168,7 @@ contract('OrderedIntervalList', function () {
       await this.orderedList.get(2).should.be.rejectedWith(EVMRevert);
 
       await this.orderedList.set(1, 3, 101, 150);
-            
+
       let interval = await this.orderedList.get(4);
 
       interval[0].should.be.bignumber.equal(101);
@@ -243,9 +243,9 @@ contract('OrderedIntervalList', function () {
 
       await this.orderedList.set(1, 2, 100, 101);
       await this.orderedList.set(1, 3, 200, 201);
-           
+
       await validateList(this.orderedList, 1);
-           
+
       await this.orderedList.set(1, 0, 300, 400);
       const id = await this.orderedList.lastInserted.call();
       const interval = await this.orderedList.get(id);
