@@ -4,7 +4,6 @@ const { MerkleTree, keccak160 } = require('./helpers/merkleTree.js');
 const { expectThrow } = require('./helpers/expectThrow');
 
 const PlasmaTransactionsWrapper = artifacts.require('PlasmaTransactionsWrapper');
-const MerkleProofWrapper = artifacts.require('MerkleProofWrapper');
 
 require('chai')
   .should();
@@ -12,18 +11,16 @@ require('chai')
 contract('PlasmaTransactions', (accounts) => {
   let toHex = (buf) => {
     buf = buf.toString('hex');
-    if (buf.substring(0, 2) == "0x")
-        return buf;
-    return "0x" + buf.toString("hex");
+    if (buf.substring(0, 2) === '0x') {
+      return buf;
+    }
+    return '0x' + buf.toString('hex');
   };
 
   let plasmaTransactions;
-  let merkleProofWrapper;
-
 
   before('before', async () => {
     plasmaTransactions = await PlasmaTransactionsWrapper.deployed();
-    merkleProofWrapper = await MerkleProofWrapper.deployed();
   });
 
   describe('validateTransaction', () => {
@@ -31,17 +28,17 @@ contract('PlasmaTransactions', (accounts) => {
       let tx = [
         [
           [accounts[0], 1, 1, 0, [2, 3]],
-          [accounts[1], 1, 1, 1, [2, 3]]
+          [accounts[1], 1, 1, 1, [2, 3]],
         ],
         [
           [accounts[0], [2, 3]],
-          [accounts[1], [2, 3]]
+          [accounts[1], [2, 3]],
         ],
         1,
         [
           [1, 2, 3],
-          [4, 5, 6]
-        ]
+          [4, 5, 6],
+        ],
       ];
       tx = toHex(rlp.encode(tx));
       (await plasmaTransactions.validateTransaction(tx)).should.equal(true);
@@ -52,17 +49,17 @@ contract('PlasmaTransactions', (accounts) => {
         [
           [accounts[0], 1, 1, 0, [2, 3]],
           [accounts[1], 1, 1, 1, [2, 3]],
-          [accounts[1], 1, 1, 1, [2, 3]]
+          [accounts[1], 1, 1, 1, [2, 3]],
         ],
         [
           [accounts[0], [2, 3]],
-          [accounts[1], [2, 3]]
+          [accounts[1], [2, 3]],
         ],
         1,
         [
           [1, 2, 3],
-          [4, 5, 6]
-        ]
+          [4, 5, 6],
+        ],
       ];
       tx = toHex(rlp.encode(tx));
       await expectThrow(plasmaTransactions.validateTransaction(tx));

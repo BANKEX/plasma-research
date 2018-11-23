@@ -6,7 +6,7 @@ const PlasmaTransactions = artifacts.require('PlasmaTransactions');
 const PlasmaTransactionsWrapper = artifacts.require('PlasmaTransactionsWrapper');
 
 module.exports = deployer => {
-  deployer.then(async () => {
+  return deployer.then(async () => {
     await deployer.deploy(PlasmaBlocks);
     await deployer.deploy(MerkleProof);
     await deployer.deploy(MerkleProofWrapper);
@@ -14,4 +14,4 @@ module.exports = deployer => {
     await deployer.deploy(PlasmaTransactions);
     await deployer.deploy(PlasmaTransactionsWrapper);
   });
-}
+};
