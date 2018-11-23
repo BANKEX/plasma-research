@@ -14,9 +14,8 @@ contract OrderedIntervalListWrapper {
   }
 
   function first() public view returns(uint) {
-    return _data.first;
+    return _data.getFirst();
   }
-
   
   function get(uint index) public view returns(uint begin, uint end) {
 

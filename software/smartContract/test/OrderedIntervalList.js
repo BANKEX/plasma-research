@@ -92,6 +92,22 @@ contract('OrderedIntervalList', function () {
       await validateList(this.orderedList, 2);
     });
 
+    it('insert in front of list', async function() {
+      await this.orderedList.set(0, 0, 101, 200);
+      await this.orderedList.set(0, 1, 0, 100);
+
+      const intervalFirst = await this.orderedList.get(2);
+      const intervalSecond = await this.orderedList.get(1);
+
+      intervalFirst[0].should.be.bignumber.equal(0);
+      intervalFirst[1].should.be.bignumber.equal(100);
+      intervalSecond[0].should.be.bignumber.equal(101);
+      intervalSecond[1].should.be.bignumber.equal(200);
+
+      await validateList(this.orderedList, 2);
+
+    })
+
     it('insert error', async function () {
       await this.orderedList.set(0, 0, 0, 100);
       await this.orderedList.set(1, 0, 101, 200);
