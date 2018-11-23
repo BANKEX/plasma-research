@@ -2,7 +2,13 @@ const tbn = (x) => new BigNumber(x);
 const tw = (x) => BigNumber.isBigNumber(x) ? x.times(1e18).integerValue() : tbn(x).times(1e18).integerValue();
 const fw = (x) => BigNumber.isBigNumber(x) ? x.times(1e-18).toNumber() : tbn(x).times(1e-18).toNumber();
 
-const web3 =  new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:9545'));
+if (typeof window.web3 !== 'undefined') {
+    // Use Mist/MetaMask's provider
+    window.web3 = new Web3(web3.currentProvider);
+} else {
+    window.web3 =  new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:9545'));
+}
+
 
 async function get(instance, method, parameters) {
     return await instance.methods[method](...parameters).call();
@@ -25,6 +31,19 @@ async function signTransaction(privateKey, receiver, amount, transactionData) {
     tx.sign(privateKeyBuffer);
     const serializedTx = tx.serialize();
     return '0x' + serializedTx.toString('hex');
+}
+
+async function sendTransactionViaMetaMask(receiver, amount, transactionData) {
+    const txParam = {
+        to: receiver,
+        from: web3.eth.accounts.givenProvider.selectedAddress,
+        value: amount,
+        data: transactionData !== undefined ? transactionData : '',
+        gasPrice: await web3.eth.getGasPrice(),
+        gas: 210000
+    };
+
+    return await web3.eth.sendTransaction(txParam)
 }
 
 async function sendSignedTransaction(rawTransaction) {
