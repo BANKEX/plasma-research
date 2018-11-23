@@ -30,13 +30,10 @@ require('chai')
         previousIndex = await listContract.getPrevious.call(curIndex)
         currentInterval = await listContract.get.call(curIndex)
         list.push("[" + currentInterval[0].toString() + "," + currentInterval[1].toString() + ")")    
-        console.log(list)
       
         if (nextIndex > 0) {
             next = await listContract.get.call(nextIndex);
-            console.log(nextIndex.toString())
-            console.log(next[0].toString())
-            console.log(next[1].toString())
+          
             assert(next[0] >= currentInterval[1])
         }   
 
@@ -51,7 +48,7 @@ require('chai')
     }
     currentInterval = await listContract.get.call(curIndex)
     list.push("[" + currentInterval[0].toString() + "," + currentInterval[1].toString() + ")")    
-    console.log(list)
+ //   console.log(list)
     assert((await listContract.getNext.call(curIndex)).equals(new BigNumber(0)))
    
     currentInterval = await listContract.get.call(curIndex);
@@ -146,7 +143,7 @@ require('chai')
             await this.orderedList.set(0, 0, 0, 100);
             await this.orderedList.remove(1, 0, 100);      
             
-            assertRevert(this.orderedList.get(1));
+            this.orderedList.get(1).should.rejectedWith(EVMRevert);
             validateList(this.orderedList, 0);
 
             await this.orderedList.set(0, 0, 0, 100);
@@ -234,11 +231,10 @@ require('chai')
         })
 
 
-
     })
 
-    describe('remove and insert', function() {
-        it('concat intervals', async function() {
+    describe('merge intervals', function() {
+        it('full merge', async function() {
             await this.orderedList.set(0, 0, 0, 100);
             await this.orderedList.set(1, 0, 101, 200);      
             await this.orderedList.set(2, 0, 201, 300);
@@ -249,8 +245,73 @@ require('chai')
             await this.orderedList.set(1, 3, 200, 201)
            
             await validateList(this.orderedList, 1)
+           
+            await this.orderedList.set(1, 0, 300, 400)
+            id = await this.orderedList.lastInserted.call()
+            const interval = await this.orderedList.get(id)
+
+            interval[0].should.be.bignumber.equal(0);
+            interval[1].should.be.bignumber.equal(400);
+
+            await validateList(this.orderedList, 1)
 
         })
+
+        it('merge with previous interval', async function() {
+
+            await this.orderedList.set(0, 0, 0, 100);
+            await this.orderedList.set(1, 0, 200, 300);   
+            idCenter = await this.orderedList.lastInserted.call()
+            await this.orderedList.set(2, 0, 400, 500);  
+            idLast = await this.orderedList.lastInserted.call()
+
+            await this.orderedList.set(idLast, 0, 500, 600);
+
+
+            var interval = await this.orderedList.get(idLast)
+
+            interval[0].should.be.bignumber.equal(400);
+            interval[1].should.be.bignumber.equal(600);
+
+            await this.orderedList.set(idCenter, idLast, 300, 350);
+
+
+            interval = await this.orderedList.get(idCenter)
+            interval[0].should.be.bignumber.equal(200);
+            interval[1].should.be.bignumber.equal(350);
+
+            await validateList(this.orderedList, 3)
+        })
+
+        it('merge with next interval', async function() {
+            await this.orderedList.set(0, 0, 50, 100);
+            idFirst = await this.orderedList.lastInserted.call()
+            await this.orderedList.set(1, 0, 200, 300);   
+            idCenter = await this.orderedList.lastInserted.call()
+            await this.orderedList.set(2, 0, 400, 500);  
+            
+
+            await this.orderedList.set(0, idFirst, 0, 50);
+
+
+            var interval = await this.orderedList.get(idFirst)
+
+            interval[0].should.be.bignumber.equal(0);
+            interval[1].should.be.bignumber.equal(100);
+
+            await this.orderedList.set(idFirst, idCenter, 150, 200);
+
+
+            interval = await this.orderedList.get(idCenter)
+            interval[0].should.be.bignumber.equal(150);
+            interval[1].should.be.bignumber.equal(300);
+
+            await validateList(this.orderedList, 3)
+
+        })
+
+
+
     })
 
 

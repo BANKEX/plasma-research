@@ -6,66 +6,66 @@ pragma solidity ^0.4.24;
  */
 library OrderedIntervalList {
     struct Interval {
-        uint64 begin; // inclusive
-        uint64 end; // exclusive
+        uint begin; // inclusive
+        uint end; // exclusive
 
-        uint64 next;  
-        uint64 previous;
-    }
-    struct Data {
-        //Interval[] intervals;
-        mapping (uint64 => Interval) intervals;
-        uint64 first;
-        uint64 index;
+        uint next;  
+        uint previous;
     }
 
+    struct Data {        
+        mapping (uint => Interval) intervals;
+        uint first;
+        uint index;
+    }
   
+    function getFirst(Data storage self) internal view returns(uint) {
+        return self.first;
+    }
 
     /**
-    @notice Get interval by list index
-    @param id interval index in list
+    @notice Get interval by the index
+    @param id interval index in the list
     @return interval tuple
      */
-    function get(Data storage self, uint64 id) internal view returns(Interval storage interval) {
+    function get(Data storage self, uint id) internal view returns(Interval storage interval) {
         require(id <= self.index, "interval id doesn't exists in interval set");        
         interval = self.intervals[id];    
         require(interval.end != 0, "interval id doesn't exsits in interval set");    
-        return interval;
     }  
 
     
 
     /**
-    @notice Insert interval by specific index in list
+    @notice Insert interval in the specific place in a list
     @dev Method also check that new interval doesn't intersect with existed intervals in list
-    @param prev previous index
-    @param next next index
-    @param begin left bound of interval (inclusive)
-    @param end right bound of interval (exclusive)        
+    @param prev id of the previous interval in the list. Zero if it's a first interval.
+    @param next id of the next interval in the list. Zero if it's a last interval.
+    @param begin left bound of the new interval (inclusive)
+    @param end right bound of the new interval (exclusive)        
+    @return id of the interval that contain new interval. Could be a new interval or an existed with extended bounds in case of adjacent bounds 
+    of the inserted interval with his neighbors. 
      */
-    function insert(Data storage self, uint64 prev, uint64 next, uint64 begin, uint64 end) internal returns(uint64 id) {
-        require(begin < end, "right bound less than left bound");              
+    function insert(Data storage self, uint prev, uint next, uint begin, uint end) internal returns(uint id) {
+        require(begin < end, "right bound less or equal to left bound");              
        
         bool concatLeft = false;
         bool concatRight = false;
         id = self.index + 1;
-        self.index = self.index + 1;
         
         if (self.first == 0) { 
             prev = 0;
             next = 0;
             self.first = id;
         } else {
-            require(prev > 0 || next > 0);
+            require(prev > 0 || next > 0, "previous and next element doesn't exists");
             Interval storage prevInterval = self.intervals[prev];   
             Interval storage nextInterval = self.intervals[next];        
            
-            if (prev > 0 && next > 0) {
+            if (prev > 0 && next > 0) { // insert between to existed intervals
                 require(prevInterval.end != 0, "previous interval doesn't exists");     
                 require(nextInterval.end != 0, "next interval doesn't exists");       
-                require(
-                    prevInterval.end <= begin && nextInterval.begin >= end
-                );
+                require(prevInterval.end <= begin && nextInterval.begin >= end, "new interval out of bounds of neighbors intervals");
                 if (prevInterval.end == begin) {
                     concatLeft = true;               
                     prevInterval.end = end;
@@ -84,12 +84,10 @@ library OrderedIntervalList {
                     prevInterval.next = nextInterval.next;                  
                     delete self.intervals[next];
                 }
-            } else if (prev > 0 && next == 0) {
+            } else if (prev > 0 && next == 0) { // insert as last elemnt
                 require(prevInterval.end != 0, "previous interval doesn't exists");     
                 require(prevInterval.next == 0, "previous element is not last element");
-                require(
-                    prevInterval.end <= begin
-                );
+                require(prevInterval.end <= begin, "new interval out of bounds of previous interval");
 
                 if (prevInterval.end == begin) {
                     concatLeft = true;               
@@ -97,12 +95,11 @@ library OrderedIntervalList {
                 } else {
                     prevInterval.next = id;
                 }
-            } else if (prev == 0 && next >= 0) {
+            } else if (prev == 0 && next >= 0) { // insert as first element
                 require(nextInterval.end != 0, "next interval doesn't exists");     
                 require(nextInterval.previous == 0, "next element is not first element");
-                require(
-                    nextInterval.begin >= end
-                );
+                require(nextInterval.begin >= end, "new interval out of bounds of next interval");
+
                 if (nextInterval.begin == end) {
                     concatRight = true;
                     nextInterval.begin = begin;
@@ -114,11 +111,10 @@ library OrderedIntervalList {
             }
         }
  
-        if (! concatRight && ! concatLeft) {
+        if (! concatRight && ! concatLeft) { 
             self.index = id;
             self.intervals[id] = Interval({begin: begin, end: end, previous: prev, next: next});   
-        } else {
-            
+        } else {            
             if (concatLeft) {                
                 id = prev;
             } else{          
@@ -131,12 +127,13 @@ library OrderedIntervalList {
     } 
 
     /**
-        @notice Remove interval by index
+        @notice Remove range in interval by index
         @param index interval index in list        
-        @param begin left bound
-        @param end right bound
+        @param begin left range bound
+        @param end right range bound
+        @return index of the new interval if new one was created (was made a hole insided existed interval) or zero.
      */
-    function remove(Data storage self, uint64 index, uint64 begin, uint64 end) internal returns (uint64 newInterval) {
+    function remove(Data storage self, uint index, uint begin, uint end) internal returns (uint newInterval) {
         require(begin < end, "right bound less than left bound");        
         require(index <= self.index, "valid index bounds");
         
@@ -147,13 +144,12 @@ library OrderedIntervalList {
 
         if (begin > modifiedInterval.begin ) {
 
-            uint64 oldEnd = modifiedInterval.end;
+            uint oldEnd = modifiedInterval.end;
             modifiedInterval.end = begin;
             if (end < oldEnd) {
                 newInterval = insert(self, index, modifiedInterval.next, end, oldEnd);
                 modifiedInterval.next = newInterval;
             } 
-
         } else {
             modifiedInterval.begin = end;
         }
@@ -172,11 +168,7 @@ library OrderedIntervalList {
             }  
             
             delete self.intervals[index];
-        }
-
-
-       
-
+        } 
     }    
     
 }
