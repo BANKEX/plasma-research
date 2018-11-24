@@ -1,12 +1,17 @@
-package blocks
+package transaction
 
 import (
-	// "math/big"
-	"../utils"
+	"../../utils"
+	a "../alias"
 	"errors"
 	"fmt"
-
 	"github.com/ethereum/go-ethereum/crypto"
+)
+
+const (
+	MaxInputs     = 6
+	MaxOutputs    = 6
+	MaxSignatures = 2
 )
 
 type UnsignedTransaction struct {
@@ -17,11 +22,31 @@ type UnsignedTransaction struct {
 
 type Transaction struct {
 	UnsignedTransaction
-	Signatures [][65]byte `json:"signatures"`
+	Signatures []a.Signature `json:"signatures"`
 }
 
 type Metadata struct {
 	MaxBlockNumber uint32 `json:"maxBlockNumber"`
+}
+
+type Input struct {
+	Owner       a.Uint160 `json:"owner"`
+	BlockIndex  uint32    `json:"blockNumber"`
+	TxIndex     uint32    `json:"txNumber"`
+	OutputIndex uint8     `json:"outputNumber"`
+	//AssetID     uint256  `json:"assetId"`
+	Amount Segment `json:"amount"`
+}
+
+type Output struct {
+	Owner a.Uint160 `json:"owner"`
+	//AssetID uint256 `json:"assetId"`
+	Amount Segment `json:"amount"`
+}
+
+type Segment struct {
+	begin uint64
+	end   uint64
 }
 
 func (tr *Transaction) GetHash() ([]byte, error) {

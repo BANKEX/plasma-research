@@ -1,26 +1,32 @@
 package blocks
 
 import (
-	//"math/big"
 	"../utils"
+	a "./alias"
+	t "./transaction"
 	"fmt"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
 type Block struct {
-	Header       BlockHeader   `json:"header"`
-	Transactions []Transaction `json:"transactions"`
+	Header       BlockHeader     `json:"header"`
+	Transactions []t.Transaction `json:"transactions"`
 }
 
 type UnsignedBlockHeader struct {
-	BlockNumber       uint32  `json:"blockNumber"`
-	PreviousBlockHash uint256 `json:"previousBlockHash"`
-	MerkleRoot        uint256 `json:"merkleRoot"`
+	BlockNumber       uint32    `json:"blockNumber"`
+	PreviousBlockHash a.Uint256 `json:"previousBlockHash"`
+	MerkleRoot        a.Uint256 `json:"merkleRoot"`
 }
 
 type BlockHeader struct {
 	UnsignedBlockHeader
-	Signature [65]byte `json:"signature"`
+	Signature a.Signature `json:"signature"`
+}
+
+type RSAInclusionProof struct {
+	B a.Uint2048
+	R a.Uint256
 }
 
 func (b *Block) GetHash() ([]byte, error) {
