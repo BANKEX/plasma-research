@@ -4,7 +4,6 @@ import (
 	//"math/big"
 	"../utils"
 	"fmt"
-
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
@@ -14,9 +13,9 @@ type Block struct {
 }
 
 type UnsignedBlockHeader struct {
-	BlockNumber       uint32   `json:"blockNumber"`
-	PreviousBlockHash [32]byte `json:"previousBlockHash"`
-	MerkleRoot        [32]byte `json:"merkleRoot"`
+	BlockNumber       uint32  `json:"blockNumber"`
+	PreviousBlockHash uint256 `json:"previousBlockHash"`
+	MerkleRoot        uint256 `json:"merkleRoot"`
 }
 
 type BlockHeader struct {
@@ -53,7 +52,6 @@ func (b *Block) Sign(key []byte) error {
 }
 
 func (b *Block) CalculateMerkleRoot() error {
-	// b.Header.MerkleRoot =
 	return nil
 }
 

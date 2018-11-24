@@ -1,14 +1,10 @@
 package blocks
 
-import (
-	"math/big"
-)
-
 type Input struct {
-	BlockNumber  uint32   `json:"blockNumber"`
-	TxNumber     uint32   `json:"txNumber"`
-	OutputNumber uint8    `json:"outputNumber"`
-	Owner        [20]byte `json:"owner"`
-	AssetID      [32]byte `json:"assetId"`
-	Amount       big.Int  `json:"amount"`
+	Owner       uint160 `json:"owner"`
+	BlockIndex  uint32  `json:"blockNumber"`
+	TxIndex     uint32  `json:"txNumber"`
+	OutputIndex uint8   `json:"outputNumber"`
+	//AssetID     uint256  `json:"assetId"`
+	Amount Segment `json:"amount"`
 }
