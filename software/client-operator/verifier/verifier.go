@@ -96,7 +96,7 @@ func executor(comm string) {
 }
 
 func CLI() {
-	fmt.Println("------------Plasma Verifier----------")
+	fmt.Println("-------------Plasma Verifier-------------")
 
 	p := prompt.New(
 		executor,
