@@ -18,3 +18,26 @@
 01:55:32.689948 db@open done T·10.839497ms
 01:55:32.690001 db@close closing
 01:55:32.690024 db@close done T·21.984µs
+=============== Nov 26, 2018 (MSK) ===============
+02:07:22.430129 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+02:07:22.430369 version@stat F·[1] S·332B[332B] Sc·[0.25]
+02:07:22.430394 db@open opening
+02:07:22.430449 journal@recovery F·1
+02:07:22.432841 journal@recovery recovering @3
+02:07:22.436025 version@stat F·[1] S·332B[332B] Sc·[0.25]
+02:07:22.443293 db@janitor F·3 G·0
+02:07:22.443326 db@open done T·12.919001ms
+02:07:22.443368 db@close closing
+02:07:22.443395 db@close done T·25.438µs
+=============== Nov 26, 2018 (MSK) ===============
+02:07:27.132841 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+02:07:27.132959 version@stat F·[1] S·332B[332B] Sc·[0.25]
+02:07:27.132966 db@open opening
+02:07:27.132999 journal@recovery F·1
+02:07:27.133520 journal@recovery recovering @5
+02:07:27.136385 memdb@flush created L0@7 N·1 S·332B "event-1,v3":"event-1,v3"
+02:07:27.136899 version@stat F·[2] S·664B[664B] Sc·[0.50]
+02:07:27.143407 db@janitor F·4 G·0
+02:07:27.143420 db@open done T·10.449303ms
+02:07:27.143483 db@close closing
+02:07:27.143521 db@close done T·35.103µs

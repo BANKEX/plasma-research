@@ -9,7 +9,7 @@ import (
 	"log"
 	"os"
 	"strconv"
-
+	"../db"
 	"../listeners/balance"
 	"../listeners/ethClient"
 	"../listeners/event"
@@ -74,10 +74,10 @@ func executor(comm string) {
 		}
 	} else if comm == "dbEvents"{
 
+		events, err := db.Event("database").GetAll()
 		if err != nil {
 			println("Mistake DB")
 		}
-
 		fmt.Println(events)
 
 	}
