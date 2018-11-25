@@ -1,7 +1,1 @@
-{
-    "port":3000,
-    "key":"0x240d6ad83930067d82e0803696996f743acd78d8fa6a5f6e4f148fd9def37c55",
-    "operator":"http://localhost:8080",
-    "node":"ws://127.0.0.1:8546",
-    "smart": "0xeefbba7a6fe93c8d4983c4badc4119a3cdde38dc"
-}
+{"port":3000,"key":"0x240d6ad83930067d82e0803696996f743acd78d8fa6a5f6e4f148fd9def37c55","operator":"http://localhost:8080","node":"ws://127.0.0.1:8546","smart":"0x1893d32e6570de242b3bce518267166a03534aab"}
