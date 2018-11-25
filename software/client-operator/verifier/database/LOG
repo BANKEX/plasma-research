@@ -1,0 +1,72 @@
+=============== Nov 26, 2018 (MSK) ===============
+01:38:57.289311 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+01:38:57.295137 db@open opening
+01:38:57.301907 version@stat F·[] S·0B[] Sc·[]
+01:38:57.306298 db@janitor F·2 G·0
+01:38:57.306325 db@open done T·11.160063ms
+01:38:57.306372 db@close closing
+01:38:57.306403 db@close done T·30.15µs
+=============== Nov 26, 2018 (MSK) ===============
+01:38:58.175110 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+01:38:58.175239 version@stat F·[] S·0B[] Sc·[]
+01:38:58.175245 db@open opening
+01:38:58.175296 journal@recovery F·1
+01:38:58.176477 journal@recovery recovering @1
+01:38:58.179288 memdb@flush created L0@2 N·1 S·331B "event-1,v1":"event-1,v1"
+01:38:58.181882 version@stat F·[1] S·331B[331B] Sc·[0.25]
+01:38:58.188872 db@janitor F·3 G·0
+01:38:58.188895 db@open done T·13.644946ms
+01:38:58.188930 db@close closing
+01:38:58.188979 db@close done T·46.772µs
+=============== Nov 26, 2018 (MSK) ===============
+01:39:05.985080 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+01:39:05.985232 version@stat F·[1] S·331B[331B] Sc·[0.25]
+01:39:05.985242 db@open opening
+01:39:05.985288 journal@recovery F·1
+01:39:05.986069 journal@recovery recovering @3
+01:39:05.988957 memdb@flush created L0@5 N·1 S·331B "event-2,v3":"event-2,v3"
+01:39:05.989886 version@stat F·[2] S·662B[662B] Sc·[0.50]
+01:39:05.997314 db@janitor F·4 G·0
+01:39:05.997361 db@open done T·12.109736ms
+01:39:05.997443 db@close closing
+01:39:05.997484 db@close done T·40.602µs
+=============== Nov 26, 2018 (MSK) ===============
+01:39:19.921455 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+01:39:19.921639 version@stat F·[2] S·662B[662B] Sc·[0.50]
+01:39:19.921649 db@open opening
+01:39:19.921701 journal@recovery F·1
+01:39:19.922509 journal@recovery recovering @6
+01:39:19.925371 memdb@flush created L0@8 N·1 S·332B "event-3,v5":"event-3,v5"
+01:39:19.926790 version@stat F·[3] S·994B[994B] Sc·[0.75]
+01:39:19.934488 db@janitor F·5 G·0
+01:39:19.934509 db@open done T·12.853467ms
+01:39:19.934550 db@close closing
+01:39:19.934583 db@close done T·32.373µs
+=============== Nov 26, 2018 (MSK) ===============
+01:39:30.609764 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+01:39:30.609940 version@stat F·[3] S·994B[994B] Sc·[0.75]
+01:39:30.609950 db@open opening
+01:39:30.609996 journal@recovery F·1
+01:39:30.610824 journal@recovery recovering @9
+01:39:30.613399 memdb@flush created L0@11 N·1 S·332B "event-4,v7":"event-4,v7"
+01:39:30.614386 version@stat F·[4] S·1KiB[1KiB] Sc·[1.00]
+01:39:30.622321 db@janitor F·6 G·0
+01:39:30.622337 db@open done T·12.38135ms
+01:39:30.622364 table@move L0@11 -> L1
+01:39:30.622374 db@close closing
+01:39:30.622376 table-move@commit exiting
+01:39:30.622401 db@close done T·25.363µs
+=============== Nov 26, 2018 (MSK) ===============
+01:44:16.997591 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+01:44:16.997806 version@stat F·[4] S·1KiB[1KiB] Sc·[1.00]
+01:44:16.997821 db@open opening
+01:44:16.997876 journal@recovery F·1
+01:44:16.999461 journal@recovery recovering @12
+01:44:17.002739 memdb@flush created L0@14 N·1 S·332B "event-5,v9":"event-5,v9"
+01:44:17.004897 version@stat F·[5] S·1KiB[1KiB] Sc·[1.25]
+01:44:17.014150 db@janitor F·7 G·0
+01:44:17.014185 db@open done T·16.35463ms
+01:44:17.014213 table@move L0@14 -> L1
+01:44:17.014221 db@close closing
+01:44:17.014234 table-move@commit exiting
+01:44:17.014260 db@close done T·37.873µs

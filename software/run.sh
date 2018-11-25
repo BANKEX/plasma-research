@@ -1,8 +1,8 @@
 #!/bin/bash
 
-docker rm -f geth
+sudo docker rm -f geth
 # docker rm -f op
-docker run -it -d -p 9545:8545 --name geth -p 8546:8546 -p 30303:30303 erage/gethplasma
+sudo docker run -it -d -p 9545:8545 --name geth -p 8546:8546 -p 30303:30303 erage/gethplasma
 cd smartContract
 sudo rm -rf build
 npm i
