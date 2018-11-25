@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"time"
+	"../listeners"
 
 	"../listeners/balance"
 	"../listeners/ethClient"
@@ -28,7 +28,7 @@ type Config struct {
 	Smart    string `json:smart`
 }
 
-var info = ""
+//var info = ""
 
 // For open config file
 func OpenConfig(file string) Config {
@@ -49,26 +49,7 @@ func OpenConfig(file string) Config {
 	return config
 }
 
-func Checker() {
-	for {
-		if storage.StateForEvent == 1 {
-			fmt.Println("\n\n\n")
 
-			event.EventCount++
-
-			event.EventMap[event.EventCount] =
-					"Who" + "\n" + storage.Who.String() + "\n" +
-					"Amount" + "\n" + storage.Amount.String() + "\n" +
-					"BlockHash" + "\n" + storage.EventBlockHash + "\n" +
-					"BlockNumber" + "\n" + strconv.Itoa(int(storage.EventBlockNumber))
-
-			storage.StateForEvent = 0
-
-			fmt.Println(event.EventMap[event.EventCount])
-		}
-		time.Sleep(time.Second * 0)
-	}
-}
 
 // For CLI
 func completer(d prompt.Document) []prompt.Suggest {
@@ -124,7 +105,8 @@ func main() {
 	fmt.Println("\n\n")
 
 	ethClient.InitClient(conf.Node)
-	go Checker()
+
+	go listeners.Checker()
 	go balance.UpdateBalance(&storage.Balance, conf.Smart)
 	go event.Start(storage.Client, conf.Smart, &storage.Who, &storage.Amount, &storage.EventBlockHash, &storage.EventBlockNumber)
 

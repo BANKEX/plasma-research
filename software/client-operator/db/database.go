@@ -10,3 +10,12 @@ func Tx(dbName string) (*leveldb.Table) {
 	}
 	return txTable
 }
+
+func Event(dbName string) (*leveldb.Table) {
+	db, err := leveldb.Connect(dbName, 16,16,1024)
+	txTable := leveldb.NewTable(db, "event-")
+	if err != nil {
+		panic(err)
+	}
+	return txTable
+}
