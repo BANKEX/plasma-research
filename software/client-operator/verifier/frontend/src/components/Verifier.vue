@@ -2,9 +2,9 @@
   <div>
     <div v-bind:class="{ config: confReady }">
       Operator Address: {{operator}}
-      <p>
+
       Node address: {{node}}
-      <p>
+
       Smart Contract address: {{smart}}
     </div>
     <button @click="getConfigInfo()">Get Info</button>
@@ -12,18 +12,30 @@
     <div v-bind:class="{ pb: pbReady }" >
       Plasma Balance: {{pb}}
     </div>
-    <Button @click="getPlasmaBalance()">Plasma Balance</Button>
+    <button @click="getPlasmaBalance()">Plasma Balance</button>
 
     <div v-bind:class="{ scb: scbReady }" >
       Smart Contract Balance: {{scb}}
     </div>
-    <Button @click="getSCBalance()">Get smart contract balance</Button>
-    
+    <button @click="getSCBalance()">Get smart contract balance</button>
+
+    <div v-bind:class="{ dth: depositReady }" >
+      Tx-hash: {{dth}}
+    </div>
+    <button @click="depositViaMetaMask(1000)">Deposit</button>
+    <br>
+    <br>
+    <div v-bind:class="{ error: errorReady }">
+      {{error}}
+    </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import Web3 from 'web3'
+import ethereumjs from 'ethereumjs-tx'
+import keythereum from 'keythereum'
 
 export default {
   name: 'Verifier',
@@ -35,8 +47,15 @@ export default {
       confReady:true,
       pb:"",
       scb:"",
+      dth:"",
+      depositTxHash:"",
       pbReady:true,
-      scbReady:true
+      scbReady:true,
+      depositReady:true,
+      errorReady:true,
+      ABI: [{"constant":false,"inputs":[{"name":"operator","type":"address"},{"name":"","type":"address"},{"name":"tokenId","type":"uint256"},{"name":"","type":"bytes"}],"name":"onERC721Received","outputs":[{"name":"","type":"bytes4"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"fromIndex","type":"uint256"},{"name":"newBlocks","type":"bytes"},{"name":"protectedBlockNumber","type":"uint256"},{"name":"protectedBlockHash","type":"address"}],"name":"submitBlocks","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"fromIndex","type":"uint256"},{"name":"newBlocks","type":"bytes"},{"name":"protectedBlockNumber","type":"uint256"},{"name":"protectedBlockHash","type":"address"},{"name":"rsv","type":"bytes"}],"name":"submitBlocksSigned","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"renounceOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"blocksLength","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"isOwner","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"token","type":"address"},{"name":"amount","type":"uint256"}],"name":"depositERC20","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"deposit","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"token","type":"address"},{"name":"tokenId","type":"uint256"}],"name":"depositERC721","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"token","type":"address"},{"name":"tokenId","type":"uint256"}],"name":"calculateAssetId","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"pure","type":"function"},{"constant":true,"inputs":[{"name":"i","type":"uint256"}],"name":"blocks","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"MAIN_COIN_ADDRESS","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"token","type":"address"},{"indexed":true,"name":"who","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"AssetDeposited","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"who","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"CoinDeposited","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"token","type":"address"},{"indexed":true,"name":"who","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"ERC20Deposited","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"token","type":"address"},{"indexed":true,"name":"who","type":"address"},{"indexed":true,"name":"tokenId","type":"uint256"}],"name":"ERC721Deposited","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"length","type":"uint256"},{"indexed":false,"name":"time","type":"uint256"}],"name":"BlocksSubmitted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"previousOwner","type":"address"},{"indexed":true,"name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"}],
+      scAddress: "0x1893d32e6570de242b3bce518267166a03534aab",
+      error:"",
     }
   },
   methods:{
@@ -62,20 +81,84 @@ export default {
         this.scbReady = false
         this.scb = x.data.Balance
       })
+    },
+    async deposit(privateKey, address, amount) {
+      const instance = this.blockchain().getInstance(this.ABI, address);
+      const transactionData = this.blockchain().getCallData(instance, "deposit", []);
+      const rawTransaction = await this.blockchain().signTransaction(privateKey, address, amount, transactionData);
+      const tx = await this.blockchain().sendSignedTransaction(rawTransaction).catch(err=>{
+        this.error = err.message;
+        this.errorReady = false;
+      });
+      this.dth = tx.transactionHash;
+      this.depositReady = false;
+    },
+    async depositViaMetaMask(amount) {
+      const instance = this.blockchain().getInstance(this.ABI, this.scAddress);
+      const transactionData = this.blockchain().getCallData(instance, "deposit", []);
+      const tx = await this.blockchain().sendTransactionViaMetaMask(this.scAddress, amount, transactionData).catch(err=>{
+        this.error = err.message;
+        this.errorReady = false;
+      });
+      return tx.transactionHash;
+    },
+    blockchain() {
+      return {
+        async get(instance, method, parameters) {
+          return await instance.methods[method](...parameters).call();
+        },
+        async sendSignedTransaction(rawTransaction) {
+          return await web3.eth.sendSignedTransaction(rawTransaction);
+        },
+        async sendTransactionViaMetaMask(receiver, amount, transactionData) {
+          const txParam = {
+            to: receiver,
+            from: web3.eth.accounts.givenProvider.selectedAddress,
+            value: amount,
+            data: transactionData !== undefined ? transactionData : '',
+            gasPrice: await web3.eth.getGasPrice(),
+            gas: 210000
+          };
+          return await web3.eth.sendTransaction(txParam)
+        },
+        async signTransaction(privateKey, receiver, amount, transactionData) {
+          const userAddress = this.getAddress(privateKey);
+          const txParam = {
+            nonce: await web3.eth.getTransactionCount(userAddress),
+            to: receiver,
+            value: Number(amount),
+            from: userAddress,
+            data: transactionData !== undefined ? transactionData : '',
+            gasPrice: await web3.eth.getGasPrice(),
+            gas: 210000
+          };
+          const privateKeyBuffer = keythereum.str2buf(privateKey.substring(2), "hex");
+          const tx = new ethereumjs(txParam);
+          tx.sign(privateKeyBuffer);
+          const serializedTx = tx.serialize();
+          return '0x' + serializedTx.toString('hex');
+        },
+        getCallData(instance, method, parameters) {
+          return instance.methods[method](...parameters).encodeABI();
+        },
+        getInstance(ABI, address) {
+          return new web3.eth.Contract(ABI, address);
+        },
+        getAddress(privateKey) {
+          let _privateKey = privateKey.substring(2, privateKey.length);
+          return keythereum.privateKeyToAddress(keythereum.str2buf(_privateKey));
+        }
+      }
     }
-
   }
 }
+
+
+window.web3 = new Web3(web3.currentProvider || new Web3.providers.HttpProvider('http://127.0.0.1:9545'));
 </script>
 <style>
 
-.config{
-  visibility: hidden;
-}
-.pb{
-  visibility: hidden;
-}
-.scb{
+.config, .dth, .pb, .scb, .error {
   visibility: hidden;
 }
 

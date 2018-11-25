@@ -6,6 +6,16 @@
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  data () {
+    return {
+      operator:"",
+    }
+  },
+  methods:{
+    getConfigInfo(){
+
+    },
+  }
 }
 </script>
