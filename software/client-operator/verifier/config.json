@@ -3,5 +3,5 @@
     "key":"0x240d6ad83930067d82e0803696996f743acd78d8fa6a5f6e4f148fd9def37c55",
     "operator":"http://localhost:8080",
     "node":"ws://127.0.0.1:8546",
-    "smart": "0xbf3433967a5e2f47294f27b2c49d2c2d9f9cb972"
+    "smart": "0xeefbba7a6fe93c8d4983c4badc4119a3cdde38dc"
 }

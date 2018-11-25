@@ -17,7 +17,7 @@ import (
 
 	"./handlers"
 
-	prompt "github.com/c-bata/go-prompt"
+	"github.com/c-bata/go-prompt"
 )
 
 type Config struct {
@@ -53,13 +53,14 @@ func Checker() {
 	for {
 		if storage.StateForEvent == 1 {
 			fmt.Println("\n\n\n")
+
 			event.EventCount++
-			event.EventMap[event.EventCount] = map[string]string{
-				"Who":         storage.Who.String(),
-				"Amount":      storage.Amount.String(),
-				"BlockHash":   storage.EventBlockHash,
-				"BlockNumber": strconv.Itoa(int(storage.EventBlockNumber)),
-			}
+
+			event.EventMap[event.EventCount] =
+					"Who" + "\n" + storage.Who.String() + "\n" +
+					"Amount" + "\n" + storage.Amount.String() + "\n" +
+					"BlockHash" + "\n" + storage.EventBlockHash + "\n" +
+					"BlockNumber" + "\n" + strconv.Itoa(int(storage.EventBlockNumber))
 
 			storage.StateForEvent = 0
 

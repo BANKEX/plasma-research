@@ -18,7 +18,18 @@ import (
 )
 
 var EventCount int
-var EventMap = map[int]map[string]string{}
+var EventMap = map[int]string {}
+
+type EventGroup struct {
+	EventCoinDeposited
+}
+
+type EventCoinDeposited struct {
+	Verefier    string
+	Amount      string
+	BlockHash   string
+	BlockNumber string
+}
 
 func SubscribeToEvent(e *ethclient.Client, addr string) (abi.ABI, ethereum.Subscription, chan types.Log, bool) {
 	client := e
@@ -81,13 +92,4 @@ func Start(client *ethclient.Client, addr string, who *common.Address, amount **
 			}
 		}
 	}
-}
-
-type EventCoinDeposited struct {
-	Who    common.Address
-	Amount *big.Int
-}
-
-type EventGroup struct {
-	EventCoinDeposited EventCoinDeposited
 }
