@@ -1,6 +1,7 @@
 package main
 
 import (
+	"../listeners"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -8,7 +9,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"../listeners"
 
 	"../listeners/balance"
 	"../listeners/ethClient"
@@ -16,7 +16,6 @@ import (
 	"../listeners/storage"
 
 	"./handlers"
-	"../db"
 	"github.com/c-bata/go-prompt"
 )
 
@@ -74,8 +73,6 @@ func executor(comm string) {
 			fmt.Println(i, j)
 		}
 	} else if comm == "dbEvents"{
-
-		events, err := db.Event("database").GetAll()
 
 		if err != nil {
 			println("Mistake DB")
