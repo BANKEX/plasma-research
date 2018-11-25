@@ -4,7 +4,6 @@ const path = require('path');
 const filePath = path.join(__dirname, '../../client-operator/verifier/config.json');
 
 
-
 module.exports = function (deployer) {
     deployer.then(async function () {
         const contractAddress = await BankexPlasma.new();
@@ -13,5 +12,4 @@ module.exports = function (deployer) {
         console.log("BankexPlasma address: " + contractAddress.address)
         fs.writeFileSync(filePath, JSON.stringify(data));
     });
-
 };
