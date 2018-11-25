@@ -1,13 +1,13 @@
 package listeners
 
 import (
+	"../db"
 	"./event"
 	"./storage"
 	"fmt"
+	"log"
 	"strconv"
 	"time"
-	"../db"
-	"log"
 )
 
 func Checker() {
@@ -33,6 +33,8 @@ func Checker() {
 			if err != nil {
 				log.Println(err)
 			}
+
+			fmt.Println(event.EventMap[event.EventCount])
 		}
 
 		time.Sleep(time.Second * 0)
