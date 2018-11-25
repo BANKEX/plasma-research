@@ -24,6 +24,8 @@ type EventGroup struct {
 	EventCoinDeposited
 }
 
+
+
 type EventCoinDeposited struct {
 	Verefier    string
 	Amount      string
