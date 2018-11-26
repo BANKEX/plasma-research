@@ -1,10 +1,11 @@
 package main
 
 import (
+	"./plasmacontract"
+	"context"
 	"crypto/ecdsa"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -12,8 +13,6 @@ import (
 	"io/ioutil"
 	"log"
 	"math/big"
-	"context"
-	"./plasmacontract"
 	"os"
 	"time"
 )
@@ -105,5 +104,5 @@ func do(client *ethclient.Client, conf Config) {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("tx sent: %s", tx.Hash().Hex()) // tx sent: 0x8d490e535678e9a24360e955d75b27ad307bdfb97a1dca51d0f3035dcee3e870
+	//fmt.Printf("tx sent: %s", tx.Hash().Hex()) // tx sent: 0x8d490e535678e9a24360e955d75b27ad307bdfb97a1dca51d0f3035dcee3e870
 }
