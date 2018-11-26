@@ -32,25 +32,26 @@ type Config struct {
 	Smart    string `json:smart`
 }
 
-//var info = ""
+func ReadConfig(fileName string) (Config, error)  {
+	var config Config
 
-// For open config file
-func OpenConfig(file string) Config {
-	// Open  json config File
-	f, err := os.Open(file)
+	f, err := os.Open(fileName)
 	if err != nil {
-		log.Println(err)
+		return config, err
 	}
 	defer f.Close()
 
-	byteValue, _ := ioutil.ReadAll(f)
+	byteValue, err := ioutil.ReadAll(f)
+	if err != nil {
+		return config, err
+	}
 
-	var config Config
+	err = json.Unmarshal(byteValue, &config)
+	if err != nil {
+		return config, err
+	}
 
-	// write byte-info in conf
-	json.Unmarshal(byteValue, &config)
-
-	return config
+	return config, nil
 }
 
 // For CLI
@@ -120,14 +121,15 @@ func GinServer(conf Config) {
 
 func main() {
 
-	config := flag.String("c", "config.json", "config file for verifier")
-
+	configFileName := flag.String("c", "config.json", "config file for verifier")
 	flag.Parse()
 
-	conf := OpenConfig(*config)
+	conf, err := ReadConfig(*configFileName)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Println("\n\n")
-
 	fmt.Println("PORT: " + strconv.Itoa(conf.Port))
 	fmt.Println("KEY: " + conf.Key)
 	fmt.Println("Operator IP: " + conf.Operator)
