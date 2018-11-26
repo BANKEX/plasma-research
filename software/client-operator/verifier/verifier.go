@@ -5,8 +5,11 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/gin-gonic/contrib/static"
+	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"strconv"
 	"../db"
@@ -123,21 +126,21 @@ func main() {
 
 	handlers.OperatorAddress = conf.Operator
 
-	CLI()
+	//CLI()
 
-	//r := gin.Default()
-	//r.Use(static.Serve("/", static.LocalFile("./frontend/dist", true)))
-	//
-	//r.GET("/scgetbalance", handlers.SCGetBalance)
-	//r.GET("/plasmabalance", handlers.GetMyPlasmaBalance)
-	//
-	//r.GET("/conf", func(c *gin.Context) {
-	//	c.JSON(http.StatusOK, gin.H{
-	//		"Smart":    conf.Smart,
-	//		"Operator": conf.Operator,
-	//		"Node":     conf.Node,
-	//	})
-	//})
-	//
-	//r.Run(":" + strconv.Itoa(conf.Port))
+	r := gin.Default()
+	r.Use(static.Serve("/", static.LocalFile("./frontend/dist", true)))
+
+	r.GET("/scgetbalance", handlers.SCGetBalance)
+	r.GET("/plasmabalance", handlers.GetMyPlasmaBalance)
+
+	r.GET("/conf", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"Smart":    conf.Smart,
+			"Operator": conf.Operator,
+			"Node":     conf.Node,
+		})
+	})
+
+	r.Run(":" + strconv.Itoa(conf.Port))
 }

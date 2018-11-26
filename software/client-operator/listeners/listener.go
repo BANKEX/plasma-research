@@ -33,7 +33,7 @@ func Checker() {
 			if err != nil {
 				log.Println(err)
 			}
-
+			//fmt.Println("new Event")
 			fmt.Println(event.EventMap[event.EventCount])
 		}
 
