@@ -17,7 +17,7 @@ truffle migrate --network development
 # give plasma owner 100 ether
 ( echo "eth.sendTransaction({from: eth.accounts[0],to:'${ADDRESS}',value: web3.toWei(100, 'ether')})" ) | geth attach http://127.0.0.1:9545
 
-cd ../client-operator/operator
+cd ../commons/operator
 
 # run operator
 go run operator.go &

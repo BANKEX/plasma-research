@@ -9,7 +9,7 @@ sudo rm -rf build
 npm i
 
 cd ..
-cd client-operator
+cd commons
 
 # install all go lang packages
 go get -d ./...
