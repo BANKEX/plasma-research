@@ -2,16 +2,10 @@ package blocks
 
 import (
 	"../utils"
+	a "./alias"
 	"fmt"
 	"github.com/ethereum/go-ethereum/crypto"
 )
-type Uint160 [20]byte
-type Uint256 [32]byte
-// RSA Accumulator
-type Uint2048 [256]byte
-// Signature 65 bytes long ECDSA signature encoded in RSV format
-// R(32) bytes S(32) bytes  V(1) byte
-type Signature [65]byte
 
 type Block struct {
 	Header       BlockHeader     `json:"header"`
@@ -20,18 +14,18 @@ type Block struct {
 
 type UnsignedBlockHeader struct {
 	BlockNumber       uint32    `json:"blockNumber"`
-	PreviousBlockHash Uint256 `json:"previousBlockHash"`
-	MerkleRoot        Uint256 `json:"merkleRoot"`
+	PreviousBlockHash a.Uint256 `json:"previousBlockHash"`
+	MerkleRoot        a.Uint256 `json:"merkleRoot"`
 }
 
 type BlockHeader struct {
 	UnsignedBlockHeader
-	Signature Signature `json:"signature"`
+	Signature a.Signature `json:"signature"`
 }
 
 type RSAInclusionProof struct {
-	B Uint2048
-	R Uint256
+	B a.Uint2048
+	R a.Uint256
 }
 
 func (b *Block) GetHash() ([]byte, error) {
