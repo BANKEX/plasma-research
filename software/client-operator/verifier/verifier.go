@@ -9,11 +9,7 @@ import (
 	"log"
 	"os"
 	"strconv"
-<<<<<<< HEAD
-
-=======
 	"../db"
->>>>>>> 0b3ad7b7de2fc2704229c41454ad51e50626ea2b
 	"../listeners/balance"
 	"../listeners/ethClient"
 	"../listeners/event"
