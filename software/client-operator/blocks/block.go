@@ -7,6 +7,10 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
+
+// For test only
+var Balance = map[string]int{"balance": 0}
+
 type Block struct {
 	Header       BlockHeader     `json:"header"`
 	Transactions []Transaction `json:"transactions"`
