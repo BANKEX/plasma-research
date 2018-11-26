@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	"../db"
@@ -25,31 +26,34 @@ import (
 )
 
 type Config struct {
-	Port     int    `json:port`
-	Key      string `json:key`
-	Operator string `json:operator`
-	EthNode  string `json:ethNode`
-	Smart    string `json:smart`
+	Verifier_port            int    `json:verifier_port`
+	Main_account_private_key string `json:main_account_private_key`
+	Plasma_operator_address  string `json:plasma_operator_address`
+	Geth_account             string `json:geth_account`
+	Main_account_public_key  string `json:main_account_public_key`
 }
 
 func ReadConfig(fileName string) (Config, error) {
+
 	var config Config
 
 	f, err := os.Open(fileName)
 	if err != nil {
-		return config, err
+		log.Println(err)
 	}
 	defer f.Close()
 
 	byteValue, err := ioutil.ReadAll(f)
 	if err != nil {
-		return config, err
+		log.Println(err)
 	}
 
 	err = json.Unmarshal(byteValue, &config)
 	if err != nil {
-		return config, err
+		log.Println(err)
 	}
+
+	fmt.Println(config)
 
 	return config, nil
 }
@@ -107,46 +111,52 @@ func GinServer(conf Config) {
 
 	r.GET("/conf", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
-			"Smart":    conf.Smart,
-			"Operator": conf.Operator,
-			"Node":     conf.EthNode,
+			"main_account_public_key": conf.Main_account_public_key,
+			"plasma_operator_address": conf.Plasma_operator_address,
+			"geth_account":            conf.Geth_account,
 		})
 	})
 
-	r.Run(":" + strconv.Itoa(conf.Port))
+	r.Run(":" + strconv.Itoa(conf.Verifier_port))
 }
 
 func main() {
 
-	configFileName := flag.String("c", "config.json", "config file for verifier")
+	defaultConfigPath, _ := filepath.Abs("../config.json")
+
+	configFileName := flag.String("c", defaultConfigPath, "config file for verifier")
 	flag.Parse()
 
 	conf, err := ReadConfig(*configFileName)
 	if err != nil {
 		log.Fatal(err)
 	}
+	if conf.Verifier_port == 0 {
+		fmt.Println("Can't read config.json!!!")
+		return
+	}
 
 	fmt.Println("\n\n")
-	fmt.Println("PORT: " + strconv.Itoa(conf.Port))
-	fmt.Println("KEY: " + conf.Key)
-	fmt.Println("Operator IP: " + conf.Operator)
-	fmt.Println("Node: " + conf.EthNode)
-	fmt.Println("Smart Contract address: " + conf.Smart)
+	fmt.Println("PORT: " + strconv.Itoa(conf.Verifier_port))
+	fmt.Println("KEY: " + conf.Main_account_private_key)
+	fmt.Println("Operator IP: " + conf.Plasma_operator_address)
+	fmt.Println("Node: " + conf.Geth_account)
+	fmt.Println("Smart Contract address: " + conf.Main_account_public_key)
 	fmt.Println("\n\n")
 
-	ethClient.InitClient(conf.EthNode)
+	ethClient.InitClient(conf.Geth_account)
 
 	dispatchers.CreateGenesisBlock()
 
 	go listeners.Checker()
-	go balance.UpdateBalance(&storage.Balance, conf.Smart)
-	go event.Start(storage.Client, conf.Smart, &storage.Who, &storage.Amount, &storage.EventBlockHash, &storage.EventBlockNumber)
+	go balance.UpdateBalance(&storage.Balance, conf.Main_account_public_key)
+	go event.Start(storage.Client, conf.Main_account_public_key, &storage.Who, &storage.Amount, &storage.EventBlockHash, &storage.EventBlockNumber)
 
-	handlers.OperatorAddress = conf.Operator
+	handlers.OperatorAddress = conf.Plasma_operator_address
 
 	// Uncomment for start CLI
-	CLI()
+	// CLI()
 
 	// Uncomment for start ginServer
-	//GinServer(conf)
+	GinServer(conf)
 }
