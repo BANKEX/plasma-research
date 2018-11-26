@@ -1,13 +1,10 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 
@@ -21,42 +18,10 @@ import (
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 
+	"../config"
 	"./handlers"
 	"github.com/c-bata/go-prompt"
 )
-
-type Config struct {
-	Verifier_port            int    `json:verifier_port`
-	Main_account_private_key string `json:main_account_private_key`
-	Plasma_operator_address  string `json:plasma_operator_address`
-	Geth_account             string `json:geth_account`
-	Main_account_public_key  string `json:main_account_public_key`
-}
-
-func ReadConfig(fileName string) (Config, error) {
-
-	var config Config
-
-	f, err := os.Open(fileName)
-	if err != nil {
-		log.Println(err)
-	}
-	defer f.Close()
-
-	byteValue, err := ioutil.ReadAll(f)
-	if err != nil {
-		log.Println(err)
-	}
-
-	err = json.Unmarshal(byteValue, &config)
-	if err != nil {
-		log.Println(err)
-	}
-
-	fmt.Println(config)
-
-	return config, nil
-}
 
 // For CLI
 func completer(d prompt.Document) []prompt.Suggest {
@@ -102,7 +67,8 @@ func CLI() {
 	p.Run()
 }
 
-func GinServer(conf Config) {
+func GinServer(conf config.VerifierConfig) {
+
 	r := gin.Default()
 	r.Use(static.Serve("/", static.LocalFile("./frontend/dist", true)))
 
@@ -122,26 +88,26 @@ func GinServer(conf Config) {
 
 func main() {
 
-	defaultConfigPath, _ := filepath.Abs("../config.json")
+	defaultConfigPath, _ := filepath.Abs("../config/config.verifier.json")
 
 	configFileName := flag.String("c", defaultConfigPath, "config file for verifier")
 	flag.Parse()
 
-	conf, err := ReadConfig(*configFileName)
+	_, conf, err := config.ReadConfig(*configFileName, "v")
 	if err != nil {
 		log.Fatal(err)
 	}
 	if conf.Verifier_port == 0 {
-		fmt.Println("Can't read config.json!!!")
+		fmt.Println("Unmarshalling error!!!")
 		return
 	}
 
 	fmt.Println("\n\n")
 	fmt.Println("PORT: " + strconv.Itoa(conf.Verifier_port))
 	fmt.Println("KEY: " + conf.Main_account_private_key)
+	fmt.Println("Smart Contract address: " + conf.Main_account_public_key)
 	fmt.Println("Operator IP: " + conf.Plasma_operator_address)
 	fmt.Println("Node: " + conf.Geth_account)
-	fmt.Println("Smart Contract address: " + conf.Main_account_public_key)
 	fmt.Println("\n\n")
 
 	ethClient.InitClient(conf.Geth_account)
@@ -159,4 +125,5 @@ func main() {
 
 	// Uncomment for start ginServer
 	GinServer(conf)
+
 }
