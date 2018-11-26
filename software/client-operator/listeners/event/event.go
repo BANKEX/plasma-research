@@ -18,13 +18,11 @@ import (
 )
 
 var EventCount int
-var EventMap = map[int]string {}
+var EventMap = map[int]string{}
 
 type EventGroup struct {
 	EventCoinDeposited
 }
-
-
 
 type EventCoinDeposited struct {
 	Verefier    string

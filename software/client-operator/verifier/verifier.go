@@ -1,22 +1,24 @@
 package main
 
 import (
-	"../listeners"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/gin-gonic/contrib/static"
-	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
+
 	"../db"
+	"../dispatchers"
+	"../listeners"
 	"../listeners/balance"
 	"../listeners/ethClient"
 	"../listeners/event"
 	"../listeners/storage"
+	"github.com/gin-gonic/contrib/static"
+	"github.com/gin-gonic/gin"
 
 	"./handlers"
 	"github.com/c-bata/go-prompt"
@@ -51,8 +53,6 @@ func OpenConfig(file string) Config {
 	return config
 }
 
-
-
 // For CLI
 func completer(d prompt.Document) []prompt.Suggest {
 	s := []prompt.Suggest{
@@ -75,7 +75,7 @@ func executor(comm string) {
 		for i, j := range event.EventMap {
 			fmt.Println(i, j)
 		}
-	} else if comm == "dbEvents"{
+	} else if comm == "dbEvents" {
 
 		events, err := db.Event("database").GetAll()
 		if err != nil {
@@ -100,6 +100,24 @@ func CLI() {
 
 }
 
+func GinServer(conf Config) {
+	r := gin.Default()
+	r.Use(static.Serve("/", static.LocalFile("./frontend/dist", true)))
+
+	r.GET("/scgetbalance", handlers.SCGetBalance)
+	r.GET("/plasmabalance", handlers.GetMyPlasmaBalance)
+
+	r.GET("/conf", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"Smart":    conf.Smart,
+			"Operator": conf.Operator,
+			"Node":     conf.Node,
+		})
+	})
+
+	r.Run(":" + strconv.Itoa(conf.Port))
+}
+
 func main() {
 
 	config := flag.String("c", "config.json", "config file for verifier")
@@ -120,27 +138,18 @@ func main() {
 
 	ethClient.InitClient(conf.Node)
 
+	dispatchers.CreateGenesisBlock()
+
 	go listeners.Checker()
 	go balance.UpdateBalance(&storage.Balance, conf.Smart)
 	go event.Start(storage.Client, conf.Smart, &storage.Who, &storage.Amount, &storage.EventBlockHash, &storage.EventBlockNumber)
 
 	handlers.OperatorAddress = conf.Operator
 
-	//CLI()
+	// Uncomment for start CLI
+	CLI()
 
-	r := gin.Default()
-	r.Use(static.Serve("/", static.LocalFile("./frontend/dist", true)))
+	// Uncomment for start ginServer
+	//GinServer(conf)
 
-	r.GET("/scgetbalance", handlers.SCGetBalance)
-	r.GET("/plasmabalance", handlers.GetMyPlasmaBalance)
-
-	r.GET("/conf", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"Smart":    conf.Smart,
-			"Operator": conf.Operator,
-			"Node":     conf.Node,
-		})
-	})
-
-	r.Run(":" + strconv.Itoa(conf.Port))
 }
