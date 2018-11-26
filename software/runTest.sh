@@ -22,6 +22,7 @@ cp config.json ../../test
 cd ../../test
 go run main.go &
 cd ../client-operator/verifier/frontend
+npm i
 npm run build
 cd ..
 go run verifier.go

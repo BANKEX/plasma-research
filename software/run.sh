@@ -16,6 +16,7 @@ cd operator
 go run operator.go &
 cd ..
 cd verifier/frontend
+npm i
 npm run build
 cd ..
 go run verifier.go
