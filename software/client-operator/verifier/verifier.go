@@ -66,8 +66,8 @@ func completer(d prompt.Document) []prompt.Suggest {
 
 func executor(comm string) {
 	if comm == "plasmaBalance" {
-		balance := handlers.GetReqBalance(handlers.OperatorAddress, "/pbalance")
-		fmt.Println("Plasma balance:" + balance)
+		plasmaBalance := handlers.GetReqBalance(handlers.OperatorAddress, "/pbalance")
+		fmt.Println("Plasma balance:" + plasmaBalance)
 	} else if comm == "smartBalance" {
 		fmt.Println("Smart Contract Balance:" + storage.Balance)
 	} else if comm == "eventMap" {
