@@ -1,6 +1,5 @@
 #!/bin/bash
 export ADDRESS="0x9B72B510F184e16BcE51Dfd7348Ba474cE30b6ed"
-echo ${ADDRESS}
 
 sudo docker rm -f geth
 # docker rm -f op
