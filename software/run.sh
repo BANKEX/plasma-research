@@ -15,7 +15,7 @@ go run operator.go &
 cd ..
 # docker build . -t operator
 # docker run --name op -p 8080:8080 -d operator
-cd verifierç
+cd verifier
 cp config.json ../../test
 cd ../../test
 go run main.go &
