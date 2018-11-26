@@ -6,6 +6,7 @@ import (
 	"crypto/ecdsa"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -45,6 +46,8 @@ func OpenConfig(file string) Config {
 
 func main () {
 
+	fmt.Println("THIS IS TEST TX FOR EVENT")
+
 	config := flag.String("c", "config.json", "config file for verifier")
 	flag.Parse()
 	conf := OpenConfig(*config)
@@ -55,7 +58,7 @@ func main () {
 		log.Fatal(err)
 	}
 
-	for i:=0; i < 50; i++ {
+	for i:=0; i < 1000; i++ {
 		do(client, conf)
 		time.Sleep(time.Second*2)
 	}
@@ -99,10 +102,8 @@ func do(client *ethclient.Client, conf Config) {
 	}
 
 
-	tx, err := instance.Deposit(auth)
-	if err != nil {
-		log.Fatal(err)
-	}
+	_, _ = instance.Deposit(auth)
+
 
 	//fmt.Printf("tx sent: %s", tx.Hash().Hex()) // tx sent: 0x8d490e535678e9a24360e955d75b27ad307bdfb97a1dca51d0f3035dcee3e870
 }

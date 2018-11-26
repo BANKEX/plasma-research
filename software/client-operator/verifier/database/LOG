@@ -1424,3 +1424,1045 @@
 04:11:26.477853 table@remove removed @206
 04:11:26.477908 db@write was delayed N·1 T·1.103134ms
 04:11:26.477945 db@close done T·430.523µs
+=============== Nov 26, 2018 (MSK) ===============
+04:13:52.642184 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:13:52.642858 version@stat F·[6 55] S·19KiB[1KiB 17KiB] Sc·[1.50 0.00]
+04:13:52.642891 db@open opening
+04:13:52.643198 journal@recovery F·1
+04:13:52.643617 journal@recovery recovering @268
+04:13:52.644591 memdb@flush created L0@272 N·1 S·332B "event-14,v166":"event-14,v166"
+04:13:52.645050 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:13:52.646620 db@janitor F·64 G·0
+04:13:52.646661 db@open done T·3.741409ms
+04:13:52.646725 table@compaction L0·1 -> L1·1 S·664B Q·167
+04:13:52.646791 table@build exiting
+04:13:52.646734 db@close closing
+04:13:52.646962 db@close done T·227.12µs
+=============== Nov 26, 2018 (MSK) ===============
+04:13:54.651544 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:13:54.651884 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:13:54.651920 db@open opening
+04:13:54.652109 journal@recovery F·1
+04:13:54.654169 journal@recovery recovering @273
+04:13:54.655009 memdb@flush created L0@275 N·1 S·331B "event-1,v168":"event-1,v168"
+04:13:54.657277 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:13:54.658624 db@janitor F·65 G·0
+04:13:54.658651 db@open done T·6.718462ms
+04:13:54.658675 table@compaction L0·1 -> L1·1 S·662B Q·169
+04:13:54.659093 table@build created L1@278 N·1 S·331B "event-1,v168":"event-1,v168"
+04:13:54.659142 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:13:54.659295 table@compaction committed F-1 S-331B Ke·0 D·1 T·588.417µs
+04:13:54.659376 table@remove removed @275
+04:13:54.659462 table@remove removed @227
+04:13:54.659484 table@compaction L0·1 -> L1·1 S·664B Q·169
+04:13:54.659735 db@close closing
+04:13:54.659795 table@build created L1@279 N·1 S·332B "event-14,v166":"event-14,v166"
+04:13:54.659812 table@build exiting
+04:13:54.659822 table@build revert @279
+04:13:54.659976 db@write was delayed N·1 T·1.037305ms
+04:13:54.660037 db@close done T·300.974µs
+=============== Nov 26, 2018 (MSK) ===============
+04:13:56.657945 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:13:56.658241 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:13:56.658275 db@open opening
+04:13:56.658459 journal@recovery F·1
+04:13:56.658869 journal@recovery recovering @276
+04:13:56.659484 memdb@flush created L0@279 N·1 S·331B "event-2,v170":"event-2,v170"
+04:13:56.659991 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:13:56.661380 db@janitor F·65 G·0
+04:13:56.661402 db@open done T·3.113579ms
+04:13:56.661430 table@compaction L0·3 -> L1·1 S·1KiB Q·171
+04:13:56.661874 table@build created L1@282 N·1 S·331B "event-2,v170":"event-2,v170"
+04:13:56.661916 version@stat F·[5 55] S·19KiB[1KiB 17KiB] Sc·[1.25 0.00]
+04:13:56.662057 table@compaction committed F-3 S-993B Ke·0 D·3 T·599.086µs
+04:13:56.662138 table@remove removed @279
+04:13:56.662227 table@remove removed @228
+04:13:56.662314 table@remove removed @190
+04:13:56.662395 table@remove removed @69
+04:13:56.662417 table@compaction L0·1 -> L1·1 S·662B Q·171
+04:13:56.662597 db@close closing
+04:13:56.662773 table@build created L1@283 N·1 S·331B "event-5,v148":"event-5,v148"
+04:13:56.662791 table@build exiting
+04:13:56.662802 table@build revert @283
+04:13:56.662922 db@write was delayed N·1 T·1.102146ms
+04:13:56.662970 db@close done T·373.314µs
+=============== Nov 26, 2018 (MSK) ===============
+04:13:58.667407 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:13:58.667751 version@stat F·[5 55] S·19KiB[1KiB 17KiB] Sc·[1.25 0.00]
+04:13:58.667786 db@open opening
+04:13:58.667975 journal@recovery F·1
+04:13:58.668366 journal@recovery recovering @280
+04:13:58.669282 memdb@flush created L0@283 N·1 S·331B "event-3,v172":"event-3,v172"
+04:13:58.669803 version@stat F·[6 55] S·19KiB[1KiB 17KiB] Sc·[1.50 0.00]
+04:13:58.670970 db@janitor F·63 G·0
+04:13:58.670993 db@open done T·3.194174ms
+04:13:58.671018 table@compaction L0·3 -> L1·1 S·1KiB Q·173
+04:13:58.671044 db@close closing
+04:13:58.671302 db@close done T·257.013µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:00.671501 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:00.671788 version@stat F·[6 55] S·19KiB[1KiB 17KiB] Sc·[1.50 0.00]
+04:14:00.671819 db@open opening
+04:14:00.672003 journal@recovery F·1
+04:14:00.672446 journal@recovery recovering @284
+04:14:00.673327 memdb@flush created L0@286 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:00.673909 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:00.675317 db@janitor F·64 G·0
+04:14:00.675341 db@open done T·3.510221ms
+04:14:00.675371 table@compaction L0·2 -> L1·1 S·993B Q·175
+04:14:00.675391 db@close closing
+04:14:00.675395 table@build exiting
+04:14:00.675489 db@close done T·97.631µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:02.679312 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:02.679642 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:02.679672 db@open opening
+04:14:02.679829 journal@recovery F·1
+04:14:02.680216 journal@recovery recovering @287
+04:14:02.681128 memdb@flush created L0@289 N·1 S·331B "event-5,v176":"event-5,v176"
+04:14:02.681701 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:02.682849 db@janitor F·65 G·0
+04:14:02.682870 db@open done T·3.186805ms
+04:14:02.682918 table@compaction L0·2 -> L1·1 S·993B Q·177
+04:14:02.683308 table@build created L1@292 N·1 S·331B "event-5,v176":"event-5,v176"
+04:14:02.683360 version@stat F·[6 55] S·19KiB[1KiB 17KiB] Sc·[1.50 0.00]
+04:14:02.683496 table@compaction committed F-2 S-662B Ke·0 D·2 T·552.755µs
+04:14:02.683565 table@remove removed @289
+04:14:02.683660 table@remove removed @237
+04:14:02.683735 table@remove removed @202
+04:14:02.683773 table@compaction L0·2 -> L1·1 S·993B Q·177
+04:14:02.684208 db@close closing
+04:14:02.684337 table@build created L1@293 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:02.684377 table@build exiting
+04:14:02.684387 table@build revert @293
+04:14:02.684645 db@write was delayed N·1 T·1.161085ms
+04:14:02.684744 db@close done T·535.909µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:04.685665 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:04.685964 version@stat F·[6 55] S·19KiB[1KiB 17KiB] Sc·[1.50 0.00]
+04:14:04.685995 db@open opening
+04:14:04.686162 journal@recovery F·1
+04:14:04.686586 journal@recovery recovering @290
+04:14:04.687454 memdb@flush created L0@293 N·1 S·331B "event-6,v178":"event-6,v178"
+04:14:04.687949 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:04.689334 db@janitor F·64 G·0
+04:14:04.689356 db@open done T·3.349202ms
+04:14:04.689394 table@compaction L0·1 -> L1·1 S·662B Q·179
+04:14:04.689421 db@close closing
+04:14:04.689422 table@build exiting
+04:14:04.689577 db@close done T·154.469µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:06.692661 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:06.693447 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:06.693543 db@open opening
+04:14:06.693873 journal@recovery F·1
+04:14:06.694349 journal@recovery recovering @294
+04:14:06.695213 memdb@flush created L0@296 N·1 S·331B "event-7,v180":"event-7,v180"
+04:14:06.695711 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:06.696971 db@janitor F·65 G·0
+04:14:06.696998 db@open done T·3.440726ms
+04:14:06.697048 table@compaction L0·1 -> L1·1 S·662B Q·181
+04:14:06.697453 table@build created L1@299 N·1 S·331B "event-7,v180":"event-7,v180"
+04:14:06.697519 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:06.697699 table@compaction committed F-1 S-331B Ke·0 D·1 T·619.002µs
+04:14:06.697797 table@remove removed @296
+04:14:06.697879 table@remove removed @246
+04:14:06.697900 table@compaction L0·1 -> L1·1 S·662B Q·181
+04:14:06.698137 db@close closing
+04:14:06.698322 table@build created L1@300 N·1 S·331B "event-6,v178":"event-6,v178"
+04:14:06.698358 table@build exiting
+04:14:06.698377 table@build revert @300
+04:14:06.698610 db@write was delayed N·1 T·1.058832ms
+04:14:06.698710 db@close done T·571.601µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:08.701924 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:08.702253 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:08.702322 db@open opening
+04:14:08.702649 journal@recovery F·1
+04:14:08.703062 journal@recovery recovering @297
+04:14:08.704009 memdb@flush created L0@300 N·1 S·331B "event-8,v182":"event-8,v182"
+04:14:08.704676 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:08.705986 db@janitor F·65 G·0
+04:14:08.706021 db@open done T·3.688328ms
+04:14:08.706047 table@compaction L0·1 -> L1·1 S·662B Q·183
+04:14:08.706502 table@build created L1@303 N·1 S·331B "event-8,v182":"event-8,v182"
+04:14:08.706555 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:08.706726 table@compaction committed F-1 S-331B Ke·0 D·1 T·637.639µs
+04:14:08.706826 table@remove removed @300
+04:14:08.706935 table@remove removed @250
+04:14:08.706955 table@compaction L0·1 -> L1·1 S·662B Q·183
+04:14:08.707233 db@close closing
+04:14:08.707274 table@build created L1@304 N·1 S·331B "event-6,v178":"event-6,v178"
+04:14:08.707293 table@build exiting
+04:14:08.707303 table@build revert @304
+04:14:08.707428 db@write was delayed N·1 T·1.16575ms
+04:14:08.707489 db@close done T·255.01µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:10.707891 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:10.708345 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:10.708382 db@open opening
+04:14:10.708579 journal@recovery F·1
+04:14:10.709093 journal@recovery recovering @301
+04:14:10.710292 memdb@flush created L0@304 N·1 S·331B "event-9,v184":"event-9,v184"
+04:14:10.711414 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:10.713114 db@janitor F·65 G·0
+04:14:10.713138 db@open done T·4.741166ms
+04:14:10.713185 table@compaction L0·1 -> L1·1 S·662B Q·185
+04:14:10.713565 table@build created L1@307 N·1 S·331B "event-9,v184":"event-9,v184"
+04:14:10.713608 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:10.713755 table@compaction committed F-1 S-331B Ke·0 D·1 T·537.168µs
+04:14:10.713836 table@remove removed @304
+04:14:10.713926 table@remove removed @254
+04:14:10.713946 table@compaction L0·1 -> L1·1 S·662B Q·185
+04:14:10.714251 table@build created L1@308 N·1 S·331B "event-6,v178":"event-6,v178"
+04:14:10.714287 version@stat F·[6 55] S·19KiB[1KiB 17KiB] Sc·[1.50 0.00]
+04:14:10.714343 db@close closing
+04:14:10.714431 table@commit exiting
+04:14:10.714519 table@remove removed @293
+04:14:10.714610 table@remove removed @271
+04:14:10.714662 db@write was delayed N·1 T·1.12606ms
+04:14:10.714697 db@close done T·354.571µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:12.712827 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:12.713135 version@stat F·[6 55] S·19KiB[1KiB 17KiB] Sc·[1.50 0.00]
+04:14:12.713169 db@open opening
+04:14:12.713357 journal@recovery F·1
+04:14:12.713860 journal@recovery recovering @305
+04:14:12.714712 memdb@flush created L0@309 N·1 S·332B "event-10,v186":"event-10,v186"
+04:14:12.715182 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:12.716433 db@janitor F·64 G·0
+04:14:12.716472 db@open done T·3.274747ms
+04:14:12.716511 table@compaction L0·1 -> L1·1 S·664B Q·187
+04:14:12.716566 db@close closing
+04:14:12.716812 db@close done T·244.874µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:14.717892 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:14.718202 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:14.718233 db@open opening
+04:14:14.718401 journal@recovery F·1
+04:14:14.718891 journal@recovery recovering @310
+04:14:14.719757 memdb@flush created L0@312 N·1 S·332B "event-11,v188":"event-11,v188"
+04:14:14.720205 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:14.721446 db@janitor F·65 G·0
+04:14:14.721468 db@open done T·3.221647ms
+04:14:14.721496 table@compaction L0·1 -> L1·1 S·664B Q·189
+04:14:14.721885 table@build created L1@315 N·1 S·332B "event-11,v188":"event-11,v188"
+04:14:14.721925 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:14.722082 table@compaction committed F-1 S-332B Ke·0 D·1 T·554.882µs
+04:14:14.722175 table@remove removed @312
+04:14:14.722295 table@remove removed @262
+04:14:14.722320 table@compaction L0·2 -> L1·1 S·993B Q·189
+04:14:14.722576 db@close closing
+04:14:14.722701 table@build created L1@316 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:14.722719 table@build exiting
+04:14:14.722729 table@build revert @316
+04:14:14.722886 db@write was delayed N·1 T·1.048653ms
+04:14:14.722932 db@close done T·356.291µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:16.724646 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:16.725019 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:16.725054 db@open opening
+04:14:16.725229 journal@recovery F·1
+04:14:16.725723 journal@recovery recovering @313
+04:14:16.726789 memdb@flush created L0@316 N·1 S·332B "event-12,v190":"event-12,v190"
+04:14:16.727438 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:16.729080 db@janitor F·65 G·0
+04:14:16.729116 db@open done T·4.050716ms
+04:14:16.729189 table@compaction L0·1 -> L1·1 S·664B Q·191
+04:14:16.729708 table@build created L1@319 N·1 S·332B "event-12,v190":"event-12,v190"
+04:14:16.729785 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:16.729971 table@compaction committed F-1 S-332B Ke·0 D·1 T·719.039µs
+04:14:16.730096 table@remove removed @316
+04:14:16.730211 table@remove removed @266
+04:14:16.730234 table@compaction L0·2 -> L1·1 S·993B Q·191
+04:14:16.730454 db@close closing
+04:14:16.730623 table@build created L1@320 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:16.730638 table@build exiting
+04:14:16.730650 table@build revert @320
+04:14:16.730845 db@write was delayed N·1 T·1.261097ms
+04:14:16.730919 db@close done T·465.019µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:18.729709 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:18.730073 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:18.730109 db@open opening
+04:14:18.730319 journal@recovery F·1
+04:14:18.730724 journal@recovery recovering @317
+04:14:18.731537 memdb@flush created L0@320 N·1 S·332B "event-13,v192":"event-13,v192"
+04:14:18.732004 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:18.733152 db@janitor F·65 G·0
+04:14:18.733173 db@open done T·3.049898ms
+04:14:18.733198 table@compaction L0·1 -> L1·1 S·664B Q·193
+04:14:18.733567 table@build created L1@323 N·1 S·332B "event-13,v192":"event-13,v192"
+04:14:18.733610 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:18.733762 table@compaction committed F-1 S-332B Ke·0 D·1 T·535.091µs
+04:14:18.733868 table@remove removed @320
+04:14:18.733947 table@remove removed @270
+04:14:18.733969 table@compaction L0·2 -> L1·1 S·993B Q·193
+04:14:18.734251 db@close closing
+04:14:18.734316 table@build created L1@324 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:18.734334 table@build exiting
+04:14:18.734344 table@build revert @324
+04:14:18.734469 db@write was delayed N·1 T·1.037607ms
+04:14:18.734534 db@close done T·281.731µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:20.738661 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:20.739091 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:20.739149 db@open opening
+04:14:20.739417 journal@recovery F·1
+04:14:20.739926 journal@recovery recovering @321
+04:14:20.740889 memdb@flush created L0@324 N·1 S·332B "event-14,v194":"event-14,v194"
+04:14:20.741595 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:20.743605 db@janitor F·65 G·0
+04:14:20.743646 db@open done T·4.469595ms
+04:14:20.743710 table@compaction L0·2 -> L1·1 S·996B Q·195
+04:14:20.744472 table@build created L1@327 N·1 S·332B "event-14,v194":"event-14,v194"
+04:14:20.744540 version@stat F·[6 55] S·19KiB[1KiB 17KiB] Sc·[1.50 0.00]
+04:14:20.744739 table@compaction committed F-2 S-664B Ke·0 D·2 T·986.703µs
+04:14:20.744866 table@remove removed @324
+04:14:20.745041 table@remove removed @272
+04:14:20.745215 table@remove removed @60
+04:14:20.745265 table@compaction L0·2 -> L1·1 S·993B Q·195
+04:14:20.745371 db@close closing
+04:14:20.745651 db@write was delayed N·1 T·1.608098ms
+04:14:20.745765 db@close done T·392.717µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:22.744923 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:22.745237 version@stat F·[6 55] S·19KiB[1KiB 17KiB] Sc·[1.50 0.00]
+04:14:22.745271 db@open opening
+04:14:22.745449 journal@recovery F·1
+04:14:22.745904 journal@recovery recovering @325
+04:14:22.746796 memdb@flush created L0@328 N·1 S·332B "event-15,v196":"event-15,v196"
+04:14:22.747247 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:22.748480 db@janitor F·64 G·0
+04:14:22.748503 db@open done T·3.21976ms
+04:14:22.748528 table@compaction L0·1 -> L1·1 S·664B Q·197
+04:14:22.748554 db@close closing
+04:14:22.748555 table@build exiting
+04:14:22.748666 db@close done T·110.921µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:24.752338 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:24.752705 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:24.752762 db@open opening
+04:14:24.752950 journal@recovery F·1
+04:14:24.753325 journal@recovery recovering @329
+04:14:24.754141 memdb@flush created L0@331 N·1 S·332B "event-16,v198":"event-16,v198"
+04:14:24.754605 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:24.755762 db@janitor F·65 G·0
+04:14:24.755786 db@open done T·3.011508ms
+04:14:24.755813 table@compaction L0·1 -> L1·1 S·664B Q·199
+04:14:24.756187 table@build created L1@334 N·1 S·332B "event-16,v198":"event-16,v198"
+04:14:24.756231 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:24.756390 table@compaction committed F-1 S-332B Ke·0 D·1 T·546.84µs
+04:14:24.756489 table@remove removed @331
+04:14:24.756583 table@remove removed @66
+04:14:24.756609 table@compaction L0·2 -> L1·1 S·993B Q·199
+04:14:24.756917 db@close closing
+04:14:24.756973 table@build created L1@335 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:24.756999 table@build exiting
+04:14:24.757015 table@build revert @335
+04:14:24.757162 db@write was delayed N·1 T·1.077155ms
+04:14:24.757232 db@close done T·314.358µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:26.757252 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:26.757757 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:26.757797 db@open opening
+04:14:26.757996 journal@recovery F·1
+04:14:26.758525 journal@recovery recovering @332
+04:14:26.759398 memdb@flush created L0@335 N·1 S·329B "event-17,v200":"event-17,v200"
+04:14:26.760080 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:26.761387 db@janitor F·65 G·0
+04:14:26.761424 db@open done T·3.613004ms
+04:14:26.761473 table@compaction L0·1 -> L1·1 S·661B Q·201
+04:14:26.761925 table@build created L1@338 N·1 S·329B "event-17,v200":"event-17,v200"
+04:14:26.761975 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:26.762135 table@compaction committed F-1 S-332B Ke·0 D·1 T·631.017µs
+04:14:26.762233 table@remove removed @335
+04:14:26.762316 table@remove removed @70
+04:14:26.762343 table@compaction L0·2 -> L1·1 S·993B Q·201
+04:14:26.762532 db@close closing
+04:14:26.762765 table@build created L1@339 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:26.762783 table@build exiting
+04:14:26.762794 table@build revert @339
+04:14:26.762927 db@write was delayed N·1 T·1.040038ms
+04:14:26.762994 db@close done T·461.167µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:28.767888 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:28.768323 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:28.768394 db@open opening
+04:14:28.768639 journal@recovery F·1
+04:14:28.769271 journal@recovery recovering @336
+04:14:28.770306 memdb@flush created L0@339 N·1 S·332B "event-18,v202":"event-18,v202"
+04:14:28.771240 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:28.773142 db@janitor F·65 G·0
+04:14:28.773177 db@open done T·4.769261ms
+04:14:28.773283 table@compaction L0·1 -> L1·1 S·664B Q·203
+04:14:28.773945 table@build created L1@342 N·1 S·332B "event-18,v202":"event-18,v202"
+04:14:28.774018 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:28.774258 table@compaction committed F-1 S-332B Ke·0 D·1 T·882.757µs
+04:14:28.774396 table@remove removed @339
+04:14:28.775082 table@remove removed @73
+04:14:28.775140 table@compaction L0·2 -> L1·1 S·993B Q·203
+04:14:28.775220 db@close closing
+04:14:28.775471 db@write was delayed N·1 T·1.927641ms
+04:14:28.775584 db@close done T·363.727µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:30.772145 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:30.772455 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:30.772490 db@open opening
+04:14:30.772675 journal@recovery F·1
+04:14:30.773070 journal@recovery recovering @340
+04:14:30.773826 memdb@flush created L0@343 N·1 S·332B "event-19,v204":"event-19,v204"
+04:14:30.774384 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:30.775479 db@janitor F·65 G·0
+04:14:30.775502 db@open done T·3.0003ms
+04:14:30.775538 table@compaction L0·1 -> L1·1 S·664B Q·205
+04:14:30.775939 table@build created L1@346 N·1 S·332B "event-19,v204":"event-19,v204"
+04:14:30.775981 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:30.776126 table@compaction committed F-1 S-332B Ke·0 D·1 T·560.426µs
+04:14:30.776206 table@remove removed @343
+04:14:30.776285 table@remove removed @76
+04:14:30.776307 table@compaction L0·2 -> L1·1 S·993B Q·205
+04:14:30.776578 db@close closing
+04:14:30.776652 table@build created L1@347 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:30.776668 table@build exiting
+04:14:30.776678 table@build revert @347
+04:14:30.776786 db@write was delayed N·1 T·1.028908ms
+04:14:30.776834 db@close done T·255.651µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:32.774902 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:32.775199 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:32.775233 db@open opening
+04:14:32.775412 journal@recovery F·1
+04:14:32.775788 journal@recovery recovering @344
+04:14:32.776329 memdb@flush created L0@347 N·1 S·332B "event-20,v206":"event-20,v206"
+04:14:32.776880 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:32.778033 db@janitor F·65 G·0
+04:14:32.778056 db@open done T·2.809922ms
+04:14:32.778080 table@compaction L0·1 -> L1·1 S·664B Q·207
+04:14:32.778436 table@build created L1@350 N·1 S·332B "event-20,v206":"event-20,v206"
+04:14:32.778474 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:32.778617 table@compaction committed F-1 S-332B Ke·0 D·1 T·510.386µs
+04:14:32.778710 table@remove removed @347
+04:14:32.779305 table@remove removed @79
+04:14:32.779334 table@compaction L0·2 -> L1·1 S·993B Q·207
+04:14:32.779376 db@close closing
+04:14:32.779499 db@write was delayed N·1 T·1.271669ms
+04:14:32.779550 db@close done T·173.397µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:34.787567 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:34.787864 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:34.787896 db@open opening
+04:14:34.788075 journal@recovery F·1
+04:14:34.788534 journal@recovery recovering @348
+04:14:34.789456 memdb@flush created L0@351 N·1 S·332B "event-21,v208":"event-21,v208"
+04:14:34.789925 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:34.791203 db@janitor F·65 G·0
+04:14:34.791224 db@open done T·3.315543ms
+04:14:34.791267 table@compaction L0·1 -> L1·1 S·664B Q·209
+04:14:34.791804 table@build created L1@354 N·1 S·332B "event-21,v208":"event-21,v208"
+04:14:34.791877 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:34.792040 table@compaction committed F-1 S-332B Ke·0 D·1 T·741.362µs
+04:14:34.792174 table@remove removed @351
+04:14:34.792749 table@remove removed @82
+04:14:34.792779 table@compaction L0·2 -> L1·1 S·993B Q·209
+04:14:34.792819 db@close closing
+04:14:34.792973 db@write was delayed N·1 T·1.528641ms
+04:14:34.793023 db@close done T·204.247µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:36.790695 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:36.791435 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:36.791570 db@open opening
+04:14:36.791818 journal@recovery F·1
+04:14:36.792379 journal@recovery recovering @352
+04:14:36.793433 memdb@flush created L0@355 N·1 S·332B "event-22,v210":"event-22,v210"
+04:14:36.793988 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:36.795173 db@janitor F·65 G·0
+04:14:36.795195 db@open done T·3.591871ms
+04:14:36.795217 table@compaction L0·1 -> L1·1 S·664B Q·211
+04:14:36.795576 table@build created L1@358 N·1 S·332B "event-22,v210":"event-22,v210"
+04:14:36.795616 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:36.795772 table@compaction committed F-1 S-332B Ke·0 D·1 T·527.936µs
+04:14:36.795872 table@remove removed @355
+04:14:36.795963 table@remove removed @85
+04:14:36.795986 table@compaction L0·2 -> L1·1 S·993B Q·211
+04:14:36.796360 table@build created L1@359 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:36.796385 table@commit exiting
+04:14:36.796364 db@close closing
+04:14:36.796457 db@write was delayed N·1 T·1.118326ms
+04:14:36.796530 db@close done T·165.417µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:38.795646 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:38.795986 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:38.796027 db@open opening
+04:14:38.796226 journal@recovery F·1
+04:14:38.796612 journal@recovery recovering @356
+04:14:38.797109 memdb@flush created L0@359 N·1 S·332B "event-23,v212":"event-23,v212"
+04:14:38.797689 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:38.798853 db@janitor F·65 G·0
+04:14:38.798876 db@open done T·2.835165ms
+04:14:38.798906 table@compaction L0·1 -> L1·1 S·664B Q·213
+04:14:38.799281 table@build created L1@362 N·1 S·332B "event-23,v212":"event-23,v212"
+04:14:38.799326 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:38.799485 table@compaction committed F-1 S-332B Ke·0 D·1 T·550.813µs
+04:14:38.799576 table@remove removed @359
+04:14:38.799668 table@remove removed @88
+04:14:38.799691 table@compaction L0·2 -> L1·1 S·993B Q·213
+04:14:38.799984 db@close closing
+04:14:38.800038 table@build created L1@363 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:38.800056 table@build exiting
+04:14:38.800066 table@build revert @363
+04:14:38.800198 db@write was delayed N·1 T·1.044916ms
+04:14:38.800247 db@close done T·262.968µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:40.802065 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:40.802397 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:40.802429 db@open opening
+04:14:40.802667 journal@recovery F·1
+04:14:40.803184 journal@recovery recovering @360
+04:14:40.804007 memdb@flush created L0@363 N·1 S·329B "event-24,v214":"event-24,v214"
+04:14:40.804469 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:40.805608 db@janitor F·65 G·0
+04:14:40.805637 db@open done T·3.196292ms
+04:14:40.805670 table@compaction L0·1 -> L1·1 S·658B Q·215
+04:14:40.806046 table@build created L1@366 N·1 S·329B "event-24,v214":"event-24,v214"
+04:14:40.806086 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:40.806230 table@compaction committed F-1 S-329B Ke·0 D·1 T·530.69µs
+04:14:40.806316 table@remove removed @363
+04:14:40.806410 table@remove removed @91
+04:14:40.806432 table@compaction L0·2 -> L1·1 S·993B Q·215
+04:14:40.806721 db@close closing
+04:14:40.806771 table@build created L1@367 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:40.806785 table@build exiting
+04:14:40.806794 table@build revert @367
+04:14:40.806924 db@write was delayed N·1 T·1.034347ms
+04:14:40.806981 db@close done T·259.248µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:42.807692 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:42.808007 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:42.808043 db@open opening
+04:14:42.808228 journal@recovery F·1
+04:14:42.808742 journal@recovery recovering @364
+04:14:42.809638 memdb@flush created L0@367 N·1 S·332B "event-25,v216":"event-25,v216"
+04:14:42.810357 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:42.811431 db@janitor F·65 G·0
+04:14:42.811454 db@open done T·3.396269ms
+04:14:42.811509 table@compaction L0·1 -> L1·1 S·664B Q·217
+04:14:42.811899 table@build created L1@370 N·1 S·332B "event-25,v216":"event-25,v216"
+04:14:42.811943 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:42.812090 table@compaction committed F-1 S-332B Ke·0 D·1 T·555.588µs
+04:14:42.812175 table@remove removed @367
+04:14:42.812263 table@remove removed @94
+04:14:42.812297 table@compaction L0·2 -> L1·1 S·993B Q·217
+04:14:42.812625 db@close closing
+04:14:42.812746 table@build created L1@371 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:42.812770 table@build exiting
+04:14:42.812784 table@build revert @371
+04:14:42.812965 db@write was delayed N·1 T·1.106339ms
+04:14:42.813043 db@close done T·417.318µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:44.813229 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:44.813825 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:44.813930 db@open opening
+04:14:44.814130 journal@recovery F·1
+04:14:44.814693 journal@recovery recovering @368
+04:14:44.815129 memdb@flush created L0@371 N·1 S·332B "event-26,v218":"event-26,v218"
+04:14:44.815577 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:44.816756 db@janitor F·65 G·0
+04:14:44.816779 db@open done T·2.834292ms
+04:14:44.816812 table@compaction L0·1 -> L1·1 S·664B Q·219
+04:14:44.817206 table@build created L1@374 N·1 S·332B "event-26,v218":"event-26,v218"
+04:14:44.817250 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:44.817395 table@compaction committed F-1 S-332B Ke·0 D·1 T·548.378µs
+04:14:44.817483 table@remove removed @371
+04:14:44.817631 table@remove removed @97
+04:14:44.817666 table@compaction L0·2 -> L1·1 S·993B Q·219
+04:14:44.817936 db@close closing
+04:14:44.818079 table@build created L1@375 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:44.818095 table@build exiting
+04:14:44.818107 table@build revert @375
+04:14:44.818233 db@write was delayed N·1 T·1.092103ms
+04:14:44.818288 db@close done T·352.579µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:46.818898 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:46.819258 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:46.819295 db@open opening
+04:14:46.819486 journal@recovery F·1
+04:14:46.819912 journal@recovery recovering @372
+04:14:46.820709 memdb@flush created L0@375 N·1 S·332B "event-27,v220":"event-27,v220"
+04:14:46.821220 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:46.822409 db@janitor F·65 G·0
+04:14:46.822432 db@open done T·3.123762ms
+04:14:46.822458 table@compaction L0·1 -> L1·1 S·664B Q·221
+04:14:46.822864 table@build created L1@378 N·1 S·332B "event-27,v220":"event-27,v220"
+04:14:46.822949 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:46.823111 table@compaction committed F-1 S-332B Ke·0 D·1 T·614.833µs
+04:14:46.823204 table@remove removed @375
+04:14:46.823312 table@remove removed @100
+04:14:46.823338 table@compaction L0·2 -> L1·1 S·993B Q·221
+04:14:46.823551 db@close closing
+04:14:46.823737 table@build created L1@379 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:46.823759 table@build exiting
+04:14:46.823771 table@build revert @379
+04:14:46.823946 db@write was delayed N·1 T·1.064728ms
+04:14:46.824044 db@close done T·491.805µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:48.823044 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:48.823436 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:48.823472 db@open opening
+04:14:48.823676 journal@recovery F·1
+04:14:48.824157 journal@recovery recovering @376
+04:14:48.825017 memdb@flush created L0@379 N·1 S·332B "event-28,v222":"event-28,v222"
+04:14:48.825486 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:48.826822 db@janitor F·65 G·0
+04:14:48.826847 db@open done T·3.360859ms
+04:14:48.826875 table@compaction L0·1 -> L1·1 S·664B Q·223
+04:14:48.827274 table@build created L1@382 N·1 S·332B "event-28,v222":"event-28,v222"
+04:14:48.827322 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:48.827469 table@compaction committed F-1 S-332B Ke·0 D·1 T·561.278µs
+04:14:48.827558 table@remove removed @379
+04:14:48.827658 table@remove removed @103
+04:14:48.827682 table@compaction L0·2 -> L1·1 S·993B Q·223
+04:14:48.828013 db@close closing
+04:14:48.828061 table@build created L1@383 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:48.828083 table@build exiting
+04:14:48.828095 table@build revert @383
+04:14:48.828256 db@write was delayed N·1 T·1.110599ms
+04:14:48.828330 db@close done T·317.052µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:50.827699 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:50.828014 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:50.828048 db@open opening
+04:14:50.828236 journal@recovery F·1
+04:14:50.828731 journal@recovery recovering @380
+04:14:50.829556 memdb@flush created L0@383 N·1 S·332B "event-29,v224":"event-29,v224"
+04:14:50.830229 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:50.831357 db@janitor F·65 G·0
+04:14:50.831384 db@open done T·3.322408ms
+04:14:50.831410 table@compaction L0·1 -> L1·1 S·664B Q·225
+04:14:50.831795 table@build created L1@386 N·1 S·332B "event-29,v224":"event-29,v224"
+04:14:50.831857 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:50.832027 table@compaction committed F-1 S-332B Ke·0 D·1 T·585.871µs
+04:14:50.832119 table@remove removed @383
+04:14:50.832209 table@remove removed @106
+04:14:50.832232 table@compaction L0·2 -> L1·1 S·993B Q·225
+04:14:50.832556 db@close closing
+04:14:50.832598 table@build created L1@387 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:50.832622 table@build exiting
+04:14:50.832640 table@build revert @387
+04:14:50.832789 db@write was delayed N·1 T·1.126092ms
+04:14:50.832870 db@close done T·313.273µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:52.835717 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:52.836075 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:52.836108 db@open opening
+04:14:52.836316 journal@recovery F·1
+04:14:52.836765 journal@recovery recovering @384
+04:14:52.837671 memdb@flush created L0@387 N·1 S·332B "event-30,v226":"event-30,v226"
+04:14:52.838161 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:52.839604 db@janitor F·65 G·0
+04:14:52.839648 db@open done T·3.527574ms
+04:14:52.839678 table@compaction L0·1 -> L1·1 S·664B Q·227
+04:14:52.840158 table@build created L1@390 N·1 S·332B "event-30,v226":"event-30,v226"
+04:14:52.840233 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:52.840510 table@compaction committed F-1 S-332B Ke·0 D·1 T·791.574µs
+04:14:52.840707 table@remove removed @387
+04:14:52.841436 table@remove removed @109
+04:14:52.841509 table@compaction L0·2 -> L1·1 S·993B Q·227
+04:14:52.841593 db@close closing
+04:14:52.841813 db@write was delayed N·1 T·1.869732ms
+04:14:52.841884 db@close done T·290.984µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:54.841963 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:54.842277 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:54.842312 db@open opening
+04:14:54.842500 journal@recovery F·1
+04:14:54.842898 journal@recovery recovering @388
+04:14:54.843843 memdb@flush created L0@391 N·1 S·332B "event-31,v228":"event-31,v228"
+04:14:54.844348 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:54.845639 db@janitor F·65 G·0
+04:14:54.845663 db@open done T·3.337745ms
+04:14:54.845694 table@compaction L0·1 -> L1·1 S·664B Q·229
+04:14:54.846135 table@build created L1@394 N·1 S·332B "event-31,v228":"event-31,v228"
+04:14:54.846190 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:54.846348 table@compaction committed F-1 S-332B Ke·0 D·1 T·619.967µs
+04:14:54.846440 table@remove removed @391
+04:14:54.846547 table@remove removed @112
+04:14:54.846571 table@compaction L0·2 -> L1·1 S·993B Q·229
+04:14:54.846760 db@close closing
+04:14:54.846976 table@build created L1@395 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:54.846993 table@build exiting
+04:14:54.847009 table@build revert @395
+04:14:54.847139 db@write was delayed N·1 T·1.032911ms
+04:14:54.847206 db@close done T·445.741µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:56.848172 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:56.848589 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:56.848626 db@open opening
+04:14:56.848811 journal@recovery F·1
+04:14:56.849254 journal@recovery recovering @392
+04:14:56.849782 memdb@flush created L0@395 N·1 S·329B "event-32,v230":"event-32,v230"
+04:14:56.850418 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:56.851562 db@janitor F·65 G·0
+04:14:56.851588 db@open done T·2.949078ms
+04:14:56.851618 table@compaction L0·1 -> L1·1 S·661B Q·231
+04:14:56.852030 table@build created L1@398 N·1 S·329B "event-32,v230":"event-32,v230"
+04:14:56.852080 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:56.852245 table@compaction committed F-1 S-332B Ke·0 D·1 T·592.806µs
+04:14:56.852337 table@remove removed @395
+04:14:56.852438 table@remove removed @115
+04:14:56.852462 table@compaction L0·2 -> L1·1 S·993B Q·231
+04:14:56.852744 db@close closing
+04:14:56.852838 table@build created L1@399 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:56.852854 table@build exiting
+04:14:56.852865 table@build revert @399
+04:14:56.853050 db@write was delayed N·1 T·1.08445ms
+04:14:56.853103 db@close done T·358.699µs
+=============== Nov 26, 2018 (MSK) ===============
+04:14:58.853862 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:14:58.854171 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:58.854206 db@open opening
+04:14:58.854392 journal@recovery F·1
+04:14:58.854800 journal@recovery recovering @396
+04:14:58.855605 memdb@flush created L0@399 N·1 S·329B "event-33,v232":"event-33,v232"
+04:14:58.856132 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:14:58.857361 db@janitor F·65 G·0
+04:14:58.857386 db@open done T·3.167627ms
+04:14:58.857420 table@compaction L0·1 -> L1·1 S·661B Q·233
+04:14:58.857813 table@build created L1@402 N·1 S·329B "event-33,v232":"event-33,v232"
+04:14:58.857857 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:14:58.858008 table@compaction committed F-1 S-332B Ke·0 D·1 T·557.877µs
+04:14:58.858101 table@remove removed @399
+04:14:58.858232 table@remove removed @118
+04:14:58.858255 table@compaction L0·2 -> L1·1 S·993B Q·233
+04:14:58.858521 db@close closing
+04:14:58.858662 table@build created L1@403 N·1 S·331B "event-4,v174":"event-4,v174"
+04:14:58.858692 table@build exiting
+04:14:58.858705 table@build revert @403
+04:14:58.858913 db@write was delayed N·1 T·1.051121ms
+04:14:58.858986 db@close done T·463.8µs
+=============== Nov 26, 2018 (MSK) ===============
+04:15:00.861749 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:15:00.862082 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:00.862116 db@open opening
+04:15:00.862300 journal@recovery F·1
+04:15:00.862695 journal@recovery recovering @400
+04:15:00.863544 memdb@flush created L0@403 N·1 S·332B "event-34,v234":"event-34,v234"
+04:15:00.864014 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:15:00.865215 db@janitor F·65 G·0
+04:15:00.865240 db@open done T·3.111399ms
+04:15:00.865268 table@compaction L0·1 -> L1·1 S·664B Q·235
+04:15:00.865674 table@build created L1@406 N·1 S·332B "event-34,v234":"event-34,v234"
+04:15:00.865718 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:00.865872 table@compaction committed F-1 S-332B Ke·0 D·1 T·571.827µs
+04:15:00.865962 table@remove removed @403
+04:15:00.866058 table@remove removed @121
+04:15:00.866081 table@compaction L0·2 -> L1·1 S·993B Q·235
+04:15:00.866323 db@close closing
+04:15:00.866463 table@build created L1@407 N·1 S·331B "event-4,v174":"event-4,v174"
+04:15:00.866477 table@build exiting
+04:15:00.866488 table@build revert @407
+04:15:00.866600 db@write was delayed N·1 T·1.022677ms
+04:15:00.866650 db@close done T·325.91µs
+=============== Nov 26, 2018 (MSK) ===============
+04:15:02.864066 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:15:02.864364 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:02.864398 db@open opening
+04:15:02.864584 journal@recovery F·1
+04:15:02.864980 journal@recovery recovering @404
+04:15:02.865540 memdb@flush created L0@407 N·1 S·332B "event-35,v236":"event-35,v236"
+04:15:02.866264 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:15:02.867369 db@janitor F·65 G·0
+04:15:02.867404 db@open done T·2.992401ms
+04:15:02.867420 table@compaction L0·1 -> L1·1 S·664B Q·237
+04:15:02.867816 table@build created L1@410 N·1 S·332B "event-35,v236":"event-35,v236"
+04:15:02.867874 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:02.868034 table@compaction committed F-1 S-332B Ke·0 D·1 T·583.695µs
+04:15:02.868124 table@remove removed @407
+04:15:02.868214 table@remove removed @124
+04:15:02.868237 table@compaction L0·2 -> L1·1 S·993B Q·237
+04:15:02.868508 db@close closing
+04:15:02.868624 table@build created L1@411 N·1 S·331B "event-4,v174":"event-4,v174"
+04:15:02.868643 table@build exiting
+04:15:02.868654 table@build revert @411
+04:15:02.868798 db@write was delayed N·1 T·1.042046ms
+04:15:02.868859 db@close done T·350.57µs
+=============== Nov 26, 2018 (MSK) ===============
+04:15:04.871056 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:15:04.871401 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:04.871440 db@open opening
+04:15:04.871636 journal@recovery F·1
+04:15:04.872175 journal@recovery recovering @408
+04:15:04.873176 memdb@flush created L0@411 N·1 S·332B "event-36,v238":"event-36,v238"
+04:15:04.874373 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:15:04.876017 db@janitor F·65 G·0
+04:15:04.876051 db@open done T·4.59656ms
+04:15:04.876104 table@compaction L0·1 -> L1·1 S·664B Q·239
+04:15:04.876530 table@build created L1@414 N·1 S·332B "event-36,v238":"event-36,v238"
+04:15:04.876579 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:04.876728 table@compaction committed F-1 S-332B Ke·0 D·1 T·588.991µs
+04:15:04.876817 table@remove removed @411
+04:15:04.876910 table@remove removed @127
+04:15:04.876934 table@compaction L0·2 -> L1·1 S·993B Q·239
+04:15:04.877212 db@close closing
+04:15:04.877331 table@build created L1@415 N·1 S·331B "event-4,v174":"event-4,v174"
+04:15:04.877357 table@build exiting
+04:15:04.877371 table@build revert @415
+04:15:04.877554 db@write was delayed N·1 T·1.086467ms
+04:15:04.877639 db@close done T·425.791µs
+=============== Nov 26, 2018 (MSK) ===============
+04:15:06.876638 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:15:06.877197 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:06.877231 db@open opening
+04:15:06.877403 journal@recovery F·1
+04:15:06.877766 journal@recovery recovering @412
+04:15:06.878534 memdb@flush created L0@415 N·1 S·332B "event-37,v240":"event-37,v240"
+04:15:06.879019 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:15:06.880085 db@janitor F·65 G·0
+04:15:06.880103 db@open done T·2.860702ms
+04:15:06.880132 table@compaction L0·1 -> L1·1 S·664B Q·241
+04:15:06.880482 table@build created L1@418 N·1 S·332B "event-37,v240":"event-37,v240"
+04:15:06.880521 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:06.880665 table@compaction committed F-1 S-332B Ke·0 D·1 T·506.106µs
+04:15:06.880745 table@remove removed @415
+04:15:06.880824 table@remove removed @130
+04:15:06.880845 table@compaction L0·2 -> L1·1 S·993B Q·241
+04:15:06.881178 table@build created L1@419 N·1 S·331B "event-4,v174":"event-4,v174"
+04:15:06.881202 db@close closing
+04:15:06.881239 version@stat F·[5 55] S·19KiB[1KiB 17KiB] Sc·[1.25 0.00]
+04:15:06.881392 table@commit exiting
+04:15:06.881479 table@remove removed @286
+04:15:06.881562 table@remove removed @234
+04:15:06.881648 table@remove removed @226
+04:15:06.881698 db@write was delayed N·1 T·1.043966ms
+04:15:06.881744 db@close done T·541.497µs
+=============== Nov 26, 2018 (MSK) ===============
+04:15:08.879714 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:15:08.880075 version@stat F·[5 55] S·19KiB[1KiB 17KiB] Sc·[1.25 0.00]
+04:15:08.880111 db@open opening
+04:15:08.880290 journal@recovery F·1
+04:15:08.880789 journal@recovery recovering @416
+04:15:08.881351 memdb@flush created L0@420 N·1 S·329B "event-38,v242":"event-38,v242"
+04:15:08.882004 version@stat F·[6 55] S·19KiB[1KiB 17KiB] Sc·[1.50 0.00]
+04:15:08.883295 db@janitor F·63 G·0
+04:15:08.883333 db@open done T·3.207982ms
+04:15:08.883373 table@compaction L0·1 -> L1·1 S·661B Q·243
+04:15:08.883408 db@close closing
+04:15:08.883886 db@close done T·470.062µs
+=============== Nov 26, 2018 (MSK) ===============
+04:15:10.885972 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:15:10.886278 version@stat F·[6 55] S·19KiB[1KiB 17KiB] Sc·[1.50 0.00]
+04:15:10.886313 db@open opening
+04:15:10.886497 journal@recovery F·1
+04:15:10.886970 journal@recovery recovering @421
+04:15:10.887860 memdb@flush created L0@423 N·1 S·332B "event-39,v244":"event-39,v244"
+04:15:10.888352 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:10.889586 db@janitor F·64 G·0
+04:15:10.889613 db@open done T·3.287743ms
+04:15:10.889637 table@compaction L0·1 -> L1·1 S·664B Q·245
+04:15:10.889663 db@close closing
+04:15:10.889871 db@close done T·206.947µs
+=============== Nov 26, 2018 (MSK) ===============
+04:15:12.890038 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:15:12.890350 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:12.890385 db@open opening
+04:15:12.890571 journal@recovery F·1
+04:15:12.891084 journal@recovery recovering @424
+04:15:12.892065 memdb@flush created L0@426 N·1 S·332B "event-40,v246":"event-40,v246"
+04:15:12.893153 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:15:12.894679 db@janitor F·65 G·0
+04:15:12.894713 db@open done T·4.315077ms
+04:15:12.894783 table@compaction L0·1 -> L1·1 S·664B Q·247
+04:15:12.895218 table@build created L1@429 N·1 S·332B "event-40,v246":"event-40,v246"
+04:15:12.895262 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:12.895435 table@compaction committed F-1 S-332B Ke·0 D·1 T·630.552µs
+04:15:12.895525 table@remove removed @426
+04:15:12.895609 table@remove removed @139
+04:15:12.895631 table@compaction L0·1 -> L1·1 S·664B Q·247
+04:15:12.895843 db@close closing
+04:15:12.895963 table@build created L1@430 N·1 S·332B "event-39,v244":"event-39,v244"
+04:15:12.895982 table@build exiting
+04:15:12.895992 table@build revert @430
+04:15:12.896146 db@write was delayed N·1 T·1.06233ms
+04:15:12.896206 db@close done T·362.416µs
+=============== Nov 26, 2018 (MSK) ===============
+04:15:14.899454 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:15:14.899766 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:14.899801 db@open opening
+04:15:14.899988 journal@recovery F·1
+04:15:14.900419 journal@recovery recovering @427
+04:15:14.901036 memdb@flush created L0@430 N·1 S·332B "event-41,v248":"event-41,v248"
+04:15:14.901586 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:15:14.902801 db@janitor F·65 G·0
+04:15:14.902833 db@open done T·3.018908ms
+04:15:14.902859 table@compaction L0·1 -> L1·1 S·664B Q·249
+04:15:14.903257 table@build created L1@433 N·1 S·332B "event-41,v248":"event-41,v248"
+04:15:14.903297 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:14.903457 table@compaction committed F-1 S-332B Ke·0 D·1 T·571.421µs
+04:15:14.903577 table@remove removed @430
+04:15:14.903670 table@remove removed @142
+04:15:14.903692 table@compaction L0·1 -> L1·1 S·664B Q·249
+04:15:14.903985 db@close closing
+04:15:14.904032 table@build created L1@434 N·1 S·332B "event-39,v244":"event-39,v244"
+04:15:14.904051 table@build exiting
+04:15:14.904060 table@build revert @434
+04:15:14.904190 db@write was delayed N·1 T·1.103139ms
+04:15:14.904235 db@close done T·249.076µs
+=============== Nov 26, 2018 (MSK) ===============
+04:15:16.906954 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:15:16.907255 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:16.907288 db@open opening
+04:15:16.907490 journal@recovery F·1
+04:15:16.907947 journal@recovery recovering @431
+04:15:16.908894 memdb@flush created L0@434 N·1 S·332B "event-42,v250":"event-42,v250"
+04:15:16.909364 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:15:16.910692 db@janitor F·65 G·0
+04:15:16.910717 db@open done T·3.417263ms
+04:15:16.910746 table@compaction L0·1 -> L1·1 S·664B Q·251
+04:15:16.911171 table@build created L1@437 N·1 S·332B "event-42,v250":"event-42,v250"
+04:15:16.911214 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:16.911367 table@compaction committed F-1 S-332B Ke·0 D·1 T·591.876µs
+04:15:16.911455 table@remove removed @434
+04:15:16.911571 table@remove removed @145
+04:15:16.911592 table@compaction L0·1 -> L1·1 S·664B Q·251
+04:15:16.911825 db@close closing
+04:15:16.911930 table@build created L1@438 N·1 S·332B "event-39,v244":"event-39,v244"
+04:15:16.911947 table@build exiting
+04:15:16.911957 table@build revert @438
+04:15:16.912083 db@write was delayed N·1 T·1.036571ms
+04:15:16.912148 db@close done T·321.558µs
+=============== Nov 26, 2018 (MSK) ===============
+04:15:18.914491 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:15:18.915623 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:18.915867 db@open opening
+04:15:18.916248 journal@recovery F·1
+04:15:18.917169 journal@recovery recovering @435
+04:15:18.918358 memdb@flush created L0@438 N·1 S·332B "event-43,v252":"event-43,v252"
+04:15:18.919192 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:15:18.921498 db@janitor F·65 G·0
+04:15:18.921547 db@open done T·5.651495ms
+04:15:18.921583 table@compaction L0·1 -> L1·1 S·664B Q·253
+04:15:18.922043 table@build created L1@441 N·1 S·332B "event-43,v252":"event-43,v252"
+04:15:18.922106 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:18.922306 table@compaction committed F-1 S-332B Ke·0 D·1 T·684.968µs
+04:15:18.922422 table@remove removed @438
+04:15:18.922546 table@remove removed @148
+04:15:18.922575 table@compaction L0·1 -> L1·1 S·664B Q·253
+04:15:18.922879 db@close closing
+04:15:18.923050 table@build created L1@442 N·1 S·332B "event-39,v244":"event-39,v244"
+04:15:18.923071 table@build exiting
+04:15:18.923082 table@build revert @442
+04:15:18.923235 db@write was delayed N·1 T·1.241755ms
+04:15:18.923305 db@close done T·424.502µs
+=============== Nov 26, 2018 (MSK) ===============
+04:15:20.920260 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:15:20.920570 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:20.920604 db@open opening
+04:15:20.920852 journal@recovery F·1
+04:15:20.921369 journal@recovery recovering @439
+04:15:20.922301 memdb@flush created L0@442 N·1 S·332B "event-44,v254":"event-44,v254"
+04:15:20.922917 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:15:20.924138 db@janitor F·65 G·0
+04:15:20.924163 db@open done T·3.546716ms
+04:15:20.924190 table@compaction L0·1 -> L1·1 S·664B Q·255
+04:15:20.924614 table@build created L1@445 N·1 S·332B "event-44,v254":"event-44,v254"
+04:15:20.924664 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:20.924826 table@compaction committed F-1 S-332B Ke·0 D·1 T·600.959µs
+04:15:20.924928 table@remove removed @442
+04:15:20.925043 table@remove removed @151
+04:15:20.925066 table@compaction L0·1 -> L1·1 S·664B Q·255
+04:15:20.925300 db@close closing
+04:15:20.925452 table@build created L1@446 N·1 S·332B "event-39,v244":"event-39,v244"
+04:15:20.925473 table@build exiting
+04:15:20.925485 table@build revert @446
+04:15:20.925617 db@write was delayed N·1 T·1.052545ms
+04:15:20.925676 db@close done T·375.123µs
+=============== Nov 26, 2018 (MSK) ===============
+04:15:22.926220 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:15:22.926543 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:22.926593 db@open opening
+04:15:22.926780 journal@recovery F·1
+04:15:22.927286 journal@recovery recovering @443
+04:15:22.928542 memdb@flush created L0@446 N·1 S·333B "event-45,v256":"event-45,v256"
+04:15:22.929505 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:15:22.931469 db@janitor F·65 G·0
+04:15:22.931508 db@open done T·4.900018ms
+04:15:22.931554 table@compaction L0·1 -> L1·1 S·665B Q·257
+04:15:22.931983 table@build created L1@449 N·1 S·333B "event-45,v256":"event-45,v256"
+04:15:22.932030 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:22.932190 table@compaction committed F-1 S-332B Ke·0 D·1 T·603.697µs
+04:15:22.932283 table@remove removed @446
+04:15:22.932374 table@remove removed @154
+04:15:22.932397 table@compaction L0·1 -> L1·1 S·664B Q·257
+04:15:22.932732 table@build created L1@450 N·1 S·332B "event-39,v244":"event-39,v244"
+04:15:22.932768 table@commit exiting
+04:15:22.932736 db@close closing
+04:15:22.932880 db@write was delayed N·1 T·1.167453ms
+04:15:22.932951 db@close done T·214.719µs
+=============== Nov 26, 2018 (MSK) ===============
+04:15:24.938001 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:15:24.938318 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:24.938352 db@open opening
+04:15:24.938535 journal@recovery F·1
+04:15:24.939004 journal@recovery recovering @447
+04:15:24.939982 memdb@flush created L0@450 N·1 S·333B "event-46,v258":"event-46,v258"
+04:15:24.940511 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:15:24.941925 db@janitor F·65 G·0
+04:15:24.941958 db@open done T·3.592815ms
+04:15:24.941987 table@compaction L0·1 -> L1·1 S·665B Q·259
+04:15:24.942453 table@build created L1@453 N·1 S·333B "event-46,v258":"event-46,v258"
+04:15:24.942528 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:24.942831 table@compaction committed F-1 S-332B Ke·0 D·1 T·805.651µs
+04:15:24.942997 table@remove removed @450
+04:15:24.943119 table@remove removed @157
+04:15:24.943160 table@compaction L0·1 -> L1·1 S·664B Q·259
+04:15:24.943263 db@close closing
+04:15:24.943598 table@build created L1@454 N·1 S·332B "event-39,v244":"event-39,v244"
+04:15:24.943622 table@build exiting
+04:15:24.943635 table@build revert @454
+04:15:24.943903 db@write was delayed N·1 T·1.20197ms
+04:15:24.944011 db@close done T·747.25µs
+=============== Nov 26, 2018 (MSK) ===============
+04:15:26.942016 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:15:26.942353 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:26.942389 db@open opening
+04:15:26.942583 journal@recovery F·1
+04:15:26.943022 journal@recovery recovering @451
+04:15:26.943554 memdb@flush created L0@454 N·1 S·333B "event-47,v260":"event-47,v260"
+04:15:26.944069 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:15:26.945347 db@janitor F·65 G·0
+04:15:26.945386 db@open done T·2.983933ms
+04:15:26.945413 table@compaction L0·1 -> L1·1 S·665B Q·261
+04:15:26.945801 table@build created L1@457 N·1 S·333B "event-47,v260":"event-47,v260"
+04:15:26.945843 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:26.945992 table@compaction committed F-1 S-332B Ke·0 D·1 T·548.381µs
+04:15:26.946079 table@remove removed @454
+04:15:26.946169 table@remove removed @160
+04:15:26.946191 table@compaction L0·1 -> L1·1 S·664B Q·261
+04:15:26.946517 table@build created L1@458 N·1 S·332B "event-39,v244":"event-39,v244"
+04:15:26.946497 db@close closing
+04:15:26.946535 table@commit exiting
+04:15:26.946684 db@write was delayed N·1 T·1.054586ms
+04:15:26.946751 db@close done T·252.337µs
+=============== Nov 26, 2018 (MSK) ===============
+04:15:28.946321 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:15:28.946619 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:28.946653 db@open opening
+04:15:28.946836 journal@recovery F·1
+04:15:28.947281 journal@recovery recovering @455
+04:15:28.948157 memdb@flush created L0@458 N·1 S·333B "event-48,v262":"event-48,v262"
+04:15:28.948621 version@stat F·[8 55] S·20KiB[2KiB 17KiB] Sc·[2.00 0.00]
+04:15:28.949823 db@janitor F·65 G·0
+04:15:28.949848 db@open done T·3.183096ms
+04:15:28.949880 table@compaction L0·1 -> L1·1 S·665B Q·263
+04:15:28.950317 table@build created L1@461 N·1 S·333B "event-48,v262":"event-48,v262"
+04:15:28.950362 version@stat F·[7 55] S·20KiB[2KiB 17KiB] Sc·[1.75 0.00]
+04:15:28.950515 table@compaction committed F-1 S-332B Ke·0 D·1 T·590.694µs
+04:15:28.950603 table@remove removed @458
+04:15:28.950688 table@remove removed @163
+04:15:28.950711 table@compaction L0·1 -> L1·1 S·664B Q·263
+04:15:28.950993 db@close closing
+04:15:28.951042 table@build created L1@462 N·1 S·332B "event-39,v244":"event-39,v244"
+04:15:28.951062 table@build exiting
+04:15:28.951073 table@build revert @462
+04:15:28.951214 db@write was delayed N·1 T·1.086472ms
+04:15:28.951265 db@close done T·271.747µs
