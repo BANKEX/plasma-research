@@ -18,11 +18,26 @@
       Smart Contract Balance: {{scb}}
     </div>
     <button @click="getSCBalance()">Get smart contract balance</button>
-
+    <br>
+    <br>
+    <label for="amount-metamask">Amount</label>
+    <input id="amount-metamask" v-on:input="amount = $event.target.value">
+    <br>
+    <button @click="depositViaMetaMask(amount)">Deposit via MetaMask</button>
+    <br>
+    <br>
+    <label for="private-key">Private Key</label>
+    <input id="private-key" v-on:input="privateKey = $event.target.value">
+    <br>
+    <label for="amount">Amount</label>
+    <input id="amount" v-on:input="amount = $event.target.value">
+    <br>
+    <button @click="deposit(privateKey, amount)">Deposit without MetaMask</button>
+    <br>
+    <br>
     <div v-bind:class="{ dth: depositReady }" >
       Tx-hash: {{dth}}
     </div>
-    <button @click="depositViaMetaMask(1000)">Deposit</button>
     <br>
     <br>
     <div v-bind:class="{ error: errorReady }">
@@ -41,6 +56,8 @@ export default {
   name: 'Verifier',
   data () {
     return {
+      amount: "0",
+      privateKey: "",
       operator:"",
       node:"",
       smart:"",
@@ -54,7 +71,7 @@ export default {
       depositReady:true,
       errorReady:true,
       ABI: [{"constant":false,"inputs":[{"name":"operator","type":"address"},{"name":"","type":"address"},{"name":"tokenId","type":"uint256"},{"name":"","type":"bytes"}],"name":"onERC721Received","outputs":[{"name":"","type":"bytes4"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"fromIndex","type":"uint256"},{"name":"newBlocks","type":"bytes"},{"name":"protectedBlockNumber","type":"uint256"},{"name":"protectedBlockHash","type":"address"}],"name":"submitBlocks","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"fromIndex","type":"uint256"},{"name":"newBlocks","type":"bytes"},{"name":"protectedBlockNumber","type":"uint256"},{"name":"protectedBlockHash","type":"address"},{"name":"rsv","type":"bytes"}],"name":"submitBlocksSigned","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"renounceOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"blocksLength","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"isOwner","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"token","type":"address"},{"name":"amount","type":"uint256"}],"name":"depositERC20","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"deposit","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"token","type":"address"},{"name":"tokenId","type":"uint256"}],"name":"depositERC721","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"token","type":"address"},{"name":"tokenId","type":"uint256"}],"name":"calculateAssetId","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"pure","type":"function"},{"constant":true,"inputs":[{"name":"i","type":"uint256"}],"name":"blocks","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"MAIN_COIN_ADDRESS","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"token","type":"address"},{"indexed":true,"name":"who","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"AssetDeposited","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"who","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"CoinDeposited","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"token","type":"address"},{"indexed":true,"name":"who","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"ERC20Deposited","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"token","type":"address"},{"indexed":true,"name":"who","type":"address"},{"indexed":true,"name":"tokenId","type":"uint256"}],"name":"ERC721Deposited","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"length","type":"uint256"},{"indexed":false,"name":"time","type":"uint256"}],"name":"BlocksSubmitted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"previousOwner","type":"address"},{"indexed":true,"name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"}],
-      scAddress: "0x1893d32e6570de242b3bce518267166a03534aab",
+      scAddress: "0x618a54808befdcd2f34f95088a24d13196627540",
       error:"",
     }
   },
@@ -82,10 +99,11 @@ export default {
         this.scb = x.data.Balance
       })
     },
-    async deposit(privateKey, address, amount) {
-      const instance = this.blockchain().getInstance(this.ABI, address);
+    async deposit(privateKey, amount) {
+      window.web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:9545'));
+      const instance = this.blockchain().getInstance(this.ABI, this.scAddress);
       const transactionData = this.blockchain().getCallData(instance, "deposit", []);
-      const rawTransaction = await this.blockchain().signTransaction(privateKey, address, amount, transactionData);
+      const rawTransaction = await this.blockchain().signTransaction(privateKey, this.scAddress, amount, transactionData);
       const tx = await this.blockchain().sendSignedTransaction(rawTransaction).catch(err=>{
         this.error = err.message;
         this.errorReady = false;
@@ -94,13 +112,15 @@ export default {
       this.depositReady = false;
     },
     async depositViaMetaMask(amount) {
+      window.web3 = new Web3(web3.currentProvider);
       const instance = this.blockchain().getInstance(this.ABI, this.scAddress);
       const transactionData = this.blockchain().getCallData(instance, "deposit", []);
       const tx = await this.blockchain().sendTransactionViaMetaMask(this.scAddress, amount, transactionData).catch(err=>{
         this.error = err.message;
         this.errorReady = false;
       });
-      return tx.transactionHash;
+      this.dth = tx.transactionHash;
+      this.depositReady = false;
     },
     blockchain() {
       return {
@@ -155,6 +175,7 @@ export default {
 
 
 window.web3 = new Web3(web3.currentProvider || new Web3.providers.HttpProvider('http://127.0.0.1:9545'));
+
 </script>
 <style>
 
