@@ -109,7 +109,7 @@ func GinServer(conf Config) {
 		c.JSON(http.StatusOK, gin.H{
 			"Smart":    conf.Smart,
 			"Operator": conf.Operator,
-			"Node":     conf.Node,
+			"Node":     conf.EthNode,
 		})
 	})
 
