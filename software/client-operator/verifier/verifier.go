@@ -28,11 +28,11 @@ type Config struct {
 	Port     int    `json:port`
 	Key      string `json:key`
 	Operator string `json:operator`
-	Node     string `json:node`
+	EthNode  string `json:ethNode`
 	Smart    string `json:smart`
 }
 
-func ReadConfig(fileName string) (Config, error)  {
+func ReadConfig(fileName string) (Config, error) {
 	var config Config
 
 	f, err := os.Open(fileName)
@@ -90,15 +90,12 @@ func executor(comm string) {
 }
 
 func CLI() {
-
 	fmt.Println("-------------Plasma Verifier-------------")
-
 	p := prompt.New(
 		executor,
 		completer,
 	)
 	p.Run()
-
 }
 
 func GinServer(conf Config) {
@@ -133,12 +130,11 @@ func main() {
 	fmt.Println("PORT: " + strconv.Itoa(conf.Port))
 	fmt.Println("KEY: " + conf.Key)
 	fmt.Println("Operator IP: " + conf.Operator)
-	fmt.Println("Node: " + conf.Node)
+	fmt.Println("Node: " + conf.EthNode)
 	fmt.Println("Smart Contract address: " + conf.Smart)
-
 	fmt.Println("\n\n")
 
-	ethClient.InitClient(conf.Node)
+	ethClient.InitClient(conf.EthNode)
 
 	dispatchers.CreateGenesisBlock()
 
@@ -153,5 +149,4 @@ func main() {
 
 	// Uncomment for start ginServer
 	//GinServer(conf)
-
 }
