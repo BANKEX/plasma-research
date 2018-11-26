@@ -176,6 +176,7 @@ export default {
 
 window.web3 = new Web3(web3.currentProvider || new Web3.providers.HttpProvider('http://127.0.0.1:9545'));
 
+
 </script>
 <style>
 

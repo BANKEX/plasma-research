@@ -9,14 +9,17 @@ import (
 	"log"
 	"os"
 	"strconv"
+<<<<<<< HEAD
 
+=======
+	"../db"
+>>>>>>> 0b3ad7b7de2fc2704229c41454ad51e50626ea2b
 	"../listeners/balance"
 	"../listeners/ethClient"
 	"../listeners/event"
 	"../listeners/storage"
 
 	"./handlers"
-
 	"github.com/c-bata/go-prompt"
 )
 
@@ -57,6 +60,7 @@ func completer(d prompt.Document) []prompt.Suggest {
 		{Text: "plasmaBalance", Description: "Get plasma balance"},
 		{Text: "smartBalance", Description: "Get Smart Contract balance"},
 		{Text: "eventMap", Description: "Get all events map"},
+		{Text: "dbEvents", Description: "Get all events from dbEvents"},
 	}
 	return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
 }
@@ -72,11 +76,21 @@ func executor(comm string) {
 		for i, j := range event.EventMap {
 			fmt.Println(i, j)
 		}
+	} else if comm == "dbEvents"{
+
+		events, err := db.Event("database").GetAll()
+		if err != nil {
+			println("Mistake DB")
+		}
+		fmt.Println(events)
+
 	}
+
 	return
 }
 
 func CLI() {
+
 	fmt.Println("-------------Plasma Verifier-------------")
 
 	p := prompt.New(
@@ -84,6 +98,7 @@ func CLI() {
 		completer,
 	)
 	p.Run()
+
 }
 
 func main() {
