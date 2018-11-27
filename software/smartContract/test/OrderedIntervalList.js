@@ -11,7 +11,7 @@ require('chai')
   .should();
 
 async function validateList (listContract, size) {
-  const first = (await listContract.first.call());
+  const first = (await listContract.firstIndex.call());
   if (size === 0 && first.equals(new BigNumber(0))) {
     return true;
   }
@@ -22,10 +22,10 @@ async function validateList (listContract, size) {
   var count = 1;
 
   var list = [];
-  (await listContract.getPrevious.call(first)).should.be.bignumber.equal(0);
+  (await listContract.getPrev.call(first)).should.be.bignumber.equal(0);
   while (!(await listContract.getNext.call(curIndex)).equals(new BigNumber(0)) && count < size) {
     let nextIndex = await listContract.getNext.call(curIndex);
-    let previousIndex = await listContract.getPrevious.call(curIndex);
+    let prevIndex = await listContract.getPrev.call(curIndex);
     let currentInterval = await listContract.get.call(curIndex);
     list.push('[' + currentInterval[0].toString() + ',' + currentInterval[1].toString() + ')');
 
@@ -35,17 +35,17 @@ async function validateList (listContract, size) {
       assert(next[0] >= currentInterval[1]);
     }
 
-    if (previousIndex > 0) {
-      let next = await listContract.get.call(previousIndex);
+    if (prevIndex > 0) {
+      let next = await listContract.get.call(prevIndex);
       assert(next[1] <= currentInterval[0]);
     }
 
     count = count + 1;
     curIndex = nextIndex;
   }
+
   let currentInterval = await listContract.get.call(curIndex);
   list.push('[' + currentInterval[0].toString() + ',' + currentInterval[1].toString() + ')');
-  //   console.log(list)
   assert((await listContract.getNext.call(curIndex)).equals(new BigNumber(0)));
 
   currentInterval = await listContract.get.call(curIndex);
@@ -91,22 +91,6 @@ contract('OrderedIntervalList', function () {
 
       await validateList(this.orderedList, 2);
     });
-
-    it('insert in front of list', async function() {
-      await this.orderedList.set(0, 0, 101, 200);
-      await this.orderedList.set(0, 1, 0, 100);
-
-      const intervalFirst = await this.orderedList.get(2);
-      const intervalSecond = await this.orderedList.get(1);
-
-      intervalFirst[0].should.be.bignumber.equal(0);
-      intervalFirst[1].should.be.bignumber.equal(100);
-      intervalSecond[0].should.be.bignumber.equal(101);
-      intervalSecond[1].should.be.bignumber.equal(200);
-
-      await validateList(this.orderedList, 2);
-
-    })
 
     it('insert error', async function () {
       await this.orderedList.set(0, 0, 0, 100);
@@ -163,7 +147,7 @@ contract('OrderedIntervalList', function () {
       interval[0].should.be.bignumber.equal(0);
       interval[1].should.be.bignumber.equal(50);
 
-      const id = (await this.orderedList.lastIndex.call());
+      const id = (await this.orderedList.maxIndex.call());
       interval = await this.orderedList.get(id);
 
       interval[0].should.be.bignumber.equal(70);
@@ -230,7 +214,7 @@ contract('OrderedIntervalList', function () {
       await this.orderedList.remove(idLast, 401, 500);
 
       (await this.orderedList.getNext.call(idNewLast)).should.be.bignumber.equal(0);
-      (await this.orderedList.getPrevious.call(idNewFirst)).should.be.bignumber.equal(0);
+      (await this.orderedList.getPrev.call(idNewFirst)).should.be.bignumber.equal(0);
 
       await validateList(this.orderedList, 2);
     });

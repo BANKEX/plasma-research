@@ -6,15 +6,23 @@ import { OrderedIntervalList } from "../OrderedIntervalList.sol";
 contract OrderedIntervalListWrapper {
   using OrderedIntervalList for OrderedIntervalList.Data;
 
-  OrderedIntervalList.Data public _data;
-  uint public lastInserted;
+  OrderedIntervalList.Data private _data;
+  uint private _lastInserted;
 
-  function lastIndex() public view returns(uint) {
-    return _data.index;
+  function lastInserted() public view returns(uint) {
+      return _lastInserted;
   }
 
-  function first() public view returns(uint) {
-    return _data.getFirst();
+  function maxIndex() public view returns(uint) {
+    return _data.intervals.length - 1;
+  }
+
+  function firstIndex() public view returns(uint) {
+    return _data.getFirstIndex();
+  }
+
+  function lastIndex() public view returns(uint) {
+    return _data.getLastIndex();
   }
 
   function get(uint index) public view returns(uint begin, uint end) {
@@ -26,16 +34,16 @@ contract OrderedIntervalListWrapper {
     return _data.intervals[index].next;
   }
 
-  function getPrevious(uint index) public view returns(uint) {
-    return _data.intervals[index].previous;
+  function getPrev(uint index) public view returns(uint) {
+    return _data.intervals[index].prev;
   }
 
-  function set( uint prev, uint next, uint _begin, uint _end) public returns (uint id) {
-    id = _data.insert(prev, next, _begin, _end);
-    lastInserted = id;
+  function set(uint prev, uint next, uint begin, uint end) public returns (uint id) {
+    id = _data.insert(prev, next, begin, end);
+    _lastInserted = id;
   }
 
-  function remove(uint _index, uint begin, uint end) public {
-    _data.remove(_index, begin, end);
+  function remove(uint index, uint begin, uint end) public {
+    _data.remove(index, begin, end);
   }
 }
