@@ -1,16 +1,7 @@
 package main
 
 import (
-	"flag"
-	"fmt"
-	"log"
-	"net/http"
-	"path/filepath"
-	"strconv"
-	"time"
-
 	"../config"
-	"../db"
 	"../dispatchers"
 	"../listeners"
 	"../listeners/balance"
@@ -18,76 +9,15 @@ import (
 	"../listeners/event"
 	"../listeners/storage"
 	"./handlers"
-	portscanner "github.com/anvie/port-scanner"
-	"github.com/c-bata/go-prompt"
-	"github.com/gin-gonic/contrib/static"
-	"github.com/gin-gonic/gin"
+	"./portscanner"
+	"./server"
+	"./cli"
+	"flag"
+	"fmt"
+	"log"
+	"path/filepath"
+	"strconv"
 )
-
-// For CLI
-func completer(d prompt.Document) []prompt.Suggest {
-	s := []prompt.Suggest{
-		{Text: "plasmaBalance", Description: "Get plasma balance"},
-		{Text: "smartBalance", Description: "Get Smart Contract balance"},
-		{Text: "eventMap", Description: "Get all events map"},
-		{Text: "dbEvents", Description: "Get all events from dbEvents"},
-	}
-	return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
-}
-
-func executor(comm string) {
-	if comm == "plasmaBalance" {
-		plasmaBalance := handlers.GetReqBalance(handlers.OperatorAddress, "/pbalance")
-		fmt.Println("Plasma balance:" + plasmaBalance)
-	} else if comm == "smartBalance" {
-		fmt.Println("Smart Contract Balance:" + storage.Balance)
-	} else if comm == "eventMap" {
-		// fmt.Println(fmt.Println(event.EventMap))
-		for i, j := range event.EventMap {
-			fmt.Println(i, j)
-		}
-	} else if comm == "dbEvents" {
-
-		events, err := db.Event("database").GetAll()
-		if err != nil {
-			println("Mistake DB")
-		}
-		fmt.Println(events)
-
-	}
-
-	return
-}
-
-func CLI() {
-	fmt.Println("-------------Plasma Verifier-------------")
-	p := prompt.New(
-		executor,
-		completer,
-	)
-	p.Run()
-}
-
-func GinServer(conf config.VerifierConfig) {
-	fmt.Println("\n")
-	fmt.Println("Gin server: starting on port " + strconv.Itoa(conf.Verifier_port) + " ....")
-
-	r := gin.Default()
-	r.Use(static.Serve("/", static.LocalFile("./frontend/dist", true)))
-
-	r.GET("/scgetbalance", handlers.SCGetBalance)
-	r.GET("/plasmabalance", handlers.GetMyPlasmaBalance)
-
-	r.GET("/conf", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"main_account_public_key": conf.Main_account_public_key,
-			"plasma_operator_address": conf.Plasma_operator_address,
-			"geth_account":            conf.Geth_account,
-		})
-	})
-
-	r.Run(":" + strconv.Itoa(conf.Verifier_port))
-}
 
 func main() {
 
@@ -114,30 +44,14 @@ func main() {
 	fmt.Println("\n\n")
 
 	ethClient.InitClient(conf.Geth_account)
-
 	dispatchers.CreateGenesisBlock()
+	handlers.OperatorAddress = conf.Plasma_operator_address
 
 	go listeners.Checker()
 	go balance.UpdateBalance(&storage.Balance, conf.Main_account_public_key)
 	go event.Start(storage.Client, conf.Main_account_public_key, &storage.Who, &storage.Amount, &storage.EventBlockHash, &storage.EventBlockNumber)
-
-	handlers.OperatorAddress = conf.Plasma_operator_address
-
-	// Start gin server
-	go GinServer(conf)
-
-	// Check server
-	go func() {
-		ps := portscanner.NewPortScanner("localhost", 2*time.Second, 5)
-		for {
-			if ps.IsOpen(2000) == true {
-				fmt.Println("Server started!")
-				return
-			}
-		}
-	}()
-
-	// Start CLI
-	CLI()
+	go server.GinServer(conf)
+	go portscanner.RunScanner()
+	cli.CLI()
 
 }
