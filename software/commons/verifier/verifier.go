@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"time"
 
+	"../config"
 	"../db"
 	"../dispatchers"
 	"../listeners"
@@ -15,12 +17,11 @@ import (
 	"../listeners/ethClient"
 	"../listeners/event"
 	"../listeners/storage"
+	"./handlers"
+	portscanner "github.com/anvie/port-scanner"
+	"github.com/c-bata/go-prompt"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
-
-	"../config"
-	"./handlers"
-	"github.com/c-bata/go-prompt"
 )
 
 // For CLI
@@ -68,6 +69,8 @@ func CLI() {
 }
 
 func GinServer(conf config.VerifierConfig) {
+	fmt.Println("\n")
+	fmt.Println("Gin server: starting on port " + strconv.Itoa(conf.Verifier_port) + " ....")
 
 	r := gin.Default()
 	r.Use(static.Serve("/", static.LocalFile("./frontend/dist", true)))
@@ -120,10 +123,21 @@ func main() {
 
 	handlers.OperatorAddress = conf.Plasma_operator_address
 
-	// Uncomment for start CLI
-	// CLI()
+	// Start gin server
+	go GinServer(conf)
 
-	// Uncomment for start ginServer
-	GinServer(conf)
+	// Check server
+	go func() {
+		ps := portscanner.NewPortScanner("localhost", 2*time.Second, 5)
+		for {
+			if ps.IsOpen(2000) == true {
+				fmt.Println("Server started!")
+				return
+			}
+		}
+	}()
+
+	// Start CLI
+	CLI()
 
 }
