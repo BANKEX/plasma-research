@@ -3,6 +3,12 @@ package cli
 import (
 	"fmt"
 	"github.com/c-bata/go-prompt"
+	 "../../db"
+	"../handlers"
+	"../../listeners/storage"
+	"../../listeners/event"
+
+
 )
 
 // For CLI
@@ -23,18 +29,15 @@ func executor(comm string) {
 	} else if comm == "smartBalance" {
 		fmt.Println("Smart Contract Balance:" + storage.Balance)
 	} else if comm == "eventMap" {
-		// fmt.Println(fmt.Println(event.EventMap))
 		for i, j := range event.EventMap {
 			fmt.Println(i, j)
 		}
 	} else if comm == "dbEvents" {
-
 		events, err := db.Event("database").GetAll()
 		if err != nil {
 			println("Mistake DB")
 		}
 		fmt.Println(events)
-
 	}
 
 	return
