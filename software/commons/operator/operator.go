@@ -27,10 +27,10 @@ func main() {
 		return
 	}
 	fmt.Println("\n\n")
-	fmt.Println("PORT: " + strconv.Itoa(conf.Operator_port))
-	fmt.Println("KEY: " + conf.Main_account_private_key)
-	fmt.Println("Smart Contract address: " + conf.Main_account_public_key)
-	fmt.Println("Node: " + conf.Geth_account)
+	fmt.Println("Operator por: " + strconv.Itoa(conf.Operator_port))
+	fmt.Println("Main account private_key: " + conf.Main_account_private_key)
+	fmt.Println("Main account public key: " + conf.Main_account_public_key)
+	fmt.Println("Geth account: " + conf.Geth_account)
 	fmt.Println("\n\n")
 
 
