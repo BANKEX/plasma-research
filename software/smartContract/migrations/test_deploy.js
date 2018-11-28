@@ -25,7 +25,7 @@ const clean_input = function(str) {
 
     const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     const deployerAddress = data.main_account_public_key;
-    const privateKey = Buffer.from(data.main_account_private_key, 'hex');
+    const privateKey = Buffer.from(data.main_account_private_key.substring(2), 'hex');
     const txParams = {
         gasPrice: clean_input(1),
         gas:      clean_input(6050992),

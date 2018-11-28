@@ -13,6 +13,7 @@ type VerifierConfig struct {
 	Main_account_public_key  string `json:main_account_public_key`
 	Plasma_operator_address  string `json:plasma_operator_address`
 	Geth_account             string `json:geth_account`
+	Smart                    string `json:smart`
 }
 
 type OperatorConfig struct {
