@@ -19,3 +19,23 @@ At the moment we have following separate docs that cover different parts of our 
 - [Architecture overview](https://github.com/BANKEX/plasma-research/blob/master/docs/architecture.md)
 - [Block structure](https://github.com/BANKEX/plasma-research/blob/master/docs/block-structure.md)
 
+# Installing
+
+1. go to /software directory
+2. run install.sh
+3. run run.sh
+4. open remix
+5. connect to web3 provider http://localhost:9545
+6. copy this code:
+``` js
+ pragma solidity 0.4.25;
+ contract BankexPlasma {
+ function deposit() public payable {}
+ }
+```
+7. Compile it and go ti Run tab
+8. Copy Plasma Smart contract address from console where you run your 'run.sh' file or you can write 'smartContractAddress' at CLI
+8. Put your this addresss to input 'At Address' and push the button
+9. Push deposit button nearby
+10. Whatch console where your run 'run.sh'. You can write events to see all deposit events
+
