@@ -33,7 +33,6 @@ const clean_input = function (str) {
     const serializedTx = tx.serialize();
     const txHash = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
     console.log("BankexPlasma address: " + txHash.contractAddress);
-    // console.log("TxHash: " + txHash.transactionHash);
     data.plasma_contract_address = txHash.contractAddress;
     fs.writeFileSync(filePath, JSON.stringify(data));
 })();

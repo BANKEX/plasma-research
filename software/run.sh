@@ -17,9 +17,9 @@ sleep 3
 
 
 # deploy bankex plasma contract to ethereum
-truffle migrate --reset
-#truffle compile
-#node migrations/contract_deploy.js
+#truffle migrate --reset
+truffle compile
+node migrations/contract_deploy.js
 
 cd ../commons/operator
 
