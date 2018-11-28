@@ -7,7 +7,7 @@ import (
 )
 
 func InitConfig() VerifierConfig {
-	defaultConfigPath, _ := filepath.Abs("../config/config.verifier.json")
+	defaultConfigPath, _ := filepath.Abs("../commons/config/config.verifier.json")
 	configFileName := flag.String("c", defaultConfigPath, "config file for verifier")
 	flag.Parse()
 	_, conf, err := ReadConfig(*configFileName, "v")

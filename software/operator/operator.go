@@ -7,14 +7,14 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"../config"
+	"../commons/config"
 	"./handlers"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 
-	defaultConfigPath, _ := filepath.Abs("../config/config.operator.json")
+	defaultConfigPath, _ := filepath.Abs("../commons/config/config.operator.json")
 
 	configFileName := flag.String("c", defaultConfigPath, "config file for verifier")
 	flag.Parse()

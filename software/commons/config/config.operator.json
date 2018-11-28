@@ -1,5 +1,5 @@
 {
-  "operator_port": 3000,
+  "operator_port": 3001,
   "main_account_private_key": "0x240d6ad83930067d82e0803696996f743acd78d8fa6a5f6e4f148fd9def37c55",
   "main_account_public_key": "0x28088c91385a83563c6392ee09f1d0d386f0cd7f",
   "geth_account": "ws://127.0.0.1:8546"

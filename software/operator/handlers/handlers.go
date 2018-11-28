@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"../../blocks"
-	"../../db"
-	"../../ether"
+	"../../commons/blocks"
+	"../../commons/db"
+	"../../commons/ether"
 	"github.com/gin-gonic/gin"
 )
 

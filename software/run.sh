@@ -21,7 +21,7 @@ sleep 3
 truffle compile
 node migrations/contract_deploy.js
 
-cd ../commons/operator
+cd ../operator
 
 # run operator
 GIN_MODE=release go run operator.go &

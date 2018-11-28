@@ -1,9 +1,9 @@
 package cli
 
 import (
-	"../../config"
-	"../../db"
-	"../../listeners/storage"
+	"../../commons/config"
+	"../../commons/db"
+	"../../commons/listeners/storage"
 	"fmt"
 	"github.com/c-bata/go-prompt"
 )

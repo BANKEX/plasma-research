@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"../../../config"
-	"../../../listeners/storage"
+	"../../../commons/config"
+	"../../../commons/listeners/storage"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

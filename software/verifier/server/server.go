@@ -1,7 +1,7 @@
 package server
 
 import (
-	"../../config"
+	"../../commons/config"
 	"./handlers"
 	"github.com/gin-gonic/contrib/cors"
 	"github.com/gin-gonic/gin"

@@ -1,13 +1,13 @@
 package main
 
 import (
-	"../config"
-	"../dispatchers"
-	"../listeners"
-	"../listeners/balance"
-	"../listeners/ethClient"
-	"../listeners/event"
-	"../listeners/storage"
+	"../commons/config"
+	"../commons/dispatchers"
+	"../commons/listeners"
+	"../commons/listeners/balance"
+	"../commons/listeners/ethClient"
+	"../commons/listeners/event"
+	"../commons/listeners/storage"
 	"./cli"
 	"./portscanner"
 	"./server"

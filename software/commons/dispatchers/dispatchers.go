@@ -88,7 +88,6 @@ func CreateGenesisBlock() {
 func GetTxHashTest(who *common.Address, amount *big.Int) []byte {
 	tx := TxTest{To: who, Sum: amount, From: who} // from == who for test
 	hash := crypto.Keccak256(TxToBytesArr(tx))
-
 	return hash
 }
 
