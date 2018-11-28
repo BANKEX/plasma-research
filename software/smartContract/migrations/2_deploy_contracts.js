@@ -49,7 +49,7 @@ module.exports = function (deployer) {
         // deployContract("BankexPlasma")
         const contractAddress = await BankexPlasma.new();
         const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-        data.smart = contractAddress.address;
+        data.plasma_operator_address = contractAddress.address;
         console.log("BankexPlasma address: " + contractAddress.address)
         fs.writeFileSync(filePath, JSON.stringify(data));
     });
