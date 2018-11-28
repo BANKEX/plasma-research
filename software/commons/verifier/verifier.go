@@ -39,7 +39,7 @@ func main() {
 	fmt.Println("Verifier port: " + strconv.Itoa(conf.Verifier_port))
 	fmt.Println("Main account private key: " + conf.Main_account_private_key)
 	fmt.Println("Plasma operator address: " + conf.Plasma_operator_address)
-	fmt.Println("Smart contract address: " + conf.Smart)
+	fmt.Println("Smart contract address: " + conf.Plasma_contract_address)
 	fmt.Println("Geth account: " + conf.Geth_account)
 	fmt.Println("\n\n")
 
@@ -49,8 +49,8 @@ func main() {
 	handlers.OperatorAddress = conf.Plasma_operator_address
 
 	go listeners.Checker()
-	go balance.UpdateBalance(&storage.Balance, conf.Smart)
-	go event.Start(storage.Client, conf.Smart, &storage.Who, &storage.Amount, &storage.EventBlockHash, &storage.EventBlockNumber)
+	go balance.UpdateBalance(&storage.Balance, conf.Plasma_contract_address)
+	go event.Start(storage.Client, conf.Plasma_contract_address, &storage.Who, &storage.Amount, &storage.EventBlockHash, &storage.EventBlockNumber)
 	go server.GinServer(conf)
 	go portscanner.RunScanner()
 	cli.CLI()
