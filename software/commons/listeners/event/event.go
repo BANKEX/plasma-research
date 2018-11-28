@@ -87,6 +87,7 @@ func Start(client *ethclient.Client, addr string, who *common.Address, amount **
 				*amount = event.Amount
 				*eventBlockHash = vLog.BlockHash.Hex()
 				*blockNumber = vLog.BlockNumber
+
 				storage.StateForEvent = 1
 
 			}
