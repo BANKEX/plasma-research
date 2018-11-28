@@ -1,7 +1,7 @@
 const BankexPlasma = artifacts.require('BankexPlasma');
 const fs = require('fs');
 const path = require('path');
-const filePath = path.join(__dirname, '../../commons/verifier/config.json');
+const filePath = path.join(__dirname, '../../commons/config/config.verifier.json');
 
 
 module.exports = function (deployer) {

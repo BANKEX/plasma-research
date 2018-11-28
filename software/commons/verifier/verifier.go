@@ -47,9 +47,9 @@ func main() {
 	dispatchers.CreateGenesisBlock()
 	handlers.OperatorAddress = conf.Plasma_operator_address
 
-	go listeners.Checker()
 	go balance.UpdateBalance(&storage.Balance, conf.Main_account_public_key)
 	go event.Start(storage.Client, conf.Main_account_public_key, &storage.Who, &storage.Amount, &storage.EventBlockHash, &storage.EventBlockNumber)
+	go listeners.Checker()
 	go server.GinServer(conf)
 	go portscanner.RunScanner()
 	cli.CLI()
