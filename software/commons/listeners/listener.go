@@ -13,7 +13,7 @@ import (
 func Checker() {
 	for {
 		if storage.StateForEvent == 1 {
-			fmt.Println("\n\n\n")
+			fmt.Println("\n\n\n\n")
 
 			event.EventCount++
 

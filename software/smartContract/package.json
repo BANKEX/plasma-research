@@ -48,7 +48,6 @@
   },
   "homepage": "https://github.com/BANKEX/plasma-research/tree/master/software/smartContract#readme",
   "dependencies": {
-    "ethereumjs-tx": "^1.3.7",
-    "web3": "^1.0.0-beta.36"
+    "ethereumjs-tx": "^1.3.7"
   }
 }

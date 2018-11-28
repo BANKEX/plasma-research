@@ -1,53 +1,45 @@
 package cli
 
 import (
+	"../../config"
+	"../../db"
+	"../../listeners/storage"
 	"fmt"
 	"github.com/c-bata/go-prompt"
-	 "../../db"
-	"../handlers"
-	"../../listeners/storage"
-	"../../listeners/event"
-
-
 )
 
-// For CLI
-func completer(d prompt.Document) []prompt.Suggest {
+func commandsInfo(d prompt.Document) []prompt.Suggest {
 	s := []prompt.Suggest{
-		{Text: "plasmaBalance", Description: "Get plasma balance"},
-		{Text: "smartBalance", Description: "Get Smart Contract balance"},
-		{Text: "eventMap", Description: "Get all events map"},
-		{Text: "dbEvents", Description: "Get all events from dbEvents"},
+		{Text: "smartContractAddress", Description: "Get Smart Contract address"},
+		{Text: "plasmaBalance", Description: "Get balance of my account in Plasma"},
+		{Text: "smartContractBalance", Description: "Get balance of Plasma smart contract"},
+		{Text: "events", Description: "Get all events"},
 	}
 	return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
 }
 
-func executor(comm string) {
-	if comm == "plasmaBalance" {
-		plasmaBalance := handlers.GetReqBalance(handlers.OperatorAddress, "/pbalance")
-		fmt.Println("Plasma balance:" + plasmaBalance)
-	} else if comm == "smartBalance" {
+func commandsListener(input string) {
+	switch input {
+	case "smartContractAddress":
+		fmt.Println(config.SmartContractAddress)
+	case "plasmaBalance":
+		fmt.Println("Not working yet")
+	case "smartContractBalance":
 		fmt.Println("Smart Contract Balance:" + storage.Balance)
-	} else if comm == "eventMap" {
-		for i, j := range event.EventMap {
-			fmt.Println(i, j)
-		}
-	} else if comm == "dbEvents" {
+	case "events":
 		events, err := db.Event("database").GetAll()
 		if err != nil {
-			println("Mistake DB")
+			println("Mistake at cli.go 34 line with DB")
 		}
 		fmt.Println(events)
 	}
-
 	return
 }
 
 func CLI() {
-	fmt.Println("-------------Plasma Verifier-------------")
-	p := prompt.New(
-		executor,
-		completer,
+	prompter := prompt.New(
+		commandsListener,
+		commandsInfo,
 	)
-	p.Run()
+	prompter.Run()
 }
