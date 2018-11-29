@@ -12,6 +12,12 @@ type Accumulator struct {
 	value *gmp.Int
 }
 
+type Proof struct {
+	B    *big.Int
+	R    *big.Int
+	Beta *big.Int
+}
+
 func concatCopyPreAllocate(slices ...[]byte) []byte {
 	var totalLen int
 	for _, s := range slices {
@@ -39,7 +45,11 @@ func alignBytes(data []byte, nbytes int) []byte {
 // ProveInclusion check proof that alpha \in [g, A].
 // x - total accumulator exponent rate from g to A
 // b, r - proving key
-func ProveInclusion(g, A *Accumulator, b, r, alpha *big.Int) bool {
+func ProveInclusion(g, A *Accumulator, alpha *big.Int, p *Proof) bool {
+	b, r, beta := p.B, p.R, p.Beta
+	if beta.Cmp(big.NewInt(0)) != 0 {
+		return false
+	}
 	h := new(gmp.Int).Exp(g.value, new(gmp.Int).SetBigInt(alpha), gmp.NewInt(0))
 	B := new(gmp.Int).SetBytes(concatCopyPreAllocate(alignBytes(g.value.Bytes(), 256), alignBytes(A.value.Bytes(), 256), alignBytes(h.Bytes(), 256)))
 
@@ -50,7 +60,8 @@ func ProveInclusion(g, A *Accumulator, b, r, alpha *big.Int) bool {
 // ProveExclusion check proof that alpha \notin [g, A].
 // x - total accumulator exponent rate from g to A
 // b, r, beta - proving key
-func ProveExclusion(g, A *Accumulator, b, r, alpha, beta *big.Int) bool {
+func ProveExclusion(g, A *Accumulator, alpha *big.Int, p *Proof) bool {
+	b, r, beta := p.B, p.R, p.Beta
 	if new(big.Int).GCD(nil, nil, alpha, beta).Cmp(big.NewInt(1)) != 0 {
 		return false
 	}
@@ -68,18 +79,18 @@ func ProveExclusion(g, A *Accumulator, b, r, alpha, beta *big.Int) bool {
 // x - total accumulator exponent rate from g to A
 // b, r - standard proving key components
 // beta - remainder of the division x/alpha. It is zero for inclusion and non-zero for exclusion
-func GenProof(g, A *Accumulator, _x *big.Int, _alpha *big.Int) (*big.Int, *big.Int, *big.Int) {
+func GenProof(g, A *Accumulator, _x *big.Int, _alpha *big.Int) *Proof {
 	x := new(gmp.Int).SetBigInt(_x)
 	alpha := new(gmp.Int).SetBigInt(_alpha)
 	y, beta := new(gmp.Int).DivMod(x, alpha, new(gmp.Int))
 	h := new(gmp.Int).Exp(g.value, alpha, RSA_N)
 	k := new(gmp.Int).Exp(g.value, beta, RSA_N)
 	A1 := new(gmp.Int).Mod(new(gmp.Int).Mul(A.value, k), RSA_N)
-	B := new(gmp.Int).SetBytes(concatCopyPreAllocate(alignBytes(g.value.Bytes(), 256), alignBytes(A1.Bytes(), 256), alignBytes(h.Bytes(), 256)))
+	B := new(gmp.Int).SetBytes(Hash256(concatCopyPreAllocate(alignBytes(g.value.Bytes(), 256), alignBytes(A1.Bytes(), 256), alignBytes(h.Bytes(), 256))).Data)
 
 	r := new(gmp.Int).Mod(y, B)
 	b := new(gmp.Int).Exp(g.value, new(gmp.Int).Div(y, B), RSA_N)
-	return b.BigInt(), r.BigInt(), beta.BigInt()
+	return &Proof{b.BigInt(), r.BigInt(), beta.BigInt()}
 }
 
 func (s *Accumulator) Value() *big.Int {

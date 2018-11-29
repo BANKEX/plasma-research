@@ -28,3 +28,11 @@ func Hash(data []byte) *Cipher {
 	res = hash.Sum(res)[0:HASH_SIZE]
 	return new(Cipher).SetBytes(res)
 }
+
+func Hash256(data []byte) *Cipher {
+	res := []byte{}
+	hash := sha3.NewKeccak256()
+	hash.Write(data)
+	res = hash.Sum(res)[:]
+	return new(Cipher).SetBytes(res)
+}

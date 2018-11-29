@@ -34,6 +34,22 @@ func TestPerformanceVerybig(t *testing.T) {
 
 }
 
+func mulAllUint32(i []uint32) *big.Int {
+	res := big.NewInt(1)
+	for _, item := range i {
+		res.Mul(res, big.NewInt(int64(item)))
+	}
+	return res
+}
+
+func mulAllBigInt(i []*big.Int) *big.Int {
+	res := big.NewInt(1)
+	for _, item := range i {
+		res.Mul(res, item)
+	}
+	return res
+}
+
 func TestRSAAccumulators(t *testing.T) {
 	block_slices := [][]*slice.Slice{
 		{
@@ -67,7 +83,17 @@ func TestRSAAccumulators(t *testing.T) {
 			multipliers = append(multipliers, mult)
 		}
 	}
-	_ = accuchain
-	_ = multipliers
-	fmt.Println(len(accuchain), multipliers)
+
+	r := slice.LogProofInclusion((&slice.Slice{Begin: 1, End: 2}).GetAlignedSlices())
+	r_mul := mulAllUint32(r)
+	p := plasmacrypto.GenProof(accuchain[0], accuchain[2], new(big.Int).Div(mulAllBigInt(multipliers[1:3]), r_mul), r_mul)
+	// p.beta = 0 => included
+	fmt.Println(p)
+
+	r = slice.LogProofInclusion((&slice.Slice{Begin: 3, End: 4}).GetAlignedSlices())
+	r_mul = mulAllUint32(r)
+	p = plasmacrypto.GenProof(accuchain[0], accuchain[2], new(big.Int).Div(mulAllBigInt(multipliers[1:3]), r_mul), r_mul)
+	// p.beta = 10523688520131956578713779864521885279237926185629405864639170870135220351587134108533202597008847969123508724992252667170 => not included
+
+	fmt.Println(p)
 }
