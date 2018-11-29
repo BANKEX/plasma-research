@@ -86,6 +86,10 @@ func (s *Accumulator) Value() *big.Int {
 	return s.value.BigInt()
 }
 
+func (s *Accumulator) Clone() *Accumulator {
+	return &Accumulator{new(gmp.Int).Set(s.value)}
+}
+
 func (s *Accumulator) SetInt(value *big.Int) *Accumulator {
 	s.value = new(gmp.Int).SetBigInt(value)
 	return s

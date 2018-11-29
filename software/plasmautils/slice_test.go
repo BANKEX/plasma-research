@@ -2,10 +2,12 @@ package test
 
 import (
 	"fmt"
+	"math/big"
 	"math/rand"
 	"reflect"
 	"testing"
 
+	"./plasmacrypto"
 	"./slice"
 	"./testtools"
 	"github.com/snjax/gmp"
@@ -32,10 +34,40 @@ func TestPerformanceVerybig(t *testing.T) {
 
 }
 
-func TestGmpBytes(t *testing.T) {
-	n := new(gmp.Int).SetUint64(0xffffffffffffffff)
-	n = n.Exp(n, gmp.NewInt(2), gmp.NewInt(0))
-	fmt.Println(n.String())
-	fmt.Println(n.Bytes())
+func TestRSAAccumulators(t *testing.T) {
+	block_slices := [][]*slice.Slice{
+		{
+			&slice.Slice{Begin: 1, End: 2},
+			&slice.Slice{Begin: 4, End: 100},
+			&slice.Slice{Begin: 150, End: 170},
+			&slice.Slice{Begin: 560, End: 800},
+		}, {
+			&slice.Slice{Begin: 120, End: 130},
+			&slice.Slice{Begin: 300, End: 400},
+			&slice.Slice{Begin: 1000, End: 1050},
+			&slice.Slice{Begin: 1600, End: 1700},
+		},
+	}
 
+	accuchain := make([]*plasmacrypto.Accumulator, 0)
+	multipliers := make([]*big.Int, 0)
+	accuchain = append(accuchain, new(plasmacrypto.Accumulator).SetInt(big.NewInt(17)))
+	multipliers = append(multipliers, big.NewInt(1))
+
+	for _, blocks := range block_slices {
+		acc := accuchain[len(accuchain)-1]
+		mult := big.NewInt(1)
+		for _, s := range blocks {
+			r := slice.LogProofInclusion(s.GetAlignedSlices())
+			acc.BatchAccumulate(r)
+			for _, m := range r {
+				mult.Mul(mult, new(big.Int).SetUint64(uint64(m)))
+			}
+			accuchain = append(accuchain, acc)
+			multipliers = append(multipliers, mult)
+		}
+	}
+	_ = accuchain
+	_ = multipliers
+	fmt.Println(len(accuchain), multipliers)
 }
