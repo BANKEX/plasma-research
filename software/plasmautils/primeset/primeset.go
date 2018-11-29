@@ -63,8 +63,8 @@ func initFiles() {
 	dataset = make([]uint8, ttlsz*crypto.HASH_SIZE)
 
 	var p = new(gmp.Int)
-	primeset[0] = 3
-	diffset[0] = 1
+	primeset[0] = 5
+	diffset[0] = 2
 	for i := 1; i < 1<<PRIMES_LOG2; i++ {
 		primeset[i] = p.SetUint64(uint64(primeset[i-1])).NextPrime().Uint32()
 		diffset[i] = uint8((primeset[i] - primeset[i-1]) / 2)
