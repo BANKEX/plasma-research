@@ -10,7 +10,7 @@ contract OrderedIntervalListWrapper {
   uint private _lastInserted;
 
   function lastInserted() public view returns(uint) {
-      return _lastInserted;
+    return _lastInserted;
   }
 
   function maxIndex() public view returns(uint) {

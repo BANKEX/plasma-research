@@ -31,7 +31,6 @@ async function validateList (listContract, size) {
 
     if (nextIndex > 0) {
       let next = await listContract.get.call(nextIndex);
-
       assert(next[0] >= currentInterval[1]);
     }
 
@@ -69,6 +68,7 @@ contract('OrderedIntervalList', function () {
 
     it('insert one', async function () {
       await this.orderedList.set(0, 0, 0, 100);
+
       const interval = await this.orderedList.get(1);
 
       interval[0].should.be.bignumber.equal(0);
@@ -79,41 +79,40 @@ contract('OrderedIntervalList', function () {
 
     it('insert twice', async function () {
       await this.orderedList.set(0, 0, 0, 100);
-      await this.orderedList.set(1, 0, 101, 200);
+      await this.orderedList.set(1, 0, 100, 200);
 
       const intervalFirst = await this.orderedList.get(1);
-      const intervalSecond = await this.orderedList.get(2);
 
       intervalFirst[0].should.be.bignumber.equal(0);
-      intervalFirst[1].should.be.bignumber.equal(100);
-      intervalSecond[0].should.be.bignumber.equal(101);
-      intervalSecond[1].should.be.bignumber.equal(200);
+      intervalFirst[1].should.be.bignumber.equal(200);
 
-      await validateList(this.orderedList, 2);
+      await validateList(this.orderedList, 1);
+    });
+
+    it('insert twice with gap should be failed', async function () {
+      await this.orderedList.set(0, 0, 0, 100);
+      await this.orderedList.set(1, 0, 101, 200).should.be.rejectedWith(EVMRevert);
     });
 
     it('insert error', async function () {
-      await this.orderedList.set(0, 0, 0, 100);
-      await this.orderedList.set(1, 0, 101, 200);
+      await this.orderedList.set(0, 0, 300, 400);
+      await this.orderedList.set(0, 1, 100, 200);
+
+      // wrong begin/end
+      await this.orderedList.set(0, 0, 100, 50).should.rejectedWith(EVMRevert);
+
+      // wrong prev/next
+      await this.orderedList.set(2, 0, 90, 110).should.rejectedWith(EVMRevert);
+      await this.orderedList.set(0, 0, 90, 110).should.rejectedWith(EVMRevert);
+      await this.orderedList.set(0, 2, 90, 110).should.rejectedWith(EVMRevert);
 
       // already inserted position
-      await this.orderedList.set(2, 0, 100, 200).should.rejectedWith(EVMRevert);
+      await this.orderedList.set(0, 1, 90, 110).should.rejectedWith(EVMRevert);
+      await this.orderedList.set(1, 0, 190, 210).should.rejectedWith(EVMRevert);
+      await this.orderedList.set(1, 0, 190, 310).should.rejectedWith(EVMRevert);
 
-      // range collision
-      await this.orderedList.set(1, 2, 150, 200).should.rejectedWith(EVMRevert);
-
-      await this.orderedList.set(2, 0, 201, 300);
-
-      const interval = await this.orderedList.get(3);
-      interval[0].should.be.bignumber.equal(201);
-      interval[1].should.be.bignumber.equal(300);
-
-      // zero interval size
-      assertRevert(this.orderedList.set(3, 0, 300, 300));
-      // begin and end swapped
-      assertRevert(this.orderedList.set(3, 0, 305, 302));
-
-      await validateList(this.orderedList, 3);
+      // too distant from last
+      await this.orderedList.set(1, 2, 450, 500).should.rejectedWith(EVMRevert);
     });
   });
 
