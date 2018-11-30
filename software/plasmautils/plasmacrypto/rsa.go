@@ -89,7 +89,7 @@ func GenProof(g, A *Accumulator, _x *big.Int, _alpha *big.Int) *Proof {
 	B := new(gmp.Int).SetBytes(Hash256(concatCopyPreAllocate(alignBytes(g.value.Bytes(), 256), alignBytes(A1.Bytes(), 256), alignBytes(h.Bytes(), 256))).Data)
 
 	r := new(gmp.Int).Mod(y, B)
-	b := new(gmp.Int).Exp(g.value, new(gmp.Int).Div(y, B), RSA_N)
+	b := new(gmp.Int).Exp(h, new(gmp.Int).Div(y, B), RSA_N)
 	return &Proof{b.BigInt(), r.BigInt(), beta.BigInt()}
 }
 

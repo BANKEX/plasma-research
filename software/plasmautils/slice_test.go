@@ -86,14 +86,14 @@ func TestRSAAccumulators(t *testing.T) {
 
 	r := slice.LogProofInclusion((&slice.Slice{Begin: 1, End: 2}).GetAlignedSlices())
 	r_mul := mulAllUint32(r)
-	p := plasmacrypto.GenProof(accuchain[0], accuchain[2], new(big.Int).Div(mulAllBigInt(multipliers[1:3]), r_mul), r_mul)
+	p := plasmacrypto.GenProof(accuchain[0], accuchain[2], mulAllBigInt(multipliers[1:3]), r_mul)
 	// p.beta = 0 => included
 	fmt.Println(p)
 
 	r = slice.LogProofInclusion((&slice.Slice{Begin: 3, End: 4}).GetAlignedSlices())
 	r_mul = mulAllUint32(r)
-	p = plasmacrypto.GenProof(accuchain[0], accuchain[2], new(big.Int).Div(mulAllBigInt(multipliers[1:3]), r_mul), r_mul)
-	// p.beta = 10523688520131956578713779864521885279237926185629405864639170870135220351587134108533202597008847969123508724992252667170 => not included
+	p = plasmacrypto.GenProof(accuchain[0], accuchain[2], mulAllBigInt(multipliers[1:3]), r_mul)
+	// p.beta = 4207738043537623397541798000238454336740305776368028713929602680589891569694359519830505738770529461765842497062803431900 => not included
 
 	fmt.Println(p)
 }
