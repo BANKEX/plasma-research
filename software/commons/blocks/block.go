@@ -21,9 +21,18 @@ type Block struct {
 }
 
 type UnsignedBlockHeader struct {
-	BlockNumber       uint32    `json:"blockNumber"`
-	PreviousBlockHash a.Uint256 `json:"previousBlockHash"`
-	MerkleRoot        a.Uint256 `json:"merkleRoot"`
+	BlockNumber      uint32            `json:"blockNumber"`
+	TransactionsRoot SumMerkleNode     `json:"transactionsRoot"`
+	RSAAccumulator   a.Uint2048        `json:"sumMerkleNode"`
+	RSAChainProof    RSAInclusionProof `json:"RSAInclusionProof"`
+}
+
+const PlasmaRangeSpace = 2 ^ 24 - 1
+
+type SumMerkleNode struct {
+	// We use 24 bit
+	Length uint32
+	Hash   a.Uint160
 }
 
 type BlockHeader struct {
