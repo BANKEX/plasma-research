@@ -34,7 +34,7 @@ library OrderedIntervalList {
    * @return interval tuple
    */
   function get(Data storage self, uint256 id) internal view returns(Interval storage interval) {
-    require(id <= self.intervals.length, "interval id doesn't exists in interval set");
+    require(id < self.intervals.length, "interval id doesn't exists in interval set");
     interval = self.intervals[id];
     require(interval.end != 0, "interval id doesn't exsits in interval set");
   }
@@ -63,6 +63,8 @@ library OrderedIntervalList {
     Interval storage lastInterval = self.intervals[self.lastIndex];
     return insert(self, self.lastIndex, 0, lastInterval.end, lastInterval.end + size - 1);
   }
+
+  event Log(uint, uint, uint, uint, bool);
 
   /**
    * @notice Insert interval in the specific place in a list
@@ -102,6 +104,13 @@ library OrderedIntervalList {
     if ((prev > 0) == (next > 0)) {
       // Adding between existing intervals or very first interval
 
+      emit Log(
+        prevInterval.next, 
+        next,
+        nextInterval.prev,
+        prev,
+        prevInterval.next == next && nextInterval.prev == prev
+      );
       require(
         prevInterval.next == next && nextInterval.prev == prev,
         "prev and next should refer to the neighboring intervals"
@@ -199,13 +208,13 @@ library OrderedIntervalList {
     if (shrinkBegin && shrinkEnd) {
       // Remove whole interval
 
-      if (exist(self, modifiedInterval.prev)) {
+      if (modifiedInterval.prev > 0) {
         prevInterval.next = modifiedInterval.next;
       } else {
         self.firstIndex = modifiedInterval.next;
       }
 
-      if (exist(self, modifiedInterval.next)) {
+      if (modifiedInterval.next > 0) {
         nextInterval.prev = modifiedInterval.prev;
       } else {
         self.lastIndex = modifiedInterval.prev;

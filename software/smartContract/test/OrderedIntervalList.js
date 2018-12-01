@@ -123,11 +123,13 @@ contract('OrderedIntervalList', function () {
       await this.orderedList.remove(-1, 0, 100).should.rejectedWith(EVMRevert);
     });
 
-    it('full remove one element', async function () {
+    it.only('full remove one element', async function () {
       await this.orderedList.set(0, 0, 0, 100);
       await this.orderedList.remove(1, 0, 100);
 
       await this.orderedList.get(1).should.rejectedWith(EVMRevert);
+      (await this.orderedList.firstIndex.call()).should.be.bignumber.equal(0);
+      (await this.orderedList.lastIndex.call()).should.be.bignumber.equal(0);
 
       await validateList(this.orderedList, 0);
 
