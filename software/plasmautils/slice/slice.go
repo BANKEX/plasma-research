@@ -13,6 +13,8 @@ type Slice struct {
 
 const TREE_HEIGHT = 24
 
+// GetAlignedSlices returns an array of aligned slice indexes given
+// an arbitrary source slice with begin and end leaf indexes.
 func (s *Slice) GetAlignedSlices() []uint32 {
 	res := []uint32{}
 	a := s.Begin
@@ -38,6 +40,7 @@ func (s *Slice) GetAlignedSlices() []uint32 {
 	return res
 }
 
+// LogProofInclusion generates an inclusion proof for an array of aligned slice indexes.
 func LogProofInclusion(n []uint32) []uint32 {
 	res := make([]uint32, 0)
 
@@ -65,6 +68,7 @@ func LogProofInclusion(n []uint32) []uint32 {
 	return res[0:j]
 }
 
+// LogProofInclusion generates an exclusion proof for an array of aligned slice indexes.
 func LogProofExclusion(n []uint32) []uint32 {
 	res := make([]uint32, 0)
 	for _, item := range n {
