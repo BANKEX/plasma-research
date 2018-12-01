@@ -8,6 +8,7 @@ import (
 	"math/big"
 
 	"../../plasmautils/plasmacrypto"
+	"../../plasmautils/primeset"
 	"../../plasmautils/slice"
 )
 
@@ -79,7 +80,7 @@ func UpdateRSAAccumulator(previous *big.Int, transactions []Transaction) *big.In
 		for _, i := range t.Inputs {
 			s := slice.Slice{Begin: i.Amount.Begin, End: i.Amount.End}
 			for _, p := range s.GetAlignedSlices() {
-				acc.Accumulate(p)
+				acc.Accumulate(primeset.PrimeN(int(p)))
 			}
 		}
 	}
