@@ -5,14 +5,17 @@ import (
 	a "./alias"
 	"fmt"
 	"github.com/ethereum/go-ethereum/crypto"
-)
+	"math/big"
 
+	"../../plasmautils/plasmacrypto"
+	"../../plasmautils/slice"
+)
 
 // For test only
 var Balance = map[string]int{"balance": 0}
 
 type Block struct {
-	Header       BlockHeader     `json:"header"`
+	Header       BlockHeader   `json:"header"`
 	Transactions []Transaction `json:"transactions"`
 }
 
@@ -65,3 +68,20 @@ func (b *Block) CalculateMerkleRoot() error {
 }
 
 // === validation ===
+
+// === utils ===
+
+// UpdateRSAAccumulator adds input ranges for all submitted transactions to the RSA accumulator
+// Algorithm complexity is O(N*logN) for N transactions
+func UpdateRSAAccumulator(previous *big.Int, transactions []Transaction) *big.Int {
+	acc := plasmacrypto.Accumulator{}.SetInt(previous)
+	for _, t := range transactions {
+		for _, i := range t.Inputs {
+			s := slice.Slice{Begin: i.Amount.Begin, End: i.Amount.End}
+			for _, p := range s.GetAlignedSlices() {
+				acc.Accumulate(p)
+			}
+		}
+	}
+	return acc.Value()
+}

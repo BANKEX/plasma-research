@@ -45,8 +45,8 @@ type Output struct {
 }
 
 type Segment struct {
-	begin uint64
-	end   uint64
+	Begin uint32
+	End   uint32
 }
 
 func (tr *Transaction) GetHash() ([]byte, error) {
