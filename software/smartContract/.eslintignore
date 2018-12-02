@@ -3,3 +3,4 @@ truffle.js
 js/
 test/helpers
 coverage/
+migrations/

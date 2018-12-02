@@ -1,5 +1,3 @@
-
-const { assertRevert } = require('./helpers/assertRevert.js');
 const EVMRevert = require('./helpers/EVMRevert');
 
 const OrderedIntervalList = artifacts.require('OrderedIntervalListWrapper');
@@ -22,7 +20,7 @@ async function validateList (listContract, arr, ids) {
   let i = 0;
   let prevId = 0;
   let id = await listContract.firstIndex.call();
-  while (i < arr.length && id != 0) {
+  while (i < arr.length && id !== 0) {
     const interval = await listContract.get.call(id);
     interval[0].should.be.bignumber.equal(arr[i][0]);
     interval[1].should.be.bignumber.equal(arr[i][1]);
@@ -53,7 +51,7 @@ async function printList (listContract) {
   let id = await listContract.firstIndex.call();
   s += 'last=' + (await listContract.lastIndex.call()) + ' ';
   s += 'list={ ';
-  while (id != 0) {
+  while (id !== 0) {
     const interval = await listContract.get.call(id);
     const prevId = await listContract.getPrev.call(id);
     s += id + ':[' + interval[0] + ',' + interval[1] + '):' + prevId + ' ';
@@ -64,6 +62,7 @@ async function printList (listContract) {
 
   return s;
 }
+printList; // fix unused
 
 contract('OrderedIntervalList', function () {
   beforeEach(async function () {
@@ -363,7 +362,7 @@ contract('OrderedIntervalList', function () {
       let idNewFirst = await this.orderedList.lastInserted.call();
       await this.orderedList.insert(0, 3, 0, 100);
       let idFirst = await this.orderedList.lastInserted.call();
-      await validateList(this.orderedList, [[0,100], [101, 200], [201, 300], [401, 500]], [4, 3, 2, 1]);
+      await validateList(this.orderedList, [[0, 100], [101, 200], [201, 300], [401, 500]], [4, 3, 2, 1]);
 
       // 2
       await this.orderedList.remove(idFirst, 0, 100);
