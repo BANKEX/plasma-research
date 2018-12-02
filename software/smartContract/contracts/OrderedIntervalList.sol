@@ -20,12 +20,25 @@ library OrderedIntervalList {
     uint lastIndex;
   }
 
+  function isInitialized(Data storage self) internal view returns(bool) {
+    return self.intervals.length > 0;
+  }
+
   function getFirstIndex(Data storage self) internal view returns(uint) {
     return self.firstIndex;
   }
 
   function getLastIndex(Data storage self) internal view returns(uint) {
     return self.lastIndex;
+  }
+
+  /**
+   * @notice Check if OrderedIntervalList initialized
+   * @return was initialized or not
+   */
+  function initialize(Data storage self) internal {
+    require(self.intervals.length == 0, "OrderedIntervalList was already initialized");
+    self.intervals.push(Interval(0,0,0,0));
   }
 
   /**
@@ -36,7 +49,7 @@ library OrderedIntervalList {
   function get(Data storage self, uint256 id) internal view returns(Interval storage interval) {
     require(id < self.intervals.length, "interval id doesn't exists in interval set");
     interval = self.intervals[id];
-    require(interval.end != 0, "interval id doesn't exsits in interval set");
+    //require(interval.end != 0, "interval id doesn't exsits in interval set");
   }
 
   /**
@@ -64,8 +77,6 @@ library OrderedIntervalList {
     return insert(self, self.lastIndex, 0, lastInterval.end, lastInterval.end + size - 1);
   }
 
-  event Log(uint, uint, uint, uint, bool);
-
   /**
    * @notice Insert interval in the specific place in a list
    * @dev Method also check that new interval doesn't intersect with existed intervals in list
@@ -86,103 +97,14 @@ library OrderedIntervalList {
     internal
     returns(uint256 id)
   {
-    require(begin < end, "right bound less or equal to left bound");
-
-    if (self.intervals.length == 0) {
-      self.intervals.push(Interval(0,0,0,0));
-    }
-
-    Interval storage prevInterval = self.intervals[prev];
-    Interval storage nextInterval = self.intervals[next];
-
-    require(prev == 0 || begin >= prevInterval.end, "begin could not intersect prev interval");
-    require(next == 0 || end <= nextInterval.begin, "end could not intersect next interval");
-
-    bool concatPrev = (prev > 0 && begin == prevInterval.end);
-    bool concatNext = (next > 0 && end == nextInterval.begin);
-
-    if ((prev > 0) == (next > 0)) {
-      // Adding between existing intervals or very first interval
-
-      emit Log(
-        prevInterval.next, 
-        next,
-        nextInterval.prev,
-        prev,
-        prevInterval.next == next && nextInterval.prev == prev
-      );
-      require(
-        prevInterval.next == next && nextInterval.prev == prev,
-        "prev and next should refer to the neighboring intervals"
-      );
-
-      if (!concatPrev && !concatNext) {
-        id = self.intervals.length;
-        self.intervals.push(Interval({
-          begin: begin,
-          end: end,
-          prev: prev,
-          next: next
-        }));
-
-        if (prev == 0 && next == 0) {
-          self.firstIndex = id;
-          self.lastIndex = id;
-        }
-      }
-    } else
-    if (next > 0) {
-      // Adding before first interval
-
-      require(
-        self.firstIndex == next && nextInterval.prev == 0,
-        "next should refer to the first interval"
-      );
-    } else
-    if (prev > 0) {
-      // Adding after last interval
-
-      require(
-        self.lastIndex == prev && prevInterval.next == 0,
-        "prev should refer to the last interval"
-      );
-      require(
-        prev != self.lastIndex || prevInterval.end == begin, 
-        "should begin from the end of latest interval when adding to the end"
-      );
-    }
-
-    if (!concatPrev && !concatNext) {
-      nextInterval.prev = id;
-      prevInterval.next = id;
-    } else
-    if (concatPrev && concatNext) {
-      prevInterval.end = nextInterval.end;
-      prevInterval.next = nextInterval.next;
-      delete self.intervals[prev];
-      id = prev;
-
-      // When attaching pre last to last
-      if (next == self.lastIndex) {
-        self.lastIndex = id;
-      }
-    } else
-    if (concatPrev) {
-      prevInterval.end = end;
-      id = prev;
-    } else
-    if (concatNext) {
-      nextInterval.begin = begin;
-      id = next;
-    }
-
-    // Update first and last indexes if needed
-    if (next == self.firstIndex && self.firstIndex != id) {
-      self.firstIndex = id;
-    }
-    if (prev == self.lastIndex && self.lastIndex != id) {
-      self.lastIndex = id;
-    }
+    return _insert(
+      self,
+      prev,
+      next,
+      begin,
+      end,
+      false
+    );
   }
 
   /**
@@ -233,8 +155,113 @@ library OrderedIntervalList {
       // Make a hole
       uint256 oldEnd = modifiedInterval.end;
       modifiedInterval.end = begin;
-      modifiedInterval.next = insert(self, index, modifiedInterval.next, end, oldEnd);
+      modifiedInterval.next = _insert(
+        self,
+        index,
+        modifiedInterval.next,
+        end,
+        oldEnd,
+        true
+      );
       newInterval = modifiedInterval.next;
+    }
+  }
+
+  function _insert(
+    Data storage self,
+    uint256 prev,
+    uint256 next,
+    uint256 begin,
+    uint256 end,
+    bool allowGapAfterLast
+  )
+    private
+    returns(uint256 id)
+  {
+    require(begin < end, "right bound less or equal to left bound");
+    require((prev != 0 || next != 0) == (self.firstIndex > 0), "prev and next could be zero iff no intervals");
+
+    if (!isInitialized(self)) {
+      initialize(self);
+    }
+
+    Interval storage prevInterval = self.intervals[prev];
+    Interval storage nextInterval = self.intervals[next];
+
+    require(prev == 0 || begin >= prevInterval.end, "begin could not intersect prev interval");
+    require(next == 0 || end <= nextInterval.begin, "end could not intersect next interval");
+
+    if ((prev > 0) == (next > 0)) {
+      // Adding between existing intervals or very first interval
+      require(
+        prevInterval.next == next && nextInterval.prev == prev,
+        "prev and next should refer to the neighboring intervals"
+      );
+    } else
+    if (next > 0) {
+      // Adding before first interval
+      require(
+        self.firstIndex == next && nextInterval.prev == 0,
+        "next should refer to the first interval"
+      );
+    } else
+    if (prev > 0) {
+      // Adding after last interval
+      require(
+        self.lastIndex == prev && prevInterval.next == 0,
+        "prev should refer to the last interval"
+      );
+      require(
+        allowGapAfterLast || prev != self.lastIndex || prevInterval.end == begin, 
+        "should begin from the end of latest interval when adding to the end"
+      );
+    }
+
+    bool concatPrev = (prev > 0 && begin == prevInterval.end);
+    bool concatNext = (next > 0 && end == nextInterval.begin);
+
+    if (!concatPrev && !concatNext) {
+      id = self.intervals.length;
+      self.intervals.push(Interval({
+        begin: begin,
+        end: end,
+        prev: prev,
+        next: next
+      }));
+
+      if (next > 0) {
+        nextInterval.prev = id;
+      } else {
+        self.lastIndex = id;
+      }
+
+      if (prev > 0) {
+        prevInterval.next = id;
+      } else {
+        self.firstIndex = id;
+      }
+    } else
+    if (concatPrev && concatNext) {
+      prevInterval.end = nextInterval.end;
+      prevInterval.next = nextInterval.next;
+      id = prev;
+
+      // When attaching pre last to last
+      if (next == self.lastIndex) {
+        self.lastIndex = id;
+      } else {
+        self.intervals[nextInterval.next].prev = id;
+      }
+
+      delete self.intervals[next];
+    } else
+    if (concatPrev) {
+      prevInterval.end = end;
+      id = prev;
+    } else
+    if (concatNext) {
+      nextInterval.begin = begin;
+      id = next;
     }
   }
 }

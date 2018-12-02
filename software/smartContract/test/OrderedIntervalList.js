@@ -10,48 +10,59 @@ require('chai')
   .use(require('chai-as-promised'))
   .should();
 
-async function validateList (listContract, size) {
-  const first = (await listContract.firstIndex.call());
-  if (size === 0 && first.equals(new BigNumber(0))) {
-    return true;
-  }
-  if (first.equals(new BigNumber(0))) {
-    return false;
-  }
-  var curIndex = first;
-  var count = 1;
+async function validateList (listContract, arr, ids) {
+  // Validate zero element
+  const zeroInterval = await listContract.get.call(0);
+  zeroInterval[0].should.be.bignumber.equal(0);
+  zeroInterval[1].should.be.bignumber.equal(0);
+  (await listContract.getPrev.call(0)).should.be.bignumber.equal(0);
+  (await listContract.getNext.call(0)).should.be.bignumber.equal(0);
 
-  var list = [];
-  (await listContract.getPrev.call(first)).should.be.bignumber.equal(0);
-  while (!(await listContract.getNext.call(curIndex)).equals(new BigNumber(0)) && count < size) {
-    let nextIndex = await listContract.getNext.call(curIndex);
-    let prevIndex = await listContract.getPrev.call(curIndex);
-    let currentInterval = await listContract.get.call(curIndex);
-    list.push('[' + currentInterval[0].toString() + ',' + currentInterval[1].toString() + ')');
+  // Validate linked list with prev refs
+  let i = 0;
+  let prevId = 0;
+  let id = await listContract.firstIndex.call();
+  while (i < arr.length && id != 0) {
+    const interval = await listContract.get.call(id);
+    interval[0].should.be.bignumber.equal(arr[i][0]);
+    interval[1].should.be.bignumber.equal(arr[i][1]);
 
-    if (nextIndex > 0) {
-      let next = await listContract.get.call(nextIndex);
-      assert(next[0] >= currentInterval[1]);
+    if (ids.length > 0) {
+      id.should.be.bignumber.equal(ids[i]);
     }
 
-    if (prevIndex > 0) {
-      let next = await listContract.get.call(prevIndex);
-      assert(next[1] <= currentInterval[0]);
-    }
-
-    count = count + 1;
-    curIndex = nextIndex;
+    i++;
+    (await listContract.getPrev.call(id)).should.be.bignumber.equal(prevId);
+    prevId = id;
+    id = await listContract.getNext.call(id);
   }
 
-  let currentInterval = await listContract.get.call(curIndex);
-  list.push('[' + currentInterval[0].toString() + ',' + currentInterval[1].toString() + ')');
-  assert((await listContract.getNext.call(curIndex)).equals(new BigNumber(0)));
+  i.should.be.equal(arr.length);
+  id.should.be.bignumber.equal(0);
+  (await listContract.lastIndex.call()).should.be.bignumber.equal(prevId);
+}
 
-  currentInterval = await listContract.get.call(curIndex);
+async function printList (listContract) {
+  // Validate zero element
+  const zeroInterval = await listContract.get.call(0);
+  const zeroPrev = await listContract.getPrev.call(0);
+  const zeroNext = await listContract.getNext.call(0);
+  let s = 'zeroInterval=(' + zeroInterval[0] + ',' + zeroInterval[1] + ',' + zeroPrev + ',' + zeroNext + ') ';
 
-  (await listContract.getNext.call(curIndex)).should.be.bignumber.equal(0);
+  // Validate linked list with prev refs
+  let id = await listContract.firstIndex.call();
+  s += 'last=' + (await listContract.lastIndex.call()) + ' ';
+  s += 'list={ ';
+  while (id != 0) {
+    const interval = await listContract.get.call(id);
+    const prevId = await listContract.getPrev.call(id);
+    s += id + ':[' + interval[0] + ',' + interval[1] + '):' + prevId + ' ';
 
-  size.should.be.equal(count);
+    id = await listContract.getNext.call(id);
+  }
+  s += '}';
+
+  return s;
 }
 
 contract('OrderedIntervalList', function () {
@@ -61,246 +72,423 @@ contract('OrderedIntervalList', function () {
 
   describe('insert', function () {
     it('check init state', async function () {
-      await this.orderedList.get(0).should.rejectedWith(EVMRevert);
-      await this.orderedList.get(1).should.rejectedWith(EVMRevert);
-      await this.orderedList.get(-1).should.rejectedWith(EVMRevert);
+      await this.orderedList.get.call(0).should.be.fulfilled;
+      await this.orderedList.get.call(1).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.get.call(-1).should.be.rejectedWith(EVMRevert);
+      await validateList(this.orderedList, []);
     });
 
-    it('insert one', async function () {
-      await this.orderedList.set(0, 0, 0, 100);
+    describe('single', function () {
+      it('insert single', async function () {
+        //
+        //  + [0,100)
+        //  = [0,100)
+        //
 
-      const interval = await this.orderedList.get(1);
+        await this.orderedList.insert(0, 0, 0, 100);
+        await validateList(this.orderedList, [[0, 100]], [1]);
+      });
 
-      interval[0].should.be.bignumber.equal(0);
-      interval[1].should.be.bignumber.equal(100);
+      it('insert single with wrong range', async function () {
+        //
+        // !+ [200,100)
+        //  = [0,0)
+        //
 
-      await validateList(this.orderedList, 1);
+        await this.orderedList.insert(0, 0, 200, 100).should.be.rejectedWith(EVMRevert);
+        await validateList(this.orderedList, [], []);
+      });
+
+      it('insert single with wrong prev', async function () {
+        //
+        // !+ [0,100)
+        //  = [0,0)
+        //
+
+        await this.orderedList.insert(1, 0, 0, 100).should.be.rejectedWith(EVMRevert);
+        await validateList(this.orderedList, [], []);
+      });
+
+      it('insert single with wrong next', async function () {
+        //
+        // !+ [0,100)
+        //  = [0,0)
+        //
+
+        await this.orderedList.insert(0, 1, 0, 100).should.be.rejectedWith(EVMRevert);
+        await validateList(this.orderedList, [], []);
+      });
     });
 
-    it('insert twice', async function () {
-      await this.orderedList.set(0, 0, 0, 100);
-      await this.orderedList.set(1, 0, 100, 200);
+    it('insert second', async function () {
+      //
+      //  + |-----|
+      //  +       |-----|
+      //  = |-----------|
+      //
 
-      const intervalFirst = await this.orderedList.get(1);
-
-      intervalFirst[0].should.be.bignumber.equal(0);
-      intervalFirst[1].should.be.bignumber.equal(200);
-
-      await validateList(this.orderedList, 1);
+      await this.orderedList.insert(0, 0, 0, 100);
+      await validateList(this.orderedList, [[0, 100]], [1]);
+      await this.orderedList.insert(1, 0, 100, 200);
+      await validateList(this.orderedList, [[0, 200]], [1]);
     });
 
-    it('insert twice with gap should be failed', async function () {
-      await this.orderedList.set(0, 0, 0, 100);
-      await this.orderedList.set(1, 0, 101, 200).should.be.rejectedWith(EVMRevert);
+    it('fails to insert after rightest with gap', async function () {
+      //
+      //  + |-----|
+      // !+        |-----|
+      // !+         |----|
+      // !+              |-----|
+      //  = |-----|
+      //
+
+      await this.orderedList.insert(0, 0, 0, 100);
+      await this.orderedList.insert(1, 0, 101, 200).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(1, 0, 105, 200).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(1, 0, 200, 300).should.be.rejectedWith(EVMRevert);
+      await validateList(this.orderedList, [[0, 100]], [1]);
     });
 
-    it('insert error', async function () {
-      await this.orderedList.set(0, 0, 300, 400);
-      await this.orderedList.set(0, 1, 100, 200);
+    it('fails to insert with intersection', async function () {
+      //
+      //  +        |-----|
+      // !+   |-----|
+      // !+             |-----|
+      // !+        |-----|
+      // !+       |------|
+      // !+        |------|
+      // !+       |-------|
+      //  =        |-----|
+      //
 
-      // wrong begin/end
-      await this.orderedList.set(0, 0, 100, 50).should.rejectedWith(EVMRevert);
+      await this.orderedList.insert(0, 0, 100, 200);
+      await this.orderedList.insert(0, 0, 50, 101).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(0, 1, 50, 101).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(1, 0, 50, 101).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(1, 1, 50, 101).should.be.rejectedWith(EVMRevert);
 
-      // wrong prev/next
-      await this.orderedList.set(2, 0, 90, 110).should.rejectedWith(EVMRevert);
-      await this.orderedList.set(0, 0, 90, 110).should.rejectedWith(EVMRevert);
-      await this.orderedList.set(0, 2, 90, 110).should.rejectedWith(EVMRevert);
+      await this.orderedList.insert(0, 0, 199, 250).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(0, 1, 199, 250).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(1, 0, 199, 250).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(1, 1, 199, 250).should.be.rejectedWith(EVMRevert);
 
-      // already inserted position
-      await this.orderedList.set(0, 1, 90, 110).should.rejectedWith(EVMRevert);
-      await this.orderedList.set(1, 0, 190, 210).should.rejectedWith(EVMRevert);
-      await this.orderedList.set(1, 0, 190, 310).should.rejectedWith(EVMRevert);
+      await this.orderedList.insert(0, 0, 100, 200).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(0, 1, 100, 200).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(1, 0, 100, 200).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(1, 1, 100, 200).should.be.rejectedWith(EVMRevert);
 
-      // too distant from last
-      await this.orderedList.set(1, 2, 450, 500).should.rejectedWith(EVMRevert);
+      await this.orderedList.insert(0, 0, 99, 200).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(0, 1, 99, 200).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(1, 0, 99, 200).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(1, 1, 99, 200).should.be.rejectedWith(EVMRevert);
+
+      await this.orderedList.insert(0, 0, 100, 201).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(0, 1, 100, 201).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(1, 0, 100, 201).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(1, 1, 100, 201).should.be.rejectedWith(EVMRevert);
+
+      await this.orderedList.insert(0, 0, 99, 201).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(0, 1, 99, 201).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(1, 0, 99, 201).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.insert(1, 1, 99, 201).should.be.rejectedWith(EVMRevert);
+
+      await validateList(this.orderedList, [[100, 200]], [1]);
+    });
+
+    it('insert second on left', async function () {
+      //
+      //  +       |-----|
+      //  + |-----|
+      //  = |-----------|
+      //
+
+      await this.orderedList.insert(0, 0, 100, 200);
+      await validateList(this.orderedList, [[100, 200]], [1]);
+      await this.orderedList.insert(0, 1, 0, 100);
+      await validateList(this.orderedList, [[0, 200]], [1]);
+    });
+
+    it('insert second on left with gap', async function () {
+      //
+      //  +       |-----|
+      //  + |--|
+      //  = |--|  |-----|
+      //
+
+      await this.orderedList.insert(0, 0, 100, 200);
+      await validateList(this.orderedList, [[100, 200]], [1]);
+      await this.orderedList.insert(0, 1, 0, 50);
+      await validateList(this.orderedList, [[0, 50], [100, 200]], [2, 1]);
     });
   });
 
   describe('remove', function () {
     it('check init state', async function () {
-      await this.orderedList.remove(0, 0, 100).should.rejectedWith(EVMRevert);
-      await this.orderedList.remove(1, 0, 100).should.rejectedWith(EVMRevert);
-      await this.orderedList.remove(-1, 0, 100).should.rejectedWith(EVMRevert);
+      await this.orderedList.remove(0, 0, 100).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.remove(1, 0, 100).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.remove(-1, 0, 100).should.be.rejectedWith(EVMRevert);
     });
 
-    it.only('full remove one element', async function () {
-      await this.orderedList.set(0, 0, 0, 100);
-      await this.orderedList.remove(1, 0, 100);
+    it('full remove one element', async function () {
+      //
+      //  + |-----|
+      //  - |-----|
+      //  =
+      //
 
-      await this.orderedList.get(1).should.rejectedWith(EVMRevert);
+      await this.orderedList.insert(0, 0, 0, 100);
+      await this.orderedList.remove(1, 0, 100);
+      await validateList(this.orderedList, [], []);
+
+      const firstInterval = await this.orderedList.get.call(1);
+      firstInterval[0].should.be.bignumber.equal(0);
+      firstInterval[1].should.be.bignumber.equal(0);
+
       (await this.orderedList.firstIndex.call()).should.be.bignumber.equal(0);
       (await this.orderedList.lastIndex.call()).should.be.bignumber.equal(0);
-
-      await validateList(this.orderedList, 0);
-
-      await this.orderedList.remove(1, 0, 100).should.be.rejectedWith(EVMRevert);
-
-      await this.orderedList.set(0, 0, 0, 100);
-      await validateList(this.orderedList, 1);
     });
 
     it('make hole inside interval', async function () {
-      await this.orderedList.set(0, 0, 0, 100);
+      //
+      //    |0  |50  |70  |100
+      //  + |-------------|
+      //  -     |----|
+      //  = |---|    |----|
+      //
+
+      await this.orderedList.insert(0, 0, 0, 100);
       await this.orderedList.remove(1, 50, 70);
-
-      let interval = await this.orderedList.get(1);
-
-      interval[0].should.be.bignumber.equal(0);
-      interval[1].should.be.bignumber.equal(50);
-
-      const id = (await this.orderedList.maxIndex.call());
-      interval = await this.orderedList.get(id);
-
-      interval[0].should.be.bignumber.equal(70);
-      interval[1].should.be.bignumber.equal(100);
-
-      await validateList(this.orderedList, 2);
+      await validateList(this.orderedList, [[0, 50], [70, 100]], [1, 2]);
     });
 
     it('make and fill hole', async function () {
-      await this.orderedList.set(0, 0, 0, 100);
-      await this.orderedList.set(1, 0, 101, 200);
-      await this.orderedList.set(2, 0, 201, 300);
+      //
+      //    |0        |100        |200      |300
+      //
+      // 1:
+      //  + |-------------------------------|
+      //  -           |-----------|
+      //  = |----1----|           |----2----|
+      //
+      // 2:
+      //  +               |---|
+      //  = |----1----|   |-3-|   |----2----|
+      //  +           |---|
+      //  = |------1----------|   |----2----|
+      //  +                   |---|
+      //  = |--------------1----------------|
+      //
 
-      // already inserted position
-      await this.orderedList.set(1, 0, 100, 150).should.be.rejectedWith(EVMRevert);
+      // 1
+      await this.orderedList.insert(0, 0, 0, 300);
+      await validateList(this.orderedList, [[0, 300]], [1]);
+      await this.orderedList.remove(1, 100, 200);
+      await validateList(this.orderedList, [[0, 100], [200, 300]], [1, 2]);
 
-      await this.orderedList.remove(2, 101, 200);
-      await this.orderedList.get(2).should.be.rejectedWith(EVMRevert);
-
-      await this.orderedList.set(1, 3, 101, 150);
-
-      let interval = await this.orderedList.get(4);
-
-      interval[0].should.be.bignumber.equal(101);
-      interval[1].should.be.bignumber.equal(150);
-      await validateList(this.orderedList, 3);
+      // 2
+      await this.orderedList.insert(1, 2, 130, 170);
+      await validateList(this.orderedList, [[0, 100], [130, 170], [200, 300]], [1, 3, 2]);
+      await this.orderedList.insert(1, 3, 100, 130);
+      await validateList(this.orderedList, [[0, 170], [200, 300]], [1, 2]);
+      await this.orderedList.insert(1, 2, 170, 200);
+      await validateList(this.orderedList, [[0, 300]], [1]);
     });
 
     it('make and fill hole from multiple intervals', async function () {
-      await this.orderedList.set(0, 0, 0, 100);
-      await this.orderedList.set(1, 0, 101, 200);
-      await this.orderedList.set(2, 0, 201, 300);
-      await this.orderedList.set(3, 0, 401, 500);
+      //
+      //    |0        |100      |200      |300      |400      |500
+      //
+      // 1:
+      //  +                                         |----1----|
+      //  +                               |----1----|
+      //  + |----2----|
+      //  +           |----2----|
+      //  = |---------2---------|         |---------1---------|
+      //
+      // 2:
+      //  -       |-------|
+      //  = |--2--|       |--3--|         |---------1---------|
+      //  -                                     |-------|
+      //  = |--2--|       |--3--|         |--1--|       |--4--|
+      //
+      // 3:
+      //  +                     |---------|
+      //  = |--2--|       |----------3----------|       |--4--|
+      //
 
-      await this.orderedList.remove(2, 101, 200);
-      await this.orderedList.remove(3, 201, 300);
+      // 1
+      await this.orderedList.insert(0, 0, 300, 400);
+      await validateList(this.orderedList, [[300, 400]], [1]);
+      await this.orderedList.insert(1, 0, 400, 500);
+      await validateList(this.orderedList, [[300, 500]], [1]);
+      await this.orderedList.insert(0, 1, 0, 100);
+      await validateList(this.orderedList, [[0, 100], [300, 500]], [2, 1]);
+      await this.orderedList.insert(2, 1, 100, 200);
+      await validateList(this.orderedList, [[0, 200], [300, 500]], [2, 1]);
 
-      // invalid previous element
-      await this.orderedList.set(2, 4, 150, 170).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.set(1, 3, 150, 170).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.set(1, 4, 102, 110);
-      await validateList(this.orderedList, 3);
-      await this.orderedList.set(1, 5, 101, 102);
-      await validateList(this.orderedList, 3);
+      // 2
+      await this.orderedList.remove(2, 50, 150);
+      await validateList(this.orderedList, [[0, 50], [150, 200], [300, 500]], [2, 3, 1]);
+      await this.orderedList.remove(1, 350, 450);
+      await validateList(this.orderedList, [[0, 50], [150, 200], [300, 350], [450, 500]], [2, 3, 1, 4]);
 
-      var interval = await this.orderedList.get(5);
-      interval[0].should.be.bignumber.equal(101);
-      interval[1].should.be.bignumber.equal(110);
-
-      await validateList(this.orderedList, 3);
+      // 3
+      await this.orderedList.insert(3, 1, 200, 300);
+      await validateList(this.orderedList, [[0, 50], [150, 350], [450, 500]], [2, 3, 4]);
     });
 
     it('remove first and last element', async function () {
-      await this.orderedList.set(0, 0, 0, 100);
-      let idFirst = await this.orderedList.lastInserted.call();
-      await this.orderedList.set(1, 0, 101, 200);
-      let idNewFirst = await this.orderedList.lastInserted.call();
-      await this.orderedList.set(2, 0, 201, 300);
-      let idNewLast = await this.orderedList.lastInserted.call();
-      await this.orderedList.set(3, 0, 401, 500);
-      let idLast = await this.orderedList.lastInserted.call();
+      //
+      //    |0        |100      |200      |300      |400      |500
+      //
+      // 1:
+      //  +                                          |---1---|
+      //  +                      |---2---|
+      //  +            |---3---|
+      //  +  |---4---|
+      //  =  |---4---| |---3---| |---2---|           |---1---|
+      //
+      // 2:
+      //  -  |---4---|
+      //  -                                          |---1---|
+      //  =            |---3---| |---2---|
+      //
 
+      // 1
+      await this.orderedList.insert(0, 0, 401, 500);
+      let idLast = await this.orderedList.lastInserted.call();
+      await this.orderedList.insert(0, 1, 201, 300);
+      let idNewLast = await this.orderedList.lastInserted.call();
+      await this.orderedList.insert(0, 2, 101, 200);
+      let idNewFirst = await this.orderedList.lastInserted.call();
+      await this.orderedList.insert(0, 3, 0, 100);
+      let idFirst = await this.orderedList.lastInserted.call();
+      await validateList(this.orderedList, [[0,100], [101, 200], [201, 300], [401, 500]], [4, 3, 2, 1]);
+
+      // 2
       await this.orderedList.remove(idFirst, 0, 100);
       await this.orderedList.remove(idLast, 401, 500);
+      await validateList(this.orderedList, [[101, 200], [201, 300]], [3, 2]);
 
       (await this.orderedList.getNext.call(idNewLast)).should.be.bignumber.equal(0);
       (await this.orderedList.getPrev.call(idNewFirst)).should.be.bignumber.equal(0);
-
-      await validateList(this.orderedList, 2);
+      (await this.orderedList.firstIndex.call()).should.be.bignumber.equal(3);
+      (await this.orderedList.lastIndex.call()).should.be.bignumber.equal(2);
     });
 
     it('invalid range removing', async function () {
-      await this.orderedList.set(0, 0, 0, 100);
-      await this.orderedList.set(1, 0, 101, 300);
+      await this.orderedList.insert(0, 0, 101, 300);
+      await this.orderedList.insert(0, 1, 0, 100);
+
       // empty range remove
-      await this.orderedList.remove(1, 99, 99).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.remove(2, 99, 99).should.be.rejectedWith(EVMRevert);
       // intersect only prefix
-      await this.orderedList.remove(1, 50, 150).should.be.rejectedWith(EVMRevert);
-      // intersect only suffix
       await this.orderedList.remove(2, 50, 150).should.be.rejectedWith(EVMRevert);
+      // intersect only suffix
+      await this.orderedList.remove(1, 50, 150).should.be.rejectedWith(EVMRevert);
       // range greater than interval
-      await this.orderedList.remove(2, 0, 500).should.be.rejectedWith(EVMRevert);
+      await this.orderedList.remove(1, 0, 500).should.be.rejectedWith(EVMRevert);
     });
   });
 
   describe('merge intervals', function () {
     it('full merge', async function () {
-      await this.orderedList.set(0, 0, 0, 100);
-      await this.orderedList.set(1, 0, 101, 200);
-      await this.orderedList.set(2, 0, 201, 300);
+      //
+      //    |0        |100      |200      |300      |400
+      //
+      // 1:
+      //  +                      |---1---|
+      //  +            |---2---|
+      //  +  |---3---|
+      //  =  |---3---| |---2---| |---1---|
+      //
+      // 2:
+      //  +          |-|
+      //  =  |--------3--------| |---1---|
+      //  +                    |-|
+      //  =  |-------------3-------------|
+      //
+      // 3:
+      //  +                              |----------|
+      //  =  |------------------3-------------------|
+      //
 
-      await validateList(this.orderedList, 3);
+      // 1
+      await this.orderedList.insert(0, 0, 201, 300);
+      await this.orderedList.insert(0, 1, 101, 200);
+      await this.orderedList.insert(0, 2, 0, 100);
+      await validateList(this.orderedList, [[0, 100], [101, 200], [201, 300]], [3, 2, 1]);
 
-      await this.orderedList.set(1, 2, 100, 101);
-      await this.orderedList.set(1, 3, 200, 201);
+      // 2
+      await this.orderedList.insert(3, 2, 100, 101);
+      await validateList(this.orderedList, [[0, 200], [201, 300]], [3, 1]);
+      await this.orderedList.insert(3, 1, 200, 201);
+      await validateList(this.orderedList, [[0, 300]], [3]);
 
-      await validateList(this.orderedList, 1);
-
-      await this.orderedList.set(1, 0, 300, 400);
-      const id = await this.orderedList.lastInserted.call();
-      const interval = await this.orderedList.get(id);
-
-      interval[0].should.be.bignumber.equal(0);
-      interval[1].should.be.bignumber.equal(400);
-
-      await validateList(this.orderedList, 1);
+      // 3
+      await this.orderedList.insert(3, 0, 300, 400);
+      await validateList(this.orderedList, [[0, 400]], [3]);
     });
 
     it('merge with previous interval', async function () {
-      await this.orderedList.set(0, 0, 0, 100);
-      await this.orderedList.set(1, 0, 200, 300);
-      const idCenter = await this.orderedList.lastInserted.call();
-      await this.orderedList.set(2, 0, 400, 500);
-      const idLast = await this.orderedList.lastInserted.call();
+      //
+      //    |0        |100      |200      |300      |400      |500      |600
+      //
+      // 1:
+      //  +                                         |----1----|
+      //  +                     |----2----|
+      //  +  |----3----|
+      //  =  |----3----|        |----2----|         |----1----|
+      //
+      // 2:
+      //  +                                                   |---------|
+      //  =  |----3----|        |----2----|         |---------1---------|
+      //  +                               |----|
+      //  =  |----3----|        |-------2------|    |---------1---------|
+      //
+      //
 
-      await this.orderedList.set(idLast, 0, 500, 600);
+      // 1
+      await this.orderedList.insert(0, 0, 400, 500);
+      await this.orderedList.insert(0, 1, 200, 300);
+      await this.orderedList.insert(0, 2, 0, 100);
+      await validateList(this.orderedList, [[0, 100], [200, 300], [400, 500]], [3, 2, 1]);
 
-      let interval = await this.orderedList.get(idLast);
-
-      interval[0].should.be.bignumber.equal(400);
-      interval[1].should.be.bignumber.equal(600);
-
-      await this.orderedList.set(idCenter, idLast, 300, 350);
-
-      interval = await this.orderedList.get(idCenter);
-      interval[0].should.be.bignumber.equal(200);
-      interval[1].should.be.bignumber.equal(350);
-
-      await validateList(this.orderedList, 3);
+      // 2
+      await this.orderedList.insert(1, 0, 500, 600);
+      await validateList(this.orderedList, [[0, 100], [200, 300], [400, 600]], [3, 2, 1]);
+      await this.orderedList.insert(2, 1, 300, 350);
+      await validateList(this.orderedList, [[0, 100], [200, 350], [400, 600]], [3, 2, 1]);
     });
 
     it('merge with next interval', async function () {
-      await this.orderedList.set(0, 0, 50, 100);
-      const idFirst = await this.orderedList.lastInserted.call();
-      await this.orderedList.set(1, 0, 200, 300);
-      const idCenter = await this.orderedList.lastInserted.call();
-      await this.orderedList.set(2, 0, 400, 500);
+      //
+      //    |0        |100      |200      |300      |400      |500      |600
+      //
+      // 1:
+      //  +                                         |----1----|
+      //  +                     |----2----|
+      //  +     |--3--|
+      //  =     |--3--|         |----2----|         |----1----|
+      //
+      // 2:
+      //  +  |--|
+      //  =  |----3---|         |----2----|         |----1----|
+      //  +                |----|
+      //  =  |----3---|    |-------2------|         |----1----|
+      //
 
-      await this.orderedList.set(0, idFirst, 0, 50);
+      // 1
+      await this.orderedList.insert(0, 0, 400, 500);
+      await this.orderedList.insert(0, 1, 200, 300);
+      await this.orderedList.insert(0, 2, 50, 100);
+      await validateList(this.orderedList, [[50, 100], [200, 300], [400, 500]], [3, 2, 1]);
 
-      let interval = await this.orderedList.get(idFirst);
-
-      interval[0].should.be.bignumber.equal(0);
-      interval[1].should.be.bignumber.equal(100);
-
-      await this.orderedList.set(idFirst, idCenter, 150, 200);
-
-      interval = await this.orderedList.get(idCenter);
-      interval[0].should.be.bignumber.equal(150);
-      interval[1].should.be.bignumber.equal(300);
-
-      await validateList(this.orderedList, 3);
+      // 2
+      await this.orderedList.insert(0, 3, 0, 50);
+      await validateList(this.orderedList, [[0, 100], [200, 300], [400, 500]], [3, 2, 1]);
+      await this.orderedList.insert(3, 2, 150, 200);
+      await validateList(this.orderedList, [[0, 100], [150, 300], [400, 500]], [3, 2, 1]);
     });
   });
 });
