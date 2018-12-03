@@ -1,8 +1,8 @@
 pragma solidity ^0.4.24;
 
-import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import { ECDSA } from "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 
 
 contract PlasmaBlocks is Ownable {

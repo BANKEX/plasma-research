@@ -7,28 +7,28 @@ pragma solidity ^0.4.24;
 */
 library OrderedIntervalList {
   struct Interval {
-    uint256 begin; // inclusive
-    uint256 end;   // exclusive
+    uint64 begin; // inclusive
+    uint64 end;   // exclusive
 
-    uint256 next;
-    uint256 prev;
+    uint64 next;
+    uint64 prev;
   }
 
   struct Data {
     Interval[] intervals; // sparsed array
-    uint firstIndex;
-    uint lastIndex;
+    uint64 firstIndex;
+    uint64 lastIndex;
   }
 
   function isInitialized(Data storage self) internal view returns(bool) {
     return self.intervals.length > 0;
   }
 
-  function getFirstIndex(Data storage self) internal view returns(uint) {
+  function getFirstIndex(Data storage self) internal view returns(uint64) {
     return self.firstIndex;
   }
 
-  function getLastIndex(Data storage self) internal view returns(uint) {
+  function getLastIndex(Data storage self) internal view returns(uint64) {
     return self.lastIndex;
   }
 
@@ -46,7 +46,7 @@ library OrderedIntervalList {
    * @param id interval index in the list
    * @return interval tuple
    */
-  function get(Data storage self, uint256 id) internal view returns(Interval storage interval) {
+  function get(Data storage self, uint64 id) internal view returns(Interval storage interval) {
     require(id < self.intervals.length, "interval id doesn't exists in interval set");
     interval = self.intervals[id];
     //require(interval.end != 0, "interval id doesn't exsits in interval set");
@@ -57,7 +57,7 @@ library OrderedIntervalList {
    * @param id interval index in the list
    * @return is existing or not
    */
-  function exist(Data storage self, uint256 id) internal view returns (bool) {
+  function exist(Data storage self, uint64 id) internal view returns (bool) {
     return self.intervals[id].end != 0;
   }
 
@@ -68,13 +68,19 @@ library OrderedIntervalList {
    */
   function append(
     Data storage self,
-    uint256 size
+    uint64 size
   )
     internal
-    returns(uint256)
+    returns(
+      uint64 id,
+      uint64 begin,
+      uint64 end
+    )
   {
     Interval storage lastInterval = self.intervals[self.lastIndex];
-    return insert(self, self.lastIndex, 0, lastInterval.end, lastInterval.end + size - 1);
+    begin = lastInterval.end;
+    end = lastInterval.end + size - 1;
+    id = insert(self, self.lastIndex, 0, begin, end);
   }
 
   /**
@@ -89,13 +95,13 @@ library OrderedIntervalList {
    */
   function insert(
     Data storage self,
-    uint256 prev,
-    uint256 next,
-    uint256 begin,
-    uint256 end
+    uint64 prev,
+    uint64 next,
+    uint64 begin,
+    uint64 end
   )
     internal
-    returns(uint256 id)
+    returns(uint64 id)
   {
     return _insert(
       self,
@@ -114,7 +120,15 @@ library OrderedIntervalList {
    * @param end right range bound
    * @return index of the new interval if new one was created (was made a hole insided existed interval) or zero.
    */
-  function remove(Data storage self, uint index, uint begin, uint end) internal returns (uint256 newInterval) {
+  function remove(
+    Data storage self,
+    uint64 index,
+    uint64 begin,
+    uint64 end
+  )
+    internal
+    returns(uint64 newInterval)
+  {
     require(begin < end, "right bound less than left bound");
     require(index < self.intervals.length, "valid index bounds");
 
@@ -153,7 +167,7 @@ library OrderedIntervalList {
       modifiedInterval.end = begin;
     } else {
       // Make a hole
-      uint256 oldEnd = modifiedInterval.end;
+      uint64 oldEnd = modifiedInterval.end;
       modifiedInterval.end = begin;
       modifiedInterval.next = _insert(
         self,
@@ -169,14 +183,14 @@ library OrderedIntervalList {
 
   function _insert(
     Data storage self,
-    uint256 prev,
-    uint256 next,
-    uint256 begin,
-    uint256 end,
+    uint64 prev,
+    uint64 next,
+    uint64 begin,
+    uint64 end,
     bool allowGapAfterLast
   )
     private
-    returns(uint256 id)
+    returns(uint64 id)
   {
     require(begin < end, "right bound less or equal to left bound");
     require((prev != 0 || next != 0) == (self.firstIndex > 0), "prev and next could be zero iff no intervals");
@@ -221,7 +235,7 @@ library OrderedIntervalList {
     bool concatNext = (next > 0 && end == nextInterval.begin);
 
     if (!concatPrev && !concatNext) {
-      id = self.intervals.length;
+      id = uint64(self.intervals.length);
       self.intervals.push(Interval({
         begin: begin,
         end: end,
