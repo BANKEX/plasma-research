@@ -1,9 +1,10 @@
 package blocks
 
 import (
+	"../../plasmautils/slice"
+	. "../alias"
 	"../rlp"
 	"../utils"
-	a "./alias"
 	"bytes"
 	"errors"
 	"fmt"
@@ -24,7 +25,7 @@ type UnsignedTransaction struct {
 
 type Transaction struct {
 	UnsignedTransaction
-	Signatures []a.Signature `json:"signatures"`
+	Signatures []Signature `json:"signatures"`
 }
 
 type Metadata struct {
@@ -32,34 +33,21 @@ type Metadata struct {
 }
 
 type Input struct {
-	Owner       a.Uint160 `json:"owner"`
-	BlockIndex  uint32    `json:"blockNumber"`
-	TxIndex     uint32    `json:"txNumber"`
-	OutputIndex uint8     `json:"outputNumber"`
-	//AssetID     uint256  `json:"assetId"`
-	Amount Segment `json:"amount"`
-
-	// TODO: optimize probably we don't need it
-	// TxHash of previous transaction
-	PrevTxHash a.Uint160
+	BlockIndex  uint32 `json:"blockNumber"`
+	TxIndex     uint32 `json:"txNumber"`
+	OutputIndex uint8  `json:"outputNumber"`
+	Output
 }
 
 type Output struct {
-	Owner a.Uint160 `json:"owner"`
-	//AssetID uint256 `json:"assetId"`
-	Amount Segment `json:"amount"`
+	Owner Uint160     `json:"owner"`
+	Slice slice.Slice `json:"amount"`
 }
 
-type Segment struct {
-	Begin uint32 // Index of one of 2^24 coins - starts from 0
-	End   uint32
-}
-
-func (ut *UnsignedTransaction) GetMerkleRoot() a.Uint160 {
-
+func (ut *UnsignedTransaction) GetMerkleRoot() Uint160 {
 	var leafs []utils.Item
 
-	for _, data := range ut.Outputs {
+	for _, data := range ut.Inputs {
 		rlpEncoded, _ := rlp.EncodeToRLP(data)
 		leafs = append(leafs, rlpEncoded)
 	}
@@ -74,10 +62,7 @@ func (ut *UnsignedTransaction) GetMerkleRoot() a.Uint160 {
 
 	tree := utils.NewMerkleTree(leafs, 3, utils.Keccak160)
 
-	var result [20]byte
-	copy(result[:], tree.GetRoot())
-
-	return result
+	return []byte(tree.GetRoot())
 }
 
 func concat(values ...[]byte) []byte {
@@ -90,22 +75,22 @@ func concat(values ...[]byte) []byte {
 
 func getSignaturesHash(t *Transaction) []byte {
 	if len(t.Signatures) == 1 {
-		b := (t.Signatures[0])[:]
+		b := t.Signatures[0]
 		return utils.Keccak160(b)
 	}
 
-	b1 := (t.Signatures[0])[:]
-	b2 := (t.Signatures[0])[:]
+	b1 := t.Signatures[0]
+	b2 := t.Signatures[0]
 	return utils.Keccak160(concat(b1, b2))
 }
 
-func (t *Transaction) GetWTFHash() (a.Uint160, error) {
+func (t *Transaction) GetWTFHash() (Uint160, error) {
 
 	contentRoot := t.UnsignedTransaction.GetMerkleRoot()
 	rootData := concat(contentRoot[:], getSignaturesHash(t))
 	rootHash := utils.Keccak160(rootData)
 
-	result := a.Uint160{}
+	result := Uint160{}
 	copy(result[:], rootHash)
 
 	return result, nil
@@ -162,10 +147,12 @@ func (t *Transaction) ValidateSignatures() error {
 	return nil
 }
 
-// todo this should receive fee arguments from outside, needed only for operator
+// todo this should receive fee arguments from the outside, needed only for operator
 func (t *Transaction) ValidateFee() error {
 	return nil
 }
+
+// todo validate slices non-intersection
 
 func (t *Transaction) Validate() error {
 	return t.ValidateSoftLimits() // || tr.ValidateOutputSum() || tr.ValidateSignatures() || tr.ValidateFee() || nil

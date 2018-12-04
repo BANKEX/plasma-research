@@ -1,8 +1,8 @@
 package blocks
 
 import (
+	. "../alias"
 	"../utils"
-	a "./alias"
 	"fmt"
 	"github.com/ethereum/go-ethereum/crypto"
 	"math/big"
@@ -14,39 +14,77 @@ import (
 
 // For test only
 var Balance = map[string]int{"balance": 0}
+var PrivateKey []byte // todo move and init in config
 
+// UnsignedBlockHeader is a structure that signature is calculated for.
+type UnsignedBlockHeader struct {
+	BlockNumber    uint32        `json:"blockNumber"`
+	PreviousHash   Uint256       `json:"previousHash"`
+	MerkleRoot     SumMerkleNode `json:"merkleRoot"`
+	RSAAccumulator Uint2048      `json:"rsaAccumulator"`
+}
+
+// BlockHeader is a structure that gets sent to a smart contract.
+type BlockHeader struct {
+	UnsignedBlockHeader
+	Signature Signature `json:"signature"`
+}
+
+// Block is a complete block that gets uploaded to public storage.
 type Block struct {
-	Header       BlockHeader   `json:"header"`
+	BlockHeader  `json:"header"`
 	Transactions []Transaction `json:"transactions"`
 }
 
-type UnsignedBlockHeader struct {
-	BlockNumber      uint32            `json:"blockNumber"`
-	TransactionsRoot SumMerkleNode     `json:"transactionsRoot"`
-	RSAAccumulator   a.Uint2048        `json:"sumMerkleNode"`
-	RSAChainProof    RSAInclusionProof `json:"RSAInclusionProof"`
-}
-
-const PlasmaRangeSpace = 2 ^ 24 - 1
-
+// todo move to merkle tree implementation
 type SumMerkleNode struct {
 	// We use 24 bit
 	Length uint32
-	Hash   a.Uint160
+	Hash   Uint160
 }
 
-type BlockHeader struct {
-	UnsignedBlockHeader
-	Signature a.Signature `json:"signature"`
-}
+/*
+// currently not used anywhere
+
+const PlasmaRangeSpace = 2 ^ 24 - 1
 
 type RSAInclusionProof struct {
-	B a.Uint2048
-	R a.Uint256
+	B Uint2048
+	R Uint256
+}
+*/
+
+// NewBlock creates a block from previous block metadata and an array of transaction.
+// This function will calculate merkle root, RSA accumulator, and sign the block.
+func NewBlock(blockNumber uint32, previousHash Uint256, previousRSAAccumulator Uint2048, transactions []Transaction) (*Block, error) {
+	block := Block{
+		BlockHeader: BlockHeader{
+			UnsignedBlockHeader: UnsignedBlockHeader{
+				BlockNumber:  blockNumber,
+				PreviousHash: previousHash,
+			},
+		},
+		Transactions: transactions,
+	}
+
+	block.UpdateRSAAccumulator(previousRSAAccumulator)
+
+	err := block.CalculateMerkleRoot()
+	if err != nil {
+		return nil, err
+	}
+
+	err = block.Sign(PrivateKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return &block, nil
 }
 
+// GetHash gets the hash of block header for signing.
 func (b *Block) GetHash() ([]byte, error) {
-	data, err := utils.EncodeToRLP(b.Header.UnsignedBlockHeader)
+	data, err := utils.EncodeToRLP(b.UnsignedBlockHeader)
 	if err != nil {
 		return nil, err
 	}
@@ -57,6 +95,7 @@ func (b *Block) GetHash() ([]byte, error) {
 	return hash, nil
 }
 
+// Sign signs the block with the specified private key.
 func (b *Block) Sign(key []byte) error {
 	hash, err := b.GetHash()
 	if err != nil {
@@ -69,29 +108,41 @@ func (b *Block) Sign(key []byte) error {
 	if len(signature) != 65 {
 		return fmt.Errorf("wrong signature length %n, expected length: %n", len(signature), 65)
 	}
-	copy(b.Header.Signature[:], signature)
+	b.Signature = signature
 	return nil
 }
 
+// CalculateMerkleRoot calculates merkle root for transactions in the block.
 func (b *Block) CalculateMerkleRoot() error {
+	// todo
 	return nil
 }
 
-// === validation ===
-
-// === utils ===
-
-// UpdateRSAAccumulator adds input ranges for all submitted transactions to the RSA accumulator
-// Algorithm complexity is O(N*logN) for N transactions
-func UpdateRSAAccumulator(previous *big.Int, transactions []Transaction) *big.Int {
-	acc := plasmacrypto.Accumulator{}.SetInt(previous)
-	for _, t := range transactions {
+// UpdateRSAAccumulator adds input ranges for all submitted transactions to the RSA accumulator.
+// Algorithm complexity is O(N*logN) for N transactions.
+// This function accepts previous accumulator as argument instead of mutating the block to avoid double invocation.
+func (b *Block) UpdateRSAAccumulator(previous Uint2048) {
+	acc := plasmacrypto.Accumulator{}.SetInt(big.Int{}.SetBytes(previous))
+	for _, t := range b.Transactions {
 		for _, i := range t.Inputs {
-			s := slice.Slice{Begin: i.Amount.Begin, End: i.Amount.End}
+			s := slice.Slice{Begin: i.Slice.Begin, End: i.Slice.End}
 			for _, p := range s.GetAlignedSlices() {
 				acc.Accumulate(primeset.PrimeN(int(p)))
 			}
 		}
 	}
-	return acc.Value()
+	b.RSAAccumulator = acc.Value().Bytes()
 }
+
+func (b *Block) Serialize() []byte {
+	// todo
+	return nil
+}
+
+func Deserialize(data []byte) *Block {
+	// todo
+	return nil
+}
+
+// todo merkle proofs for transaction inclusion for client
+// todo rsa proofs for transaction inclusion and exclusion
