@@ -5,10 +5,8 @@ import (
 	. "../alias"
 	"../rlp"
 	"../utils"
-	"bytes"
 	"errors"
 	"fmt"
-	"github.com/ethereum/go-ethereum/crypto"
 )
 
 const (
@@ -29,6 +27,8 @@ type Transaction struct {
 }
 
 type Metadata struct {
+	// MaxBlockNumber is a block number before the transaction should be included,
+	// otherwise the transaction is considered invalid
 	MaxBlockNumber uint32 `json:"maxBlockNumber"`
 }
 
@@ -41,9 +41,10 @@ type Input struct {
 
 type Output struct {
 	Owner Uint160     `json:"owner"`
-	Slice slice.Slice `json:"amount"`
+	Slice slice.Slice `json:"slice"`
 }
 
+// GetMerkleRoot gets the root of merklized transaction inputs, outputs, and metadata.
 func (ut *UnsignedTransaction) GetMerkleRoot() Uint160 {
 	var leafs []utils.Item
 
@@ -65,64 +66,39 @@ func (ut *UnsignedTransaction) GetMerkleRoot() Uint160 {
 	return []byte(tree.GetRoot())
 }
 
-func concat(values ...[]byte) []byte {
-	var buffer bytes.Buffer
-	for _, s := range values {
-		buffer.Write(s)
+// GetSignaturesHash returns a hash of concatenated signatures.
+func (t *Transaction) GetSignaturesHash() Uint160 {
+	result := make([]byte, 65*len(t.Signatures))
+	for _, s := range t.Signatures {
+		result = append(result, s...)
 	}
-	return buffer.Bytes()
+	return Uint160(utils.Keccak160(result))
 }
 
-func getSignaturesHash(t *Transaction) []byte {
-	if len(t.Signatures) == 1 {
-		b := t.Signatures[0]
-		return utils.Keccak160(b)
-	}
-
-	b1 := t.Signatures[0]
-	b2 := t.Signatures[0]
-	return utils.Keccak160(concat(b1, b2))
+// GetHash returns a full hash of signed transaction.
+func (t *Transaction) GetHash() Uint160 {
+	var result []byte
+	result = append(result, t.GetMerkleRoot()...)
+	result = append(result, t.GetSignaturesHash()...)
+	return Uint160(utils.Keccak160(result))
 }
 
-func (t *Transaction) GetWTFHash() (Uint160, error) {
-
-	contentRoot := t.UnsignedTransaction.GetMerkleRoot()
-	rootData := concat(contentRoot[:], getSignaturesHash(t))
-	rootHash := utils.Keccak160(rootData)
-
-	result := Uint160{}
-	copy(result[:], rootHash)
-
-	return result, nil
-}
-
-func (t *Transaction) GetHash() ([]byte, error) {
-	data, err := utils.EncodeToRLP(t.UnsignedTransaction)
-	if err != nil {
-		return nil, err
-	}
-	hash := crypto.Keccak256(data)
-	if len(hash) != 32 {
-		return nil, fmt.Errorf("wrong hash length %n, expected length: %n", len(hash), 32)
-	}
-	return hash, nil
-}
-
+// Signs a transaction with a specified private key.
+// This function will append the generated signature to transactions' Signatures array
 func (t *Transaction) Sign(key []byte) error {
-	hash, err := t.GetHash()
-	if err != nil {
-		return err
-	}
-	signature, err := utils.Sign(hash[:], key)
+	hash := t.GetHash()
+	signature, err := utils.Sign(hash, key)
 	if err != nil {
 		return err
 	}
 	if len(signature) != 65 {
 		return fmt.Errorf("wrong signature length %n, expected length: %n", len(signature), 65)
 	}
-	copy(t.Signatures[0][:], signature)
+	t.Signatures = append(t.Signatures, signature)
 	return nil
 }
+
+// todo serialization and deserialization
 
 // === validation ===
 
