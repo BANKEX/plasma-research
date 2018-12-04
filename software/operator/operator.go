@@ -6,11 +6,18 @@ import (
 	"log"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"../commons/config"
 	"./handlers"
 	"github.com/gin-gonic/gin"
 )
+
+func assembleBlocks(d time.Duration) {
+	for range time.Tick(d) {
+		assembleBlock()
+	}
+}
 
 func main() {
 
@@ -31,9 +38,14 @@ func main() {
 	r.Use(gin.Recovery())
 	gin.SetMode(gin.ReleaseMode)
 
+	// Assemble block ~ each second
+	go assembleBlocks(time.Second * 1)
+
+	// Handler that accept new transaction from verifier
 	r.POST("/settx/:tx", handlers.SetTx)
 	r.GET("/gettx/:tx", handlers.GetTx)
 	r.GET("/getall", handlers.GetAllTx)
+	// Handler for debug
 	r.GET("/publishblock", handlers.PublishBlock)
 	r.GET("/pbalance", handlers.PBalance)
 	r.Run(":" + strconv.Itoa(conf.Operator_port))
