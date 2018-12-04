@@ -4,7 +4,6 @@ import (
 	"../../commons/blockchain"
 	"../../commons/db"
 	"../../commons/ether"
-	tp "../pool"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -38,7 +37,7 @@ func GetTx(c *gin.Context) {
 	})
 }
 
-func SetTx(pool tp.TransactionsPool, c *gin.Context) {
+func SetTx(pool blockchain.TransactionsPool, c *gin.Context) {
 	rawTransaction := []byte(c.Param("tx"))
 
 	//TODO: Check that this unmarshaling actually works

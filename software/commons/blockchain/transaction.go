@@ -39,6 +39,11 @@ type Input struct {
 	Output
 }
 
+func (*Input) GetPrevTxHash() TxHashBytes {
+	// TODO: Major change here - index transactions
+	return TxHashBytes{0x0}
+}
+
 type Output struct {
 	Owner Uint160     `json:"owner"`
 	Slice slice.Slice `json:"slice"`

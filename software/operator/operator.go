@@ -1,9 +1,9 @@
 package main
 
 import (
+	b "../commons/blockchain"
 	"../commons/config"
 	"./handlers"
-	p "./pool"
 	"flag"
 	"fmt"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -15,8 +15,8 @@ import (
 )
 
 // Pool of pending transactions
-var transactionsPool = make(p.TransactionsPool)
-var utxoPool = make(p.UtxoPool)
+var transactionsPool = make(b.TransactionsPool)
+var utxoPool = make(b.UtxoPool)
 
 func assembleBlocks(d time.Duration, privateKey string) {
 
@@ -30,7 +30,7 @@ func assembleBlocks(d time.Duration, privateKey string) {
 
 		utxoPoolCopy := utxoPool.GetCopy()
 		pendingTransactions := transactionsPool.GetTransactions()
-		block, newUtxoPool := assembleBlock(*utxoPoolCopy, pendingTransactions, privateKeyBytes)
+		block, newUtxoPool := b.AssembleBlock(*utxoPoolCopy, pendingTransactions, privateKeyBytes)
 
 		// TODO: atomic update of utxoPool and pending transactions
 		{

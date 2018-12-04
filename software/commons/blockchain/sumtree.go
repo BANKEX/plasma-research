@@ -29,6 +29,6 @@ func NewSumMerkleTree(leafs []SumTreeNode) *SumMerkleTree {
 	return &tree
 }
 
-func (tree *SumMerkleTree) GetRoot() (uint32, a.Uint160) {
-	return 100, a.Uint160{0x0}
+func (tree *SumMerkleTree) GetRoot() SumMerkleNode {
+	return SumMerkleNode{100, a.Uint160{0x0}}
 }

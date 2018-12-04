@@ -146,3 +146,39 @@ func Deserialize(data []byte) *Block {
 
 // todo merkle proofs for transaction inclusion for client
 // todo rsa proofs for transaction inclusion and exclusion
+
+func AssembleBlock(utxoPool UtxoPool, pendingTransactions []Transaction, privateKey []byte) (Block, UtxoPool) {
+	block := Block{}
+
+	for _, transaction := range HandleTxs(utxoPool, pendingTransactions) {
+		block.Transactions = append(block.Transactions, transaction)
+	}
+
+	leafs := PrepareLeafs(block.Transactions)
+	tree := NewSumMerkleTree(leafs)
+
+	RSAAccumulator := Uint2048{}
+	// RSAInclusionProof := b.GetRSAInclusionProof(block.Transactions)
+
+	headerContent := UnsignedBlockHeader{
+		BlockNumber:    1, // TODO: current + 1
+		PreviousHash:   []byte{0x0},
+		MerkleRoot:     tree.GetRoot(),
+		RSAAccumulator: RSAAccumulator,
+		// RSAChainProof:    RSAInclusionProof,
+	}
+
+	//block.BlockHeader
+	/*
+		signature := SingHeader(headerContent, privateKey)
+	*/
+
+	block.BlockHeader = BlockHeader{
+		UnsignedBlockHeader: headerContent,
+		// Signature:           signature,
+	}
+
+	block.Sign(privateKey)
+
+	return block, utxoPool
+}

@@ -1,51 +1,51 @@
 package blockchain
 
-import "log"
+import a "../alias"
 
 func isValidTx(utxoPool UtxoPool, transaction Transaction) bool {
 
-	var utxoSet = make(map[UTXO]bool)
-
-	for _, input := range transaction.Inputs {
-		utxo := UTXO{input.PrevTxHash, input.OutputIndex}
-
-		_, outputIsUnspent := utxoPool[utxo]
-		_, alreadyClaimed := utxoSet[utxo]
-
-		if !outputIsUnspent || alreadyClaimed {
-			return false // (1) all transaction inputs has corresponding outputs in the pool and they aren't claimed twice by transaction
-		}
-
-		output := utxoPool[utxo]
-
-		// TODO: Since we know the owner of output we can check specific signature - not both
-		isValidSignature := verifySignature(output.Owner, transaction.UnsignedTransaction, transaction.Signatures[0])
-		if !isValidSignature && len(transaction.Signatures) == 1 {
-			// Only one signature and it doesn't belong to the output Owner
-			return false
-		} else if len(transaction.Signatures) == 2 && !verifySignature(output.Owner, transaction.UnsignedTransaction, transaction.Signatures[1]) {
-			// Two signatures and both of them don't belong to the output Owner
-			return false
-		}
-
-		// txInputSum += output.value;
-		utxoSet[utxo] = true
-	}
-
-	// (4) all of {@code tx}s output values are non-negative
-	//double txOutputSum = 0;
-	//for (Transaction.Output output: tx.getOutputs()) {
-	//	if( output.value < 0)
-	//	return false;
+	//var utxoSet = make(map[UTXO]bool)
 	//
-	//	txOutputSum += output.value;
+	//for _, input := range transaction.Inputs {
+	//	utxo := UTXO{input.PrevTxHash, input.OutputIndex}
+	//
+	//	_, outputIsUnspent := utxoPool[utxo]
+	//	_, alreadyClaimed := utxoSet[utxo]
+	//
+	//	if !outputIsUnspent || alreadyClaimed {
+	//		return false // (1) all transaction inputs has corresponding outputs in the pool and they aren't claimed twice by transaction
+	//	}
+	//
+	//	output := utxoPool[utxo]
+	//
+	//	// TODO: Since we know the owner of output we can check specific signature - not both
+	//	isValidSignature := verifySignature(output.Owner, transaction.UnsignedTransaction, transaction.Signatures[0])
+	//	if !isValidSignature && len(transaction.Signatures) == 1 {
+	//		// Only one signature and it doesn't belong to the output Owner
+	//		return false
+	//	} else if len(transaction.Signatures) == 2 && !verifySignature(output.Owner, transaction.UnsignedTransaction, transaction.Signatures[1]) {
+	//		// Two signatures and both of them don't belong to the output Owner
+	//		return false
+	//	}
+	//
+	//	// txInputSum += output.value;
+	//	utxoSet[utxo] = true
 	//}
+	//
+	//// (4) all of {@code tx}s output values are non-negative
+	////double txOutputSum = 0;
+	////for (Transaction.Output output: tx.getOutputs()) {
+	////	if( output.value < 0)
+	////	return false;
+	////
+	////	txOutputSum += output.value;
+	////}
 
 	return true // (txInputSum >= txOutputSum);
 }
 
 // Returns consistent set of transactions
-func HandleTxs(possibleTxs []Transaction) []Transaction {
+func HandleTxs(utxoPool UtxoPool, possibleTxs []Transaction) []Transaction {
 
 	// Accepted transactions that we choose from all possible transaction that we get
 	var accepted []Transaction
@@ -53,12 +53,12 @@ func HandleTxs(possibleTxs []Transaction) []Transaction {
 
 txLoop:
 	for _, transaction := range possibleTxs {
-		if !isValidTx(transaction) {
+		if !isValidTx(utxoPool, transaction) {
 			continue
 		}
 
 		for _, input := range transaction.Inputs {
-			utxo := UTXO{input.PrevTxHash, input.OutputIndex}
+			utxo := UTXO{input.GetPrevTxHash(), input.OutputIndex}
 			if utxoSet[utxo] {
 				// Can't use this two transactions together, since they use the same output, let's go to next one
 				continue txLoop
@@ -66,7 +66,7 @@ txLoop:
 		}
 
 		for _, input := range transaction.Inputs {
-			utxo := UTXO{input.PrevTxHash, input.OutputIndex}
+			utxo := UTXO{input.GetPrevTxHash(), input.OutputIndex}
 			utxoSet[utxo] = true
 		}
 
@@ -79,7 +79,7 @@ txLoop:
 	// Remove UXTO that we spent from the pool
 	for _, transaction := range accepted {
 		for _, input := range transaction.Inputs {
-			utxo := UTXO{input.PrevTxHash, input.OutputIndex}
+			utxo := UTXO{input.GetPrevTxHash(), input.OutputIndex}
 			delete(utxoPool, utxo)
 		}
 	}
@@ -87,9 +87,9 @@ txLoop:
 	// Add new UXTO that we produce to the pool
 	for _, transaction := range accepted {
 		for outputIdx, output := range transaction.Outputs {
-			tx, err := transaction.GetHash()
-			log.Fatal(err)
-			utxo := UTXO{tx, uint8(outputIdx)}
+			tx := transaction.GetHash()
+			key := a.ToTxHashBytes(tx)
+			utxo := UTXO{key, uint8(outputIdx)}
 			utxoPool[utxo] = output
 		}
 	}

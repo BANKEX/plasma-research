@@ -2,9 +2,18 @@ package blockchain
 
 import a "../alias"
 
+type UTXO struct {
+	TxHash      a.TxHashBytes
+	OutputIndex uint8
+}
+
 type UtxoPool map[UTXO]Output
 
-type UTXO struct {
-	TxHash      a.Uint160
-	OutputIndex uint8
+// Shallow copy of UTXO pool
+func (src *UtxoPool) GetCopy() *UtxoPool {
+	var poolCopy UtxoPool
+	for k, v := range *src {
+		poolCopy[k] = v
+	}
+	return &poolCopy
 }
