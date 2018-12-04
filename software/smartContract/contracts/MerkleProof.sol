@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 //
-// Added `index` argument to this version:
+// Added `index` argument to this version and 160-bit version of hashes (aka keccak160):
 // https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/cryptography/MerkleProof.sol
 //
 
