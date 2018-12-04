@@ -122,7 +122,7 @@ func (b *Block) CalculateMerkleRoot() error {
 // Algorithm complexity is O(N*logN) for N transactions.
 // This function accepts previous accumulator as argument instead of mutating the block to avoid double invocation.
 func (b *Block) UpdateRSAAccumulator(previous Uint2048) {
-	acc := plasmacrypto.Accumulator{}.SetInt(big.Int{}.SetBytes(previous))
+	acc := new(plasmacrypto.Accumulator).SetInt(new(big.Int).SetBytes(previous))
 	for _, t := range b.Transactions {
 		for _, i := range t.Inputs {
 			s := slice.Slice{Begin: i.Slice.Begin, End: i.Slice.End}

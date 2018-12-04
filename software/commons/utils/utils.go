@@ -12,6 +12,7 @@ import (
 func StructureToBytes(structure interface{}) []byte {
 	var network bytes.Buffer
 	enc := gob.NewEncoder(&network)
+	// todo unhandled error
 	enc.Encode(structure)
 	return network.Bytes()
 }
