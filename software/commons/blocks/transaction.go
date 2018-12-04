@@ -68,7 +68,7 @@ func (ut *UnsignedTransaction) GetMerkleRoot() Uint160 {
 
 // GetSignaturesHash returns a hash of concatenated signatures.
 func (t *Transaction) GetSignaturesHash() Uint160 {
-	result := make([]byte, 65*len(t.Signatures))
+	result := make([]byte, 0, 65*len(t.Signatures))
 	for _, s := range t.Signatures {
 		result = append(result, s...)
 	}
