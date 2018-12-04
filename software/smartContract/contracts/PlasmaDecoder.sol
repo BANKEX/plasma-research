@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-import "solidity-rlp/contracts/RLPReader.sol";
+import { RLPReader } from "solidity-rlp/contracts/RLPReader.sol";
 
 
 library PlasmaDecoder {
