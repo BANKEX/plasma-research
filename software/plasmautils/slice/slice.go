@@ -11,7 +11,7 @@ type Slice struct {
 	End   uint32
 }
 
-const TREE_HEIGHT = 24
+const TreeHeight = 24
 
 // GetAlignedSlices returns an array of aligned slice indexes given
 // an arbitrary source slice with begin and end leaf indexes.
@@ -23,7 +23,7 @@ func (s *Slice) GetAlignedSlices() []uint32 {
 	t := uint32(0)
 	for a+q < b {
 		if a>>t&1 == 1 {
-			res = append(res, 1<<(TREE_HEIGHT-t)+a/q-1)
+			res = append(res, 1<<(TreeHeight-t)+a/q-1)
 			a += q
 		}
 		q <<= 1
@@ -31,7 +31,7 @@ func (s *Slice) GetAlignedSlices() []uint32 {
 	}
 	for t+1 > 0 {
 		if a+q <= b {
-			res = append(res, 1<<(TREE_HEIGHT-t)+a/q-1)
+			res = append(res, 1<<(TreeHeight-t)+a/q-1)
 			a += q
 		}
 		q >>= 1

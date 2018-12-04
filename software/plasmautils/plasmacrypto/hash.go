@@ -6,7 +6,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto/sha3"
 )
 
-const HASH_SIZE = 20
+const HashSize = 20
 
 type Cipher struct {
 	Data []byte
@@ -25,7 +25,7 @@ func Hash(data []byte) *Cipher {
 	res := []byte{}
 	hash := sha3.NewKeccak256()
 	hash.Write(data)
-	res = hash.Sum(res)[0:HASH_SIZE]
+	res = hash.Sum(res)[0:HashSize]
 	return new(Cipher).SetBytes(res)
 }
 

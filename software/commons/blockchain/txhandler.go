@@ -4,8 +4,6 @@ import "log"
 
 func isValidTx(utxoPool UtxoPool, transaction Transaction) bool {
 
-	hasValidRanges(transaction)
-
 	var utxoSet = make(map[UTXO]bool)
 
 	for _, input := range transaction.Inputs {

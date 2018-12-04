@@ -1,6 +1,6 @@
 package blockchain
 
-import a "./alias"
+import a "../alias"
 import u "../utils"
 
 type SumTreeNode struct {
@@ -15,7 +15,7 @@ func PrepareLeafs(transactions []Transaction) []SumTreeNode {
 
 	tmp := SumTreeNode{
 		PlasmaRangeSpace,
-		a.ToUint160(u.Keccak160([]byte{0x0, 0x0})),
+		u.Keccak160([]byte{0x0, 0x0}),
 	}
 
 	return []SumTreeNode{tmp}

@@ -1,6 +1,6 @@
 package blockchain
 
-import a "./alias"
+import a "../alias"
 
 type UtxoPool map[UTXO]Output
 

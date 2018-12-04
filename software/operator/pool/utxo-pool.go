@@ -1,7 +1,7 @@
 package pool
 
 import "../../commons/blockchain"
-import a "../../commons/blockchain/alias"
+import a "../../commons/alias"
 
 type UTXO struct {
 	TxHash      a.Uint160

@@ -5,8 +5,10 @@ import (
 	"../../commons/db"
 	"../../commons/ether"
 	tp "../pool"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -36,13 +38,39 @@ func GetTx(c *gin.Context) {
 	})
 }
 
-func SetTx(pool *tp.TransactionsPool, c *gin.Context) {
+func SetTx(pool tp.TransactionsPool, c *gin.Context) {
 	rawTransaction := []byte(c.Param("tx"))
+
+	//TODO: Check that this unmarshaling actually works
+	var t blockchain.Transaction
+
+	err := json.Unmarshal(rawTransaction, &t)
+	if err != nil {
+		// TODO: use different log level for production and development
+		log.Println(err)
+		return
+	}
+
+	//TODO: Implement contend of validation function transaction
+	//err = t.ValidateSlices()
+	//if err != nil {
+	//	log.Println("wrong ranges")
+	//	return
+	//}
+	//
+	err = t.ValidateSignatures()
+	if err != nil {
+		// TODO: use different log level for production and development
+		log.Println("wrong signatures")
+		return
+	}
+
 	txHash := ether.GetTxHash(rawTransaction)
 
-	pool.Add(txHash)
+	// 3) Put real one to pool
+	pool.Add(t)
 
-	err := db.Tx("database").Put(txHash, rawTransaction)
+	err = db.Tx("database").Put(txHash, rawTransaction)
 	fmt.Print(err)
 	if err != nil {
 		println("Mistake DB")

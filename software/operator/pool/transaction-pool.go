@@ -1,12 +1,12 @@
 package pool
 
 import (
+	a "../../commons/alias"
 	b "../../commons/blockchain"
-	a "../../commons/blockchain/alias"
 	//"sync"
 )
 
-type TransactionsPool map[a.Uint256]b.Transaction
+type TransactionsPool map[a.TxHashBytes]b.Transaction
 
 //var instance *TransactionsPool
 //var once sync.Once
@@ -43,11 +43,12 @@ func (pool *TransactionsPool) GetTransactions() []b.Transaction {
 	return map2slice(pool)
 }
 
-func (*TransactionsPool) Add(transaction b.Transaction) {
-
+func (pool *TransactionsPool) Add(transaction b.Transaction) {
+	var hash = transaction.GetHash()
+	(*pool)[a.ToTxHashBytes(hash)] = transaction
 }
 
 func (pool *TransactionsPool) Remove(transaction b.Transaction) {
-	var hash, _ = transaction.GetHash()
-	delete(*pool, hash)
+	var hash = transaction.GetHash()
+	delete(*pool, a.ToTxHashBytes(hash))
 }

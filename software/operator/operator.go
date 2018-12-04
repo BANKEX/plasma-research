@@ -43,9 +43,8 @@ func assembleBlocks(d time.Duration, privateKey string) {
 }
 
 func AddTxToThePool() gin.HandlerFunc {
-
 	return func(c *gin.Context) {
-		handlers.SetTx(pendingTransactions, c)
+		handlers.SetTx(transactionsPool, c)
 	}
 }
 
