@@ -15,20 +15,16 @@ var (
 	diffset  []uint8
 )
 
-const PRIMES_LOG2 = 26
+const PrimesLog2 = 26
 
-const CHUNK_SIZE_LOG2 = 7
-const CHUNK_SIZE = 1 << CHUNK_SIZE_LOG2
-
-func SayHelloPrimeset() {
-	fmt.Println("Hello!")
-}
+const ChunkSizeLog2 = 7
+const ChunkSize = 1 << ChunkSizeLog2
 
 func tailproof(proof *[]*crypto.Cipher, data []uint32, i int) {
 
 	r := 1
 	h := uint(0)
-	for r < CHUNK_SIZE {
+	for r < ChunkSize {
 		if i>>h&1 == 1 {
 			*proof = append(*proof, hashprimeset(data[i-r:i]))
 			i -= r
@@ -53,19 +49,20 @@ func hashprimeset(data []uint32) *crypto.Cipher {
 }
 
 func initFiles() {
+	// todo handle i/o errors
 	fmt.Println("Generating prime number assets. Wait some minutes")
 	os.MkdirAll("assets", os.ModePerm)
-	btmsz := 1 << PRIMES_LOG2 / CHUNK_SIZE
+	btmsz := 1 << PrimesLog2 / ChunkSize
 	ttlsz := btmsz*2 - 1
 
-	primeset = make([]uint32, 1<<PRIMES_LOG2)
-	diffset = make([]uint8, 1<<PRIMES_LOG2)
-	dataset = make([]uint8, ttlsz*crypto.HASH_SIZE)
+	primeset = make([]uint32, 1<<PrimesLog2)
+	diffset = make([]uint8, 1<<PrimesLog2)
+	dataset = make([]uint8, ttlsz*crypto.HashSize)
 
 	var p = new(gmp.Int)
 	primeset[0] = 5
 	diffset[0] = 2
-	for i := 1; i < 1<<PRIMES_LOG2; i++ {
+	for i := 1; i < 1<<PrimesLog2; i++ {
 		primeset[i] = p.SetUint64(uint64(primeset[i-1])).NextPrime().Uint32()
 		diffset[i] = uint8((primeset[i] - primeset[i-1]) / 2)
 	}
@@ -73,45 +70,46 @@ func initFiles() {
 	ioutil.WriteFile("assets/primediffs", diffset[:], 0644)
 
 	for i := 0; i < btmsz; i++ {
-		copy(dataset[(btmsz-1+i)*crypto.HASH_SIZE:(btmsz+i)*crypto.HASH_SIZE], hashprimeset(primeset[i*CHUNK_SIZE:(i+1)*CHUNK_SIZE]).Data)
+		copy(dataset[(btmsz-1+i)*crypto.HashSize:(btmsz+i)*crypto.HashSize], hashprimeset(primeset[i*ChunkSize:(i+1)*ChunkSize]).Data)
 	}
 
 	for i := btmsz - 2; i >= 0; i-- {
-		copy(dataset[i*crypto.HASH_SIZE:(i+1)*crypto.HASH_SIZE], crypto.Hash(dataset[(2*i+1)*crypto.HASH_SIZE:(2*i+3)*crypto.HASH_SIZE]).Data)
+		copy(dataset[i*crypto.HashSize:(i+1)*crypto.HashSize], crypto.Hash(dataset[(2*i+1)*crypto.HashSize:(2*i+3)*crypto.HashSize]).Data)
 	}
 
 	ioutil.WriteFile("assets/primedataset", dataset[:], 0644)
 }
 
 func loadFiles() {
-	primeset = make([]uint32, 1<<PRIMES_LOG2)
+	primeset = make([]uint32, 1<<PrimesLog2)
 	diffset, _ = ioutil.ReadFile("assets/primediffs")
 	dataset, _ = ioutil.ReadFile("assets/primedataset")
 	p := uint32(1)
-	for i := 0; i < 1<<PRIMES_LOG2; i++ {
+	for i := 0; i < 1<<PrimesLog2; i++ {
 		p += uint32(diffset[i]) * 2
 		primeset[i] = p
 	}
 }
 
 func PrimeN(i int) uint32 {
+	// todo handle case when init is not called yet
 	return primeset[i]
 }
 
 // ProofN MerkleProof from leaf to root in raw binary
 func ProofN(i int) []*crypto.Cipher {
-	c := i / CHUNK_SIZE
-	d := i % CHUNK_SIZE
+	c := i / ChunkSize
+	d := i % ChunkSize
 	res := make([]*crypto.Cipher, 0)
-	tailproof(&res, primeset[c*CHUNK_SIZE:(c+1)*CHUNK_SIZE], d)
+	tailproof(&res, primeset[c*ChunkSize:(c+1)*ChunkSize], d)
 
-	f := 1<<PRIMES_LOG2/CHUNK_SIZE + c - 1
+	f := 1<<PrimesLog2/ChunkSize + c - 1
 
-	for h := 0; h < PRIMES_LOG2-CHUNK_SIZE_LOG2; h++ {
+	for h := 0; h < PrimesLog2-ChunkSizeLog2; h++ {
 		if f&1 == 0 {
-			res = append(res, new(crypto.Cipher).SetBytes(dataset[(f-1)*crypto.HASH_SIZE:f*crypto.HASH_SIZE]))
+			res = append(res, new(crypto.Cipher).SetBytes(dataset[(f-1)*crypto.HashSize:f*crypto.HashSize]))
 		} else {
-			res = append(res, new(crypto.Cipher).SetBytes(dataset[(f+1)*crypto.HASH_SIZE:(f+2)*crypto.HASH_SIZE]))
+			res = append(res, new(crypto.Cipher).SetBytes(dataset[(f+1)*crypto.HashSize:(f+2)*crypto.HashSize]))
 		}
 		f = (f - 1) >> 1
 	}
