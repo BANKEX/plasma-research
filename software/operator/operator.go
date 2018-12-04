@@ -1,21 +1,51 @@
 package main
 
 import (
+	"../commons/config"
+	"./handlers"
+	p "./pool"
 	"flag"
 	"fmt"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/gin-gonic/gin"
 	"log"
 	"path/filepath"
 	"strconv"
 	"time"
-
-	"../commons/config"
-	"./handlers"
-	"github.com/gin-gonic/gin"
 )
 
-func assembleBlocks(d time.Duration) {
+// Pool of pending transactions
+var transactionsPool = make(p.TransactionsPool)
+var utxoPool = make(p.UtxoPool)
+
+func assembleBlocks(d time.Duration, privateKey string) {
+
+	privateKeyBytes, _ := hexutil.Decode(privateKey)
+
 	for range time.Tick(d) {
-		assembleBlock()
+		if transactionsPool.IsEmpty() {
+			fmt.Print(".")
+			continue
+		}
+
+		utxoPoolCopy := utxoPool.GetCopy()
+		pendingTransactions := transactionsPool.GetTransactions()
+		block, newUtxoPool := assembleBlock(*utxoPoolCopy, pendingTransactions, privateKeyBytes)
+
+		// TODO: atomic update of utxoPool and pending transactions
+		{
+			for _, t := range block.Transactions {
+				transactionsPool.Remove(t)
+			}
+			utxoPool = newUtxoPool
+		}
+	}
+}
+
+func AddTxToThePool() gin.HandlerFunc {
+
+	return func(c *gin.Context) {
+		handlers.SetTx(pendingTransactions, c)
 	}
 }
 
@@ -39,12 +69,13 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 
 	// Assemble block ~ each second
-	go assembleBlocks(time.Second * 1)
+	go assembleBlocks(time.Second*1, conf.Main_account_private_key)
 
 	// Handler that accept new transaction from verifier
-	r.POST("/settx/:tx", handlers.SetTx)
+	r.POST("/settx/:tx", AddTxToThePool())
 	r.GET("/gettx/:tx", handlers.GetTx)
 	r.GET("/getall", handlers.GetAllTx)
+
 	// Handler for debug
 	r.GET("/publishblock", handlers.PublishBlock)
 	r.GET("/pbalance", handlers.PBalance)

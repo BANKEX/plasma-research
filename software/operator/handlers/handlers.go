@@ -1,26 +1,26 @@
 package handlers
 
 import (
-	"fmt"
-	"net/http"
-	"strconv"
-
-	"../../commons/blocks"
+	"../../commons/blockchain"
 	"../../commons/db"
 	"../../commons/ether"
+	tp "../pool"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"strconv"
 )
 
 // for test only
 func PBalance(c *gin.Context) {
-	balance := blocks.Balance["balance"]
+	balance := blockchain.Balance["balance"]
 	c.JSON(http.StatusOK, gin.H{
 		"balance": strconv.Itoa(balance),
 	})
 }
 
 func PublishBlock(c *gin.Context) {
-	blocks.Balance["balance"] += 1
+	blockchain.Balance["balance"] += 1
 	c.JSON(http.StatusOK, gin.H{
 		"resp": "ok",
 	})
@@ -36,9 +36,12 @@ func GetTx(c *gin.Context) {
 	})
 }
 
-func SetTx(c *gin.Context) {
+func SetTx(pool *tp.TransactionsPool, c *gin.Context) {
 	rawTransaction := []byte(c.Param("tx"))
 	txHash := ether.GetTxHash(rawTransaction)
+
+	pool.Add(txHash)
+
 	err := db.Tx("database").Put(txHash, rawTransaction)
 	fmt.Print(err)
 	if err != nil {

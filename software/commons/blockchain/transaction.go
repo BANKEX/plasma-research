@@ -1,4 +1,4 @@
-package blocks
+package blockchain
 
 import (
 	"../rlp"

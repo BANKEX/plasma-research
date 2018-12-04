@@ -3,7 +3,6 @@ package utils
 import (
 	"bytes"
 	"fmt"
-
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
@@ -12,17 +11,17 @@ type Layer []Item
 type Tree []Layer
 
 // Declare type since we use Keccak160 in production and Keccak256 in JS tests
-type HashFunction func(data Item) Item
+type HashFunction func(data []byte) []byte
 
 type MerkleTree struct {
 	Layers []Layer
 }
 
-func Keccak256(data Item) Item {
+func Keccak256(data []byte) []byte {
 	return crypto.Keccak256(data)
 }
 
-func Keccak160(data Item) Item {
+func Keccak160(data []byte) []byte {
 	return crypto.Keccak256(data)[12:32]
 }
 
@@ -118,6 +117,18 @@ func concat(values ...Item) Item {
 func (tree *MerkleTree) getHexProof(idx int) string {
 	return fmt.Sprintf("%x", tree.GetProof(idx))
 }
+
+//func (item *Item) ToUint160() alias.Uint160{
+//	var arr [20]byte
+//	copy(arr[:], (*item)[:20])
+//	return arr
+//}
+//
+//func (item *Item) ToItem() alias.Uint160{
+//	var arr [20]byte
+//	copy(arr[:], (*item)[:20])
+//	return arr
+//}
 
 func getPairElement(idx int, layer []Item) Item {
 	pairIdx := idx

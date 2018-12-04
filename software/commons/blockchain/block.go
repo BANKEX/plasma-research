@@ -1,4 +1,4 @@
-package blocks
+package blockchain
 
 import (
 	"../utils"
@@ -28,12 +28,6 @@ type UnsignedBlockHeader struct {
 }
 
 const PlasmaRangeSpace = 2 ^ 24 - 1
-
-type SumMerkleNode struct {
-	// We use 24 bit
-	Length uint32
-	Hash   a.Uint160
-}
 
 type BlockHeader struct {
 	UnsignedBlockHeader
