@@ -77,6 +77,7 @@ func (t *Transaction) GetSignaturesHash() Uint160 {
 
 // GetHash returns a full hash of signed transaction.
 func (t *Transaction) GetHash() Uint160 {
+	// TODO: We call GetHash many times - think refactor of transaction to kind of freezed object with hash that calculated once
 	var result []byte
 	result = append(result, t.GetMerkleRoot()...)
 	result = append(result, t.GetSignaturesHash()...)
