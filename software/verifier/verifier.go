@@ -24,6 +24,8 @@ func main() {
 	go balance.UpdateBalance(&storage.Balance, conf.Plasma_contract_address)
 	go event.Start(storage.Client, conf.Plasma_contract_address, &storage.Who, &storage.Amount, &storage.EventBlockHash, &storage.EventBlockNumber)
 	go server.GinServer(conf)
+
+	// TODO: fix - it calls log.Fatal internally (os.Exit) but it launched as goroutine - define what behavior we expect here
 	go portscanner.RunScanner()
 
 	println("Verifier started")
