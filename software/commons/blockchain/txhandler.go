@@ -1,47 +1,69 @@
 package blockchain
 
 import a "../alias"
+import "../../commons/utils"
+
+func CheckSignatures(txHash []byte, uniqueOwners []a.Uint160, signatures []a.Signature) bool {
+
+	if len(uniqueOwners) != len(signatures) && (len(uniqueOwners) > 0 && len(uniqueOwners) <= 2) {
+		return false
+	}
+
+	// Shortcut
+	IsValid := utils.IsSignatureValid
+
+	if len(uniqueOwners) == 1 {
+		return IsValid(uniqueOwners[0], txHash, signatures[0])
+	}
+
+	if len(uniqueOwners) == 2 {
+
+		hasSignatureOfTheFirstOwner :=
+			IsValid(uniqueOwners[0], txHash, signatures[0]) || IsValid(uniqueOwners[0], txHash, signatures[1])
+
+		hasSignatureOfTheSecondOwner :=
+			IsValid(uniqueOwners[1], txHash, signatures[0]) || IsValid(uniqueOwners[1], txHash, signatures[1])
+
+		return hasSignatureOfTheFirstOwner && hasSignatureOfTheSecondOwner
+	}
+
+	return true
+}
 
 func isValidTx(utxoPool UtxoPool, transaction Transaction) bool {
 
-	//var utxoSet = make(map[UTXO]bool)
-	//
-	//for _, input := range transaction.Inputs {
-	//	utxo := UTXO{input.PrevTxHash, input.OutputIndex}
-	//
-	//	_, outputIsUnspent := utxoPool[utxo]
-	//	_, alreadyClaimed := utxoSet[utxo]
-	//
-	//	if !outputIsUnspent || alreadyClaimed {
-	//		return false // (1) all transaction inputs has corresponding outputs in the pool and they aren't claimed twice by transaction
-	//	}
-	//
-	//	output := utxoPool[utxo]
-	//
-	//	// TODO: Since we know the owner of output we can check specific signature - not both
-	//	isValidSignature := verifySignature(output.Owner, transaction.UnsignedTransaction, transaction.Signatures[0])
-	//	if !isValidSignature && len(transaction.Signatures) == 1 {
-	//		// Only one signature and it doesn't belong to the output Owner
-	//		return false
-	//	} else if len(transaction.Signatures) == 2 && !verifySignature(output.Owner, transaction.UnsignedTransaction, transaction.Signatures[1]) {
-	//		// Two signatures and both of them don't belong to the output Owner
-	//		return false
-	//	}
-	//
-	//	// txInputSum += output.value;
-	//	utxoSet[utxo] = true
-	//}
-	//
-	//// (4) all of {@code tx}s output values are non-negative
-	////double txOutputSum = 0;
-	////for (Transaction.Output output: tx.getOutputs()) {
-	////	if( output.value < 0)
-	////	return false;
-	////
-	////	txOutputSum += output.value;
-	////}
+	// Set of UTXO claimed by transaction
+	var utxoSet = make(map[UTXO]bool)
 
-	return true // (txInputSum >= txOutputSum);
+	var ownersMap = make(map[a.Uint160Bytes]bool)
+
+	for _, input := range transaction.Inputs {
+		utxo := UTXO{input.GetPrevTxHash(), input.OutputIndex}
+
+		_, outputIsUnspent := utxoPool[utxo]
+
+		// TODO: think a bit, may be we also can remove double spend check if we have ranges check, we also need to check that rages are non negative
+		_, alreadyClaimed := utxoSet[utxo]
+
+		if !outputIsUnspent || alreadyClaimed {
+			return false // (1) all transaction inputs has corresponding outputs in the pool and they aren't claimed twice by transaction
+		}
+
+		// Owner of the output of previous transaction,
+		// Memorise it to check signatures further
+		owner := a.ToUint160Bytes(utxoPool[utxo].Owner)
+		ownersMap[owner] = true
+
+		// Mark utxo as claimed
+		utxoSet[utxo] = true
+	}
+
+	uniqueOwners := make([]a.Uint160, 2)
+	for owner, _ := range ownersMap {
+		uniqueOwners = append(uniqueOwners, owner[:])
+	}
+
+	return CheckSignatures(transaction.GetHash(), uniqueOwners, transaction.Signatures)
 }
 
 // Returns consistent set of transactions
@@ -76,7 +98,7 @@ txLoop:
 	// TODO: in case we split some range we should take and assign new prime numbers...
 	// TODO: in case we just change ownership we should keep the same prime number mapping
 
-	// Remove UXTO that we spent from the pool
+	// Remove UTXO that we spent from the pool
 	for _, transaction := range accepted {
 		for _, input := range transaction.Inputs {
 			utxo := UTXO{input.GetPrevTxHash(), input.OutputIndex}
@@ -84,7 +106,7 @@ txLoop:
 		}
 	}
 
-	// Add new UXTO that we produce to the pool
+	// Add new UTXO that we produce to the pool
 	for _, transaction := range accepted {
 		for outputIdx, output := range transaction.Outputs {
 			tx := transaction.GetHash()

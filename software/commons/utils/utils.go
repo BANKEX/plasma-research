@@ -65,7 +65,7 @@ func Sign(data, key []byte) (signature []byte, error error) {
 // VerifySignature checks that the given public key created signature over hash.
 // The public key should be in compressed (33 bytes) or uncompressed (65 bytes) format.
 // The signature should have the 65 byte [R || S || V] format.
-func VerifySignature(pubKey, hash, signature []byte) bool {
+func IsSignatureValid(pubKey, hash, signature []byte) bool {
 	signatureNoRecoverID := signature[:len(signature)-1]
 	return crypto.VerifySignature(pubKey, hash, signatureNoRecoverID)
 }
