@@ -56,6 +56,20 @@ func assembleBlocks(d time.Duration, privateKey string) {
 	}
 }
 
+// TODO: check how real deposit event works on smart contract and integrate it, probably we don't have any new block or transaction number
+func handleDepositEvent(blockNumber uint32, txHash a.TxHashBytes, output b.Output) {
+
+	// TODO: 1) Increase counter blocks - that we should publish next block with shit to one
+
+	// TODO: 2) atomic update of utxoPool, and TxIndex
+	{
+		utxo := b.UTXO{txHash, 0}
+		key := fmt.Sprintf("%d:%d:%d", blockNumber, 0, 0)
+		txIndex[key] = txHash
+		utxoPool[utxo] = output
+	}
+}
+
 func AddTxToThePool() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		handlers.SetTx(transactionsPool, c)
