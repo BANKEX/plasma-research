@@ -39,11 +39,6 @@ type Input struct {
 	Output
 }
 
-func (*Input) GetPrevTxHash() TxHashBytes {
-	// TODO: Major change here - index transactions
-	return TxHashBytes{0x0}
-}
-
 type Output struct {
 	Owner Uint160     `json:"owner"`
 	Slice slice.Slice `json:"slice"`
@@ -140,7 +135,6 @@ func (t *Transaction) ValidateFee() error {
 }
 
 // todo validate slices non-intersection
-
 func (t *Transaction) Validate() error {
 	return t.ValidateSoftLimits() // || tr.ValidateOutputSum() || tr.ValidateSignatures() || tr.ValidateFee() || nil
 }

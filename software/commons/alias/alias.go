@@ -10,6 +10,7 @@ type Uint2048 []byte //256
 // R(32) bytes S(32) bytes  V(1) byte
 type Signature []byte //65
 
+// Define bytes alias to use them as a key of maps
 type Uint160Bytes [20]byte
 type TxHashBytes [20]byte
 

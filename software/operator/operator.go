@@ -1,6 +1,7 @@
 package main
 
 import (
+	a "../commons/alias"
 	b "../commons/blockchain"
 	"../commons/config"
 	"./handlers"
@@ -14,8 +15,14 @@ import (
 	"time"
 )
 
+// Intermediate Index that maps outputs to transactions
+// Map string that looks like "BlockNumber:TransactionNumber:OutputNumber" to transaction bytes
+var txIndex = make(b.TxIndex)
+
 // Pool of pending transactions
 var transactionsPool = make(b.TransactionsPool)
+
+// Map UTXO to transactions
 var utxoPool = make(b.UtxoPool)
 
 func assembleBlocks(d time.Duration, privateKey string) {
@@ -30,12 +37,19 @@ func assembleBlocks(d time.Duration, privateKey string) {
 
 		utxoPoolCopy := utxoPool.GetCopy()
 		pendingTransactions := transactionsPool.GetTransactions()
-		block, newUtxoPool := b.AssembleBlock(*utxoPoolCopy, pendingTransactions, privateKeyBytes)
+		block, newUtxoPool := b.AssembleBlock(*utxoPoolCopy, pendingTransactions, txIndex, privateKeyBytes)
 
-		// TODO: atomic update of utxoPool and pending transactions
+		// TODO: atomic update of utxoPool, pending transactions, and TxIndex
 		{
-			for _, t := range block.Transactions {
+			for transactionNumber, t := range block.Transactions {
+				// Remove from pending transactions
 				transactionsPool.Remove(t)
+
+				// Update Tx Index (block:transaction:output to txHash)
+				for outputNumber, _ := range t.UnsignedTransaction.Outputs {
+					key := fmt.Sprintf("%d:%d:%d", block.BlockNumber, transactionNumber, outputNumber)
+					txIndex[key] = a.ToTxHashBytes(t.GetHash())
+				}
 			}
 			utxoPool = newUtxoPool
 		}

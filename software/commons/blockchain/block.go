@@ -147,10 +147,10 @@ func Deserialize(data []byte) *Block {
 // todo merkle proofs for transaction inclusion for client
 // todo rsa proofs for transaction inclusion and exclusion
 
-func AssembleBlock(utxoPool UtxoPool, pendingTransactions []Transaction, privateKey []byte) (Block, UtxoPool) {
+func AssembleBlock(utxoPool UtxoPool, pendingTransactions []Transaction, txIndex TxIndex, privateKey []byte) (Block, UtxoPool) {
 	block := Block{}
 
-	for _, transaction := range HandleTxs(utxoPool, pendingTransactions) {
+	for _, transaction := range HandleTxs(utxoPool, pendingTransactions, txIndex) {
 		block.Transactions = append(block.Transactions, transaction)
 	}
 

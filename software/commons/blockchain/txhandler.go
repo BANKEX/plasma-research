@@ -1,6 +1,9 @@
 package blockchain
 
-import a "../alias"
+import (
+	a "../alias"
+	"fmt"
+)
 import "../../commons/utils"
 
 func CheckSignatures(txHash []byte, uniqueOwners []a.Uint160, signatures []a.Signature) bool {
@@ -30,7 +33,7 @@ func CheckSignatures(txHash []byte, uniqueOwners []a.Uint160, signatures []a.Sig
 	return true
 }
 
-func isValidTx(utxoPool UtxoPool, transaction Transaction) bool {
+func isValidTx(utxoPool UtxoPool, transaction Transaction, txIndex TxIndex) bool {
 
 	// Set of UTXO claimed by transaction
 	var utxoSet = make(map[UTXO]bool)
@@ -38,7 +41,7 @@ func isValidTx(utxoPool UtxoPool, transaction Transaction) bool {
 	var ownersMap = make(map[a.Uint160Bytes]bool)
 
 	for _, input := range transaction.Inputs {
-		utxo := UTXO{input.GetPrevTxHash(), input.OutputIndex}
+		utxo := UTXO{GetPrevTxHash(input, txIndex), input.OutputIndex}
 
 		_, outputIsUnspent := utxoPool[utxo]
 
@@ -66,8 +69,13 @@ func isValidTx(utxoPool UtxoPool, transaction Transaction) bool {
 	return CheckSignatures(transaction.GetHash(), uniqueOwners, transaction.Signatures)
 }
 
+func GetPrevTxHash(input Input, txIndex TxIndex) a.TxHashBytes {
+	key := fmt.Sprintf("%d:%d:%d", input.BlockIndex, input.TxIndex, input.OutputIndex)
+	return txIndex[key]
+}
+
 // Returns consistent set of transactions
-func HandleTxs(utxoPool UtxoPool, possibleTxs []Transaction) []Transaction {
+func HandleTxs(utxoPool UtxoPool, possibleTxs []Transaction, txIndex TxIndex) []Transaction {
 
 	// Accepted transactions that we choose from all possible transaction that we get
 	var accepted []Transaction
@@ -75,20 +83,21 @@ func HandleTxs(utxoPool UtxoPool, possibleTxs []Transaction) []Transaction {
 
 txLoop:
 	for _, transaction := range possibleTxs {
-		if !isValidTx(utxoPool, transaction) {
+		if !isValidTx(utxoPool, transaction, txIndex) {
 			continue
 		}
 
 		for _, input := range transaction.Inputs {
-			utxo := UTXO{input.GetPrevTxHash(), input.OutputIndex}
+			utxo := UTXO{GetPrevTxHash(input, txIndex), input.OutputIndex}
 			if utxoSet[utxo] {
 				// Can't use this two transactions together, since they use the same output, let's go to next one
-				continue txLoop
+				goto txLoop
 			}
 		}
 
 		for _, input := range transaction.Inputs {
-			utxo := UTXO{input.GetPrevTxHash(), input.OutputIndex}
+			utxo := UTXO{GetPrevTxHash(input, txIndex), input.OutputIndex}
+			// Claim that we use that unspent output
 			utxoSet[utxo] = true
 		}
 
@@ -101,7 +110,7 @@ txLoop:
 	// Remove UTXO that we spent from the pool
 	for _, transaction := range accepted {
 		for _, input := range transaction.Inputs {
-			utxo := UTXO{input.GetPrevTxHash(), input.OutputIndex}
+			utxo := UTXO{GetPrevTxHash(input, txIndex), input.OutputIndex}
 			delete(utxoPool, utxo)
 		}
 	}

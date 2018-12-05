@@ -5,26 +5,11 @@ import (
 	//"sync"
 )
 
+// TODO: better type naming
+// Map string that looks like "BlockNumber:TransactionNumber:OutputNumber" to transaction bytes
+type TxIndex map[string]a.TxHashBytes
+
 type TransactionsPool map[a.TxHashBytes]Transaction
-
-//var instance *TransactionsPool
-//var once sync.Once
-//
-//func GetTransactionsPool() *TransactionsPool {
-//	once.Do(func() {
-//		instance = &TransactionsPool{}
-//	})
-//	return instance
-//}
-
-//func GetTransactionsPoolCopy() *TransactionsPool{
-//	var poolCopy TransactionsPool
-//	//pool := GetTransactionsPool()
-//	for k,v := range *pool{
-//		poolCopy[k] = v
-//	}
-//	return &poolCopy
-//}
 
 func (pool *TransactionsPool) IsEmpty() bool {
 	return len(*pool) == 0
