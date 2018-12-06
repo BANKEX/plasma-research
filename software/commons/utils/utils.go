@@ -62,7 +62,7 @@ func Sign(data, key []byte) (signature []byte, error error) {
 	return crypto.Sign(hash, privateKey)
 }
 
-// VerifySignature checks that the given public key created signature over hash.
+// IsSignatureValid checks that the given public key created signature over hash.
 // The public key should be in compressed (33 bytes) or uncompressed (65 bytes) format.
 // The signature should have the 65 byte [R || S || V] format.
 func IsSignatureValid(pubKey, hash, signature []byte) bool {
