@@ -11,7 +11,7 @@ type SumTreeNode struct {
 
 // TODO should return linear sequence of segments that covers Plasma address space
 // If segment affect by transaction from given list it will assign it hash to leaf otherwise it will assign hash(0)
-func PrepareLeafs(transactions []Transaction) []SumTreeNode {
+func PrepareLeaves(transactions []Transaction) []SumTreeNode {
 
 	tmp := SumTreeNode{
 		PlasmaRangeSpace,
@@ -24,7 +24,7 @@ func PrepareLeafs(transactions []Transaction) []SumTreeNode {
 type SumMerkleTree struct {
 }
 
-func NewSumMerkleTree(leafs []SumTreeNode) *SumMerkleTree {
+func NewSumMerkleTree(leaves []SumTreeNode) *SumMerkleTree {
 	var tree SumMerkleTree
 	return &tree
 }

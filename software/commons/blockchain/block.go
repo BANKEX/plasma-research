@@ -154,8 +154,8 @@ func AssembleBlock(utxoPool UtxoPool, pendingTransactions []Transaction, txIndex
 		block.Transactions = append(block.Transactions, transaction)
 	}
 
-	leafs := PrepareLeafs(block.Transactions)
-	tree := NewSumMerkleTree(leafs)
+	leaves := PrepareLeaves(block.Transactions)
+	tree := NewSumMerkleTree(leaves)
 
 	RSAAccumulator := Uint2048{}
 	// RSAInclusionProof := b.GetRSAInclusionProof(block.Transactions)

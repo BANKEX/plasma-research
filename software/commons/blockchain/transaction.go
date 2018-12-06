@@ -46,22 +46,22 @@ type Output struct {
 
 // GetMerkleRoot gets the root of merklized transaction inputs, outputs, and metadata.
 func (ut *UnsignedTransaction) GetMerkleRoot() Uint160 {
-	var leafs []utils.Item
+	var leaves []utils.Item
 
 	for _, data := range ut.Inputs {
 		rlpEncoded, _ := rlp.EncodeToRLP(data)
-		leafs = append(leafs, rlpEncoded)
+		leaves = append(leaves, rlpEncoded)
 	}
 
 	for _, data := range ut.Outputs {
 		rlpEncoded, _ := rlp.EncodeToRLP(data)
-		leafs = append(leafs, rlpEncoded)
+		leaves = append(leaves, rlpEncoded)
 	}
 
 	var rlpMetadata, _ = rlp.EncodeToRLP(ut.Metadata)
-	leafs = append(leafs, rlpMetadata)
+	leaves = append(leaves, rlpMetadata)
 
-	tree := utils.NewMerkleTree(leafs, 3, utils.Keccak160)
+	tree := utils.NewMerkleTree(leaves, 3, utils.Keccak160)
 
 	return []byte(tree.GetRoot())
 }

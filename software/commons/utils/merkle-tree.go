@@ -25,14 +25,14 @@ func Keccak160(data []byte) []byte {
 	return crypto.Keccak256(data)[12:32]
 }
 
-func NewMerkleTree(leafsData []Item, height int, hash HashFunction) *MerkleTree {
+func NewMerkleTree(leavesData []Item, height int, hash HashFunction) *MerkleTree {
 
 	tree := new(MerkleTree)
-	var leafs []Item
-	for _, data := range leafsData {
-		leafs = append(leafs, hash(data))
+	var leaves []Item
+	for _, data := range leavesData {
+		leaves = append(leaves, hash(data))
 	}
-	tree.Layers = getLayers(leafs, height, hash)
+	tree.Layers = getLayers(leaves, height, hash)
 
 	return tree
 }
