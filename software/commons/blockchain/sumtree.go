@@ -45,14 +45,14 @@ func PrepareLeaves(transactions []Transaction) []*SumTreeNode {
 		leafs = append(leafs, &leaf)
 	}
 
-	// TODO: look do we need padding at that moment
-	if len(leafs)%2 == 1 {
-		emptyLeaf := SumTreeNode{
-			Hash:   u.Keccak160([]byte{}), // Hash from empty byte array
-			Length: 0,
-		}
-		leafs = append(leafs, &emptyLeaf)
-	}
+	//// Padding
+	//if len(leafs)%2 == 1 {
+	//	emptyLeaf := SumTreeNode{
+	//		Hash:   u.Keccak160([]byte{}), // Hash from empty byte array
+	//		Length: 0,
+	//	}
+	//	leafs = append(leafs, &emptyLeaf)
+	//}
 
 	return leafs
 }
