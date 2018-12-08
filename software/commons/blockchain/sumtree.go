@@ -66,7 +66,7 @@ type SumMerkleTree struct {
 // Uint to bytes
 func u2b(value uint32) []byte {
 	b := make([]byte, 4)
-	binary.LittleEndian.PutUint32(b, value)
+	binary.BigEndian.PutUint32(b, value)
 	return b
 }
 
