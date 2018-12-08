@@ -21,6 +21,7 @@ type SumTreeNode struct {
 // Use this first when assemble blocks
 func PrepareLeaves(transactions []Transaction) []*SumTreeNode {
 
+	zeroHash := u.Keccak160([]byte{})
 	slice2transactions := map[s.Slice]*Transaction{}
 
 	var slices []s.Slice
@@ -35,10 +36,19 @@ func PrepareLeaves(transactions []Transaction) []*SumTreeNode {
 		return slices[i].Begin < slices[j].Begin
 	})
 
+	FillGapsWithSlices(slices)
+
 	var leafs []*SumTreeNode
 	for _, slice := range slices {
+
+		tx, hasTx := slice2transactions[slice]
+		var txHash = zeroHash
+		if hasTx {
+			txHash = tx.GetHash()
+		}
+
 		leaf := SumTreeNode{
-			Hash:   slice2transactions[slice].GetHash(),
+			Hash:   txHash,
 			Length: slice.End - slice.Begin,
 		}
 
@@ -162,4 +172,54 @@ func (tree *SumMerkleTree) GetProof(leafIndex uint32) []byte {
 
 func (tree *SumMerkleTree) GetRoot() *SumTreeNode {
 	return tree.Root
+}
+
+// 2^24 - 1
+const plasmaLength = 16777215
+
+// Fill plasma range space with segments, src slices should be sorted
+// 1) It fill the gaps between segments with empty slices
+// TODO: NOTE: It doesn't merge a slices even if they are neighbors - as I remember such feature can speedup plasma
+func FillGapsWithSlices(src []s.Slice) []s.Slice {
+
+	var result []s.Slice
+
+	for i := 0; i <= len(src); i++ {
+
+		// TODO: Should be out of the cycle
+		// Add initial zero slice if needed
+		if i == 0 && src[i].Begin != 0 {
+			emptySlice := s.Slice{Begin: 0, End: src[i].Begin}
+			result = append(result, emptySlice)
+		}
+
+		// TODO: Should be out of the cycle
+		// Handle last slice and add final empty slice if needed
+		if i == len(src)-1 {
+			result = append(result, src[i])
+
+			if src[i].End != plasmaLength {
+				emptySlice := s.Slice{
+					Begin: src[i].End,
+					End:   plasmaLength,
+				}
+				result = append(result, emptySlice)
+			}
+			return result // !!! Attention, The actual end of the function is Here !!!
+		}
+
+		el := src[i]
+		nextEl := src[i+1]
+
+		result = append(result, el)
+		if nextEl.Begin-el.End > 1 {
+			emptySlice := s.Slice{
+				Begin: el.End,
+				End:   nextEl.Begin,
+			}
+			result = append(result, emptySlice)
+		}
+	}
+
+	return result
 }
