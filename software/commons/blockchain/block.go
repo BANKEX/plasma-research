@@ -156,7 +156,7 @@ func AssembleBlock(utxoPool UtxoPool, pendingTransactions []Transaction, txIndex
 	headerContent := UnsignedBlockHeader{
 		BlockNumber:    1, // TODO: current + 1
 		PreviousHash:   []byte{0x0},
-		MerkleRoot:     tree.GetRoot(),
+		MerkleRoot:     *tree.GetRoot(),
 		RSAAccumulator: RSAAccumulator,
 		// RSAChainProof:    RSAInclusionProof,
 	}
