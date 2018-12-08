@@ -2,6 +2,7 @@ package blockchain
 
 import (
 	a "../alias"
+	"encoding/binary"
 	"sort"
 )
 import u "../utils"
@@ -12,8 +13,8 @@ type SumTreeNode struct {
 	Length uint32
 	Hash   a.Uint160
 
-	isLeft  bool
-	isRight bool
+	//isLeft  bool
+	//isRight bool
 
 	Left   *SumTreeNode
 	Right  *SumTreeNode
@@ -21,7 +22,7 @@ type SumTreeNode struct {
 }
 
 // Use this first when assemble blocks
-func PrepareLeafs(transactions []Transaction) []SumTreeNode {
+func PrepareLeaves(transactions []Transaction) []SumTreeNode {
 
 	slice2transactions := map[s.Slice]*Transaction{}
 
@@ -38,12 +39,10 @@ func PrepareLeafs(transactions []Transaction) []SumTreeNode {
 	})
 
 	var leafs []SumTreeNode
-	for idx, slice := range slices {
+	for _, slice := range slices {
 		leaf := SumTreeNode{
-			Hash:    slice2transactions[slice].GetHash(),
-			Length:  slice.End - slice.Begin,
-			isLeft:  idx%2 == 0,
-			isRight: idx%1 == 0,
+			Hash:   slice2transactions[slice].GetHash(),
+			Length: slice.End - slice.Begin,
 		}
 
 		leafs = append(leafs, leaf)
@@ -52,27 +51,10 @@ func PrepareLeafs(transactions []Transaction) []SumTreeNode {
 	// TODO: look do we need padding at that moment
 	if len(leafs)%2 == 1 {
 		emptyLeaf := SumTreeNode{
-			Hash:    u.Keccak160([]byte{}), // Hash from empty byte array
-			Length:  0,
-			isLeft:  false,
-			isRight: true,
+			Hash:   u.Keccak160([]byte{}), // Hash from empty byte array
+			Length: 0,
 		}
 		leafs = append(leafs, emptyLeaf)
-	}
-
-	for i := 0; i < len(leafs); i += 2 {
-		left := leafs[i]
-		right := leafs[i+1]
-
-		left.isLeft = true
-		left.isRight = false
-		left.Left = nil
-		left.Right = &right
-
-		right.isLeft = false
-		right.isRight = true
-		right.Left = &left
-		right.Right = nil
 	}
 
 	return leafs
@@ -83,11 +65,68 @@ type SumMerkleTree struct {
 	Leafs []SumTreeNode
 }
 
+// TODO: check that way is compatible with soidity
+// Uint to bytes
+func u2b(value uint32) []byte {
+	b := make([]byte, 8)
+	binary.LittleEndian.PutUint32(b, value)
+	return b
+}
+
+func concatAndHash(left SumTreeNode, right SumTreeNode) a.Uint160 {
+	l1, l2 := left.Length, right.Length
+	h1, h2 := left.Hash, right.Hash
+
+	d1 := append(u2b(l1), u2b(l2)...)
+	d2 := append(h1, h2...)
+	return u.Keccak160(append(d1, d2...))
+}
+
 func NewSumMerkleTree(leafs []SumTreeNode) *SumMerkleTree {
 	var tree SumMerkleTree
 	tree.Leafs = leafs
 
-	// Root
+	var buckets = tree.Leafs
+
+	// At the end we assign new layer to buckets, so stop when ever we can't merge anymore
+	for len(buckets) != 1 {
+		// next layer
+		var newBuckets []SumTreeNode
+
+		for len(buckets) > 0 {
+			if len(buckets) >= 2 {
+
+				// deque pair from the head
+				left, right := buckets[0], buckets[1]
+				buckets = buckets[2:]
+
+				length := left.Length + right.Length
+				hash := concatAndHash(left, right)
+
+				node := SumTreeNode{
+					Hash:   hash,
+					Length: length,
+				}
+
+				left.Parent = &node
+				right.Parent = &node
+
+				left.Right = &right
+				right.Left = &left
+
+				newBuckets = append(newBuckets, node)
+
+			} else {
+				// Pop the last one - goes to next layer as it is
+				newBuckets = append(newBuckets, buckets[0])
+				buckets = []SumTreeNode{}
+			}
+		}
+
+		buckets = newBuckets
+	}
+
+	tree.Root = buckets[0]
 
 	return &tree
 }
