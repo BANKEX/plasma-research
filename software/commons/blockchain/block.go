@@ -20,10 +20,10 @@ var PrivateKey []byte // todo move and init in config
 
 // UnsignedBlockHeader is a structure that signature is calculated for.
 type UnsignedBlockHeader struct {
-	BlockNumber    uint32        `json:"blockNumber"`
-	PreviousHash   Uint256       `json:"previousHash"`
-	MerkleRoot     SumMerkleNode `json:"merkleRoot"`
-	RSAAccumulator Uint2048      `json:"rsaAccumulator"`
+	BlockNumber    uint32      `json:"blockNumber"`
+	PreviousHash   Uint256     `json:"previousHash"`
+	MerkleRoot     SumTreeNode `json:"merkleRoot"`
+	RSAAccumulator Uint2048    `json:"rsaAccumulator"`
 }
 
 // BlockHeader is a structure that gets sent to a smart contract.
@@ -36,13 +36,6 @@ type BlockHeader struct {
 type Block struct {
 	BlockHeader  `json:"header"`
 	Transactions []Transaction `json:"transactions"`
-}
-
-// todo move to merkle tree implementation
-type SumMerkleNode struct {
-	// We use 24 bit
-	Length uint32
-	Hash   Uint160
 }
 
 /*
