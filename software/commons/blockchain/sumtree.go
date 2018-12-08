@@ -36,7 +36,7 @@ func PrepareLeaves(transactions []Transaction) []*SumTreeNode {
 		return slices[i].Begin < slices[j].Begin
 	})
 
-	FillGapsWithSlices(slices)
+	slices = FillGapsWithSlices(slices)
 
 	var leafs []*SumTreeNode
 	for _, slice := range slices {
