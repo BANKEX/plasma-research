@@ -1,8 +1,8 @@
 # plasma-research
 That repo contains docs and code snippets related to BANKEX Plasma implementation.
-At the moment we focused on implementation of plasma cashflow model improved by S[NT]ARK exclusion proofs for history compression
+At the moment we focused on implementation of plasma cashflow model improved by zk-S[NT]ARK exclusion proofs for history compression
 
-# History compression with S[NT]ARK exclusion proofs
+# History compression with zk-S[NT]ARK exclusion proofs
 At the moment when plasma user is getting a transfer from another user, he wants to ensure that the history of that transfer is valid. To do that ask other parties to provide exclusion proof for the particular slice that was transferred on most of the published plasma blocks.
 The size of such exclusion proof based on Merkle proof grows excessively, during the plasma lifetime. That problem was described [here](https://ethresear.ch/t/rsa-accumulators-for-plasma-cash-history-reduction/3739).
 
