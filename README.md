@@ -1,17 +1,23 @@
 # plasma-research
-That repo contains docs and code snippets related to BANKEX Multi-Asset Plasma implementation.
+That repo contains docs and code snippets related to BANKEX Plasma implementation.
+At the moment we focused on implementation of plasma cashflow model improved by S[NT]ARK exclusion proofs for history compression
 
-# Multiasset plasma
+# History compression with S[NT]ARK exclusion proofs
+At the moment when plasma user is getting a transfer from another user, he wants to ensure that the history of that transfer is valid. To do that ask other parties to provide exclusion proof for the particular slice that was transferred on most of the published plasma blocks.
+The size of such exclusion proof based on Merkle proof grows excessively, during the plasma lifetime. That problem was described [here](https://ethresear.ch/t/rsa-accumulators-for-plasma-cash-history-reduction/3739).
 
-The implementation that we are going to make is based on [More Viable Plasma](https://ethresear.ch/t/more-viable-plasma/2160) proposal. 
-Additionally supports it will support deposit, withdraw, transfer and exchange of a wide range of Ethereum tokens standards like ERC20, ERC721, ERC888, etc..
-And that is what we actually mean by Multi-asset.
+In our implementation, we are going to use S[NT]ARK exclusion proofs to compress it. You can find more details [here](https://ethresear.ch/t/short-s-nt-ark-exclusion-proofs-for-plasma/4438)
+
+# Multiassets plasma
+By Multi-asset we mean support of deposit, withdraw, transfer and exchange of a wide range of Ethereum tokens standards like ERC20, ERC721, ERC888, etc.. as well as Ethereum it self
 
 To support that we are going to implement the more sophisticated parent smart contract that will be able to take ownership of different tokens types.
-Although, Plasma owner can't guarantee that actual token contract is implemented safely and fully correctly.
-For the end user that means that he or she should check that token he was offered doesn't have a bugs and fraud in implementation by himself.
+
+Plasma parent contract can't guarantee that actual token contract is implemented safely and fully correctly.
+It means that end user should check that token contract he was offered doesn't have a backdors or bugs in the implementation by himself.
 
 Each token type that was deposit to plasma smart contract will get a unique id. That id will be used further in the transactions to describe transfer and exchange operations.
+
 To implement an exchange operation, we need a single transaction signed by both parties. The protocol that will allow users to share transactions for signatures will be mainly implemented in the plasma client.
 
 All the research we do, we going to document in the form of Yellow Paper.
@@ -38,4 +44,3 @@ At the moment we have following separate docs that cover different parts of our 
 8. Put your this addresss to input 'At Address' and push the button
 9. Push deposit button nearby
 10. Whatch console where your run 'run.sh'. You can write events to see all deposit events
-
