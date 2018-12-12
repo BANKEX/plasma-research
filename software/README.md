@@ -1,10 +1,7 @@
-# ETHSingapore-hackathon
+# About
 
 Plasma Cashflow with history reduction with zk-SNARKS.
 
-![plasma](https://challengepost-s3-challengepost.netdna-ssl.com/photos/production/software_thumbnail_photos/000/734/483/datas/medium.png)
-
-What have we done here?
 1. Plasma cashflow, based on specs https://hackmd.io/DgzmJIRjSzCYvl4lUjZXNQ?view and https://ethresear.ch/t/plasma-prime-design-proposal/4222
 2. History voids compression on zkSNARK 
 
@@ -14,9 +11,7 @@ https://ethresear.ch/t/short-s-nt-ark-exclusion-proofs-for-plasma/4438
 
 Main goals for this prototype:
 We are going to show plasma spec without lacks of MoreVP, Cash or RSA accumulators.
-We think, potentially fully s[nt]ark-driven plasma is better. But this construction is closer to production usage because we use the very simple circuit to exclude voids from the history. It is enough to use only hash functions and Merkle proofs, without any signatures or transaction processing. 
-
-
+We think, potentially fully s[nt]ark-driven plasma is better. But this construction is closer to production usage because we use the very simple circuit to exclude voids from the history. It is enough to use only hash functions and Merkle proofs, without any signatures or transaction processing.
 
 What can you see here:
 1. SNARK, compressing the voids. For production, usage needs to implement Pedersen hash on bellman or libsnark.
