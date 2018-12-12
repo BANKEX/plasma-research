@@ -3,6 +3,12 @@ package events
 import (
 	"context"
 	"fmt"
+	"log"
+	"math/big"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/BANKEX/plasma-research/src/node/blockchain"
 	"github.com/BANKEX/plasma-research/src/node/config"
 	"github.com/BANKEX/plasma-research/src/node/ethereum/plasmacontract"
@@ -13,11 +19,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"log"
-	"math/big"
-	"strconv"
-	"strings"
-	"time"
 )
 
 type EventAssetDeposited struct {
@@ -27,8 +28,6 @@ type EventAssetDeposited struct {
 	End         uint64
 	BlockNumber uint64
 }
-
-
 
 var eventGroup = make([]EventAssetDeposited, 0)
 var currentBlock uint64 = 0

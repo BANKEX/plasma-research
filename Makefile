@@ -20,3 +20,7 @@ test:
 coverage:
 	@echo "+ $@"
 	${GO} test -tags nocgo $(shell go list ./...) -coverprofile=coverage.out && ${GO} tool cover -html=coverage.out
+
+contracts:
+	@echo "+ $@"
+	@$(MAKE) -C src/contracts all

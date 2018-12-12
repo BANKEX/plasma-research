@@ -1,8 +1,9 @@
 package transactionManager
 
 import (
-	"github.com/BANKEX/plasma-research/src/node/transactionManager"
 	"log"
+
+	"github.com/BANKEX/plasma-research/src/node/transactionManager"
 
 	"github.com/BANKEX/plasma-research/src/node/blockchain"
 	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
@@ -10,6 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 )
+
 type Event struct {
 	Signature string
 	Handler   func(data types.Log, abi abi.ABI)

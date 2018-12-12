@@ -1,11 +1,5 @@
 package slice
 
-import (
-	"sort"
-
-	"github.com/BANKEX/plasma-research/src/node/plasmautils/primeset"
-)
-
 type Slice struct {
 	Begin uint32 `json:"begin"`
 	End   uint32 `json:"end"`
@@ -41,55 +35,57 @@ func (s *Slice) GetAlignedSlices() []uint32 {
 }
 
 // LogProofInclusion generates an inclusion proof for an array of aligned slice indexes.
-func LogProofInclusion(n []uint32) []uint32 {
-	res := make([]uint32, 0)
-
-	for _, item := range n {
-		palpha := primeset.PrimeN(int(item * 2))
-		res = append(res, palpha)
-		for beta := item; true; beta = (beta - 1) >> 1 {
-			pbeta := primeset.PrimeN(int(beta*2 + 1))
-			res = append(res, pbeta)
-			if beta == 0 {
-				break
-			}
-		}
-	}
-
-	sort.Slice(res, func(i, j int) bool { return res[i] < res[j] })
-	j := 0
-	for i := 0; i < len(res); i++ {
-		if res[j] != res[i] {
-			j++
-			res[j] = res[i]
-		}
-	}
-
-	return res[0:j]
-}
+// TODO: primeset package not working!
+// func LogProofInclusion(n []uint32) []uint32 {
+// 	res := make([]uint32, 0)
+//
+// 	for _, item := range n {
+// 		palpha := primeset.PrimeN(int(item * 2))
+// 		res = append(res, palpha)
+// 		for beta := item; true; beta = (beta - 1) >> 1 {
+// 			pbeta := primeset.PrimeN(int(beta*2 + 1))
+// 			res = append(res, pbeta)
+// 			if beta == 0 {
+// 				break
+// 			}
+// 		}
+// 	}
+//
+// 	sort.Slice(res, func(i, j int) bool { return res[i] < res[j] })
+// 	j := 0
+// 	for i := 0; i < len(res); i++ {
+// 		if res[j] != res[i] {
+// 			j++
+// 			res[j] = res[i]
+// 		}
+// 	}
+//
+// 	return res[0:j]
+// }
 
 // LogProofInclusion generates an exclusion proof for an array of aligned slice indexes.
-func LogProofExclusion(n []uint32) []uint32 {
-	res := make([]uint32, 0)
-	for _, item := range n {
-		pbeta := primeset.PrimeN(int(item*2 + 1))
-		res = append(res, pbeta)
-		for alpha := item; true; alpha = (alpha - 1) >> 1 {
-			palpha := primeset.PrimeN(int(alpha * 2))
-			res = append(res, palpha)
-			if alpha == 0 {
-				break
-			}
-		}
-	}
-	sort.Slice(res, func(i, j int) bool { return res[i] < res[j] })
-	j := 0
-	for i := 0; i < len(res); i++ {
-		if res[j] != res[i] {
-			j++
-			res[j] = res[i]
-		}
-	}
-
-	return res[0:j]
-}
+// TODO: primeset package not working!
+// func LogProofExclusion(n []uint32) []uint32 {
+// 	res := make([]uint32, 0)
+// 	for _, item := range n {
+// 		pbeta := primeset.PrimeN(int(item*2 + 1))
+// 		res = append(res, pbeta)
+// 		for alpha := item; true; alpha = (alpha - 1) >> 1 {
+// 			palpha := primeset.PrimeN(int(alpha * 2))
+// 			res = append(res, palpha)
+// 			if alpha == 0 {
+// 				break
+// 			}
+// 		}
+// 	}
+// 	sort.Slice(res, func(i, j int) bool { return res[i] < res[j] })
+// 	j := 0
+// 	for i := 0; i < len(res); i++ {
+// 		if res[j] != res[i] {
+// 			j++
+// 			res[j] = res[i]
+// 		}
+// 	}
+//
+// 	return res[0:j]
+// }
