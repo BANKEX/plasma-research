@@ -1,0 +1,16 @@
+FROM golang:1.11-alpine
+
+RUN apk add --update --no-cache linux-headers libc-dev gcc git gmp gmp-dev
+
+RUN mkdir /app
+ADD . /app/
+
+WORKDIR /app/
+
+ENV GO111MODULE=on
+RUN go build -tags "nocgo" -o verifier ./src/node/verifier
+
+EXPOSE 8080
+EXPOSE 8545
+
+CMD ["/app/verifier"]

@@ -1,0 +1,52 @@
+{
+  "name": "BankexPlasma",
+  "version": "1.0.0",
+  "description": "",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "chai-bignumber": "^3.0.0",
+    "coveralls": "^3.0.2",
+    "eslint": "^5.9.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^8.0.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "ethereumjs-util": "^6.0.0",
+    "ethjs-abi": "^0.2.1",
+    "ganache-cli": "^6.2.3",
+    "openzeppelin-solidity": "^2.0.0",
+    "solidity-coverage": "^0.5.11",
+    "solidity-rlp": "^1.1.0",
+    "solium": "^1.1.8",
+    "truffle": "^4.1.14",
+    "truffle-flattener": "^1.2.10",
+    "web3": "^1.0.0-beta.37",
+    "web3-utils": "^1.0.0-beta.36"
+  },
+  "scripts": {
+    "test": "scripts/test.sh",
+    "coverage": "scripts/coverage.sh",
+    "dist": "truffle-flattener ./contracts/BankexPlasma.sol > BankexPlasma.full.sol && solcjs --bin --abi --optimize BankexPlasma.full.sol && mv BankexPlasma_full_sol_BankexPlasma.bin BankexPlasma.full.bin && mv BankexPlasma_full_sol_BankexPlasma.abi BankexPlasma.full.abi && rm BankexPlasma_full_*",
+    "lint:js": "eslint .",
+    "lint:js:fix": "eslint . --fix",
+    "lint:sol": "solium -d .",
+    "lint:sol:fix": "solium -d . --fix",
+    "lint": "npm run lint:js && npm run lint:sol",
+    "lint:fix": "npm run lint:js:fix && npm run lint:sol:fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BANKEX/ETHSingapore-hackathon.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BANKEX/ETHSingapore-hackathon/issues"
+  },
+  "homepage": "https://github.com/BANKEX/ETHSingapore-hackathon#readme",
+  "dependencies": {
+    "ethereumjs-tx": "^1.3.7"
+  }
+}

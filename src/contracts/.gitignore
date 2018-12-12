@@ -1,0 +1,12 @@
+build/
+node_modules/
+package-lock.json
+.DS_Store
+.node-xmlhttprequest-sync-*
+.idea/*
+
+coverage/
+coverageEnv/
+allFiredEvents
+coverage.json
+scTopics
