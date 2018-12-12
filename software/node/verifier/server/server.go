@@ -1,7 +1,7 @@
 package server
 
 import (
-	"./handlers"
+	"github.com/BANKEX/plasma-research/software/node/verifier/server/handlers"
 	"github.com/gin-gonic/contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -9,8 +9,8 @@ import (
 func GinServer() {
 
 	r := gin.Default()
-	//r := gin.New()
-	//r.Use(gin.Recovery())
+	// r := gin.New()
+	// r.Use(gin.Recovery())
 	r.Use(cors.Default())
 	gin.SetMode(gin.ReleaseMode)
 
@@ -20,8 +20,8 @@ func GinServer() {
 	r.GET("/contractAddress", handlers.PlasmaContractAddress)
 	r.GET("/deposit/:sum", handlers.DepositHandler)
 	r.POST("/transfer/:address/:sum", handlers.TransferHandler)
-	r.GET("/plasmaBalance", handlers.PlasmaBalance) //
-	r.GET("/exit", handlers.ExitHandler) //
+	r.GET("/plasmaBalance", handlers.PlasmaBalance)    //
+	r.GET("/exit", handlers.ExitHandler)               //
 	r.GET("/latestBlock", handlers.LatestBlockHandler) //
 
 	r.Static("/frontend", "frontend")

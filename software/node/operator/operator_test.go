@@ -1,16 +1,17 @@
 package main
 
 import (
-	"../config"
-	"../utils"
 	"bytes"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"encoding/hex"
 	"fmt"
+	"testing"
+
+	"github.com/BANKEX/plasma-research/software/node/config"
+	"github.com/BANKEX/plasma-research/software/node/utils"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
-	"testing"
 )
 
 func TestSign(t *testing.T) {

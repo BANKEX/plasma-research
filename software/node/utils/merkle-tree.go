@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"fmt"
+
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
@@ -118,17 +119,17 @@ func (tree *MerkleTree) getHexProof(idx int) string {
 	return fmt.Sprintf("%x", tree.GetProof(idx))
 }
 
-//func (item *Item) ToUint160() alias.Uint160{
-//	var arr [20]byte
-//	copy(arr[:], (*item)[:20])
-//	return arr
-//}
+// func (item *Item) ToUint160() alias.Uint160{
+// 	var arr [20]byte
+// 	copy(arr[:], (*item)[:20])
+// 	return arr
+// }
 //
-//func (item *Item) ToItem() alias.Uint160{
-//	var arr [20]byte
-//	copy(arr[:], (*item)[:20])
-//	return arr
-//}
+// func (item *Item) ToItem() alias.Uint160{
+// 	var arr [20]byte
+// 	copy(arr[:], (*item)[:20])
+// 	return arr
+// }
 
 func getPairElement(idx int, layer []Item) Item {
 	pairIdx := idx

@@ -1,13 +1,14 @@
 package transactionManager
 
 import (
-	. "../alias"
-	"../blockchain"
-	"../utils"
 	"bytes"
 	"encoding/hex"
 	"fmt"
 	"sync"
+
+	. "github.com/BANKEX/plasma-research/software/node/alias"
+	"github.com/BANKEX/plasma-research/software/node/blockchain"
+	"github.com/BANKEX/plasma-research/software/node/utils"
 )
 
 type TransactionManager struct {
@@ -25,7 +26,7 @@ func NewTransactionManager() *TransactionManager {
 		transactionQueue: make([]*blockchain.Transaction, 0),
 		lastBlock:        0,
 		lastHash:         utils.Keccak256([]byte{}), // todo define genesis hash
-		lastAccumulator:  []byte{3},                 //todo define genesis accumulator
+		lastAccumulator:  []byte{3},                 // todo define genesis accumulator
 		mutex:            sync.Mutex{},
 	}
 	return &result

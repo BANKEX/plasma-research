@@ -1,9 +1,10 @@
 package transactionManager
 
 import (
-	"../blockchain"
 	"log"
 	"time"
+
+	"github.com/BANKEX/plasma-research/software/node/blockchain"
 )
 
 const (

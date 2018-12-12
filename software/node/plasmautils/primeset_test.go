@@ -3,8 +3,8 @@ package test
 import (
 	"testing"
 
-	"./primeset"
-	"./testtools"
+	"github.com/BANKEX/plasma-research/software/node/plasmautils/primeset"
+	"github.com/BANKEX/plasma-research/software/node/plasmautils/testtools"
 )
 
 func TestPrimeGeneration(t *testing.T) {

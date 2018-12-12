@@ -1,15 +1,15 @@
 package main
 
 import (
-	"./server"
-	"./cli"
+	"github.com/BANKEX/plasma-research/software/node/verifier/cli"
+	"github.com/BANKEX/plasma-research/software/node/verifier/server"
 )
 
 func main() {
 
-	//go listeners.Checker()
-	//go balance.UpdateBalance(&storage.Balance, conf.Plasma_contract_address)
-	//go event.Start(storage.Client, conf.Plasma_contract_address, &storage.Who, &storage.Amount, &storage.EventBlockHash, &storage.EventBlockNumber)
+	// go listeners.Checker()
+	// go balance.UpdateBalance(&storage.Balance, conf.Plasma_contract_address)
+	// go event.Start(storage.Client, conf.Plasma_contract_address, &storage.Who, &storage.Amount, &storage.EventBlockHash, &storage.EventBlockNumber)
 	go server.GinServer()
 
 	println("Verifier started")

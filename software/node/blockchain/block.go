@@ -1,21 +1,24 @@
 package blockchain
 
 import (
-	. "../alias"
-	"../config"
-	"../plasmautils/plasmacrypto"
-	"../plasmautils/primeset"
-	"../plasmautils/slice"
-	"../utils"
 	"bytes"
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"github.com/ethereum/go-ethereum/crypto"
 	"io"
 	"math/big"
+
+	. "github.com/BANKEX/plasma-research/software/node/alias"
+	"github.com/BANKEX/plasma-research/software/node/config"
+	"github.com/BANKEX/plasma-research/software/node/plasmautils/plasmacrypto"
+	"github.com/BANKEX/plasma-research/software/node/plasmautils/primeset"
+	"github.com/BANKEX/plasma-research/software/node/plasmautils/slice"
+	"github.com/BANKEX/plasma-research/software/node/utils"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
+// todo merkle proofs for transaction inclusion for client
+// todo rsa proofs for transaction inclusion and exclusion
 
 var WeiPerCoin uint = 1e11
 
@@ -55,7 +58,7 @@ func NewBlock(blockNumber uint32, previousHash Uint256, previousRSAAccumulator U
 	}
 
 	// todo enable RSA accumulator
-	//block.UpdateRSAAccumulator(previousRSAAccumulator)
+	// block.UpdateRSAAccumulator(previousRSAAccumulator)
 
 	err := block.CalculateMerkleRoot()
 	if err != nil {
@@ -119,7 +122,7 @@ func (b *Block) CalculateMerkleRoot() error {
 		return err
 	}
 	b.merkleTree = tree
-	b.MerkleRoot = b.merkleTree.NodeList[0] //.GetRoot()
+	b.MerkleRoot = b.merkleTree.NodeList[0] // .GetRoot()
 	return nil
 }
 
@@ -149,13 +152,13 @@ func (b *Block) SerializeHeader() []byte {
 	buf.Write(b.RSAAccumulator)
 	return buf.Bytes()
 
-	//result := make([]byte, 0, 4 + 32 + 4 + 20 + 256)
-	//binary.LittleEndian.PutUint32(result, b.BlockNumber)
-	//result = append(result, b.PreviousHash...)
-	//binary.LittleEndian.PutUint32(result, b.MerkleRoot.Length)
-	//result = append(result, b.MerkleRoot.Hash...)
-	//result = append(result, b.RSAAccumulator...)
-	//return result
+	// result := make([]byte, 0, 4 + 32 + 4 + 20 + 256)
+	// binary.LittleEndian.PutUint32(result, b.BlockNumber)
+	// result = append(result, b.PreviousHash...)
+	// binary.LittleEndian.PutUint32(result, b.MerkleRoot.Length)
+	// result = append(result, b.MerkleRoot.Hash...)
+	// result = append(result, b.RSAAccumulator...)
+	// return result
 }
 
 func (b *Block) Serialize() ([]byte, error) {
@@ -167,6 +170,3 @@ func Deserialize(data []byte) *Block {
 	// todo
 	return nil
 }
-
-// todo merkle proofs for transaction inclusion for client
-// todo rsa proofs for transaction inclusion and exclusion
