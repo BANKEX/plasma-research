@@ -1,5 +1,0 @@
-package eventHandlers
-
-func DepositHandler() {
-
-}
