@@ -1,0 +1,16 @@
+FROM golang:latest
+RUN mkdir /app
+ADD . /app/
+WORKDIR /app
+
+ENV GO111MODULE=on
+RUN go mod download
+RUN cd operator
+RUN go build -o operator .
+
+
+EXPOSE 8080
+EXPOSE 8545
+EXPOSE 3000
+
+CMD ["/app/operator/operator"]

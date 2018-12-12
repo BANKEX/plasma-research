@@ -1,16 +1,15 @@
-package eventHandlers
+package transactionManager
 
 import (
+	"github.com/BANKEX/plasma-research/software/node/transactionManager"
 	"log"
 
 	"github.com/BANKEX/plasma-research/software/node/blockchain"
 	"github.com/BANKEX/plasma-research/software/node/plasmautils/slice"
-	"github.com/BANKEX/plasma-research/software/node/transactionManager"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 )
-
 type Event struct {
 	Signature string
 	Handler   func(data types.Log, abi abi.ABI)
@@ -36,11 +35,10 @@ func HandleDeposit(data types.Log, abi abi.ABI) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	depositEvent.Who = common.HexToAddress(data.Topics[2].Hex())
-	depositEvent.BlockNumber = data.BlockNumber
+	who := data.Topics[2].Bytes()
 
 	out := blockchain.Output{
-		Owner: depositEvent.Who.Bytes(),
+		Owner: who,
 		Slice: slice.Slice{
 			Begin: uint32(depositEvent.Begin),
 			End:   uint32(depositEvent.End),
