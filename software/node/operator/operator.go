@@ -1,11 +1,11 @@
 package main
 
 import (
-	"../config"
-	"../ethereum/events"
-	"../transactionManager"
-	"./handlers"
 	"fmt"
+	"github.com/BANKEX/plasma-research/software/node/config"
+	"github.com/BANKEX/plasma-research/software/node/ethereum/events"
+	"github.com/BANKEX/plasma-research/software/node/operator/handlers"
+	"github.com/BANKEX/plasma-research/software/node/transactionManager"
 	"github.com/gin-gonic/contrib/cors"
 	"github.com/gin-gonic/gin"
 	"log"

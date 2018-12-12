@@ -7,9 +7,9 @@ import (
 	"reflect"
 	"testing"
 
-	"./plasmacrypto"
-	"./slice"
-	"./testtools"
+	"github.com/BANKEX/plasma-research/software/node/plasmautils/plasmacrypto"
+	"github.com/BANKEX/plasma-research/software/node/plasmautils/slice"
+	"github.com/BANKEX/plasma-research/software/node/plasmautils/testtools"
 	"github.com/snjax/gmp"
 )
 

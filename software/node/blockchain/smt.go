@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sort"
 
-	. "../alias"
-	. "../plasmautils/slice"
+	. "github.com/BANKEX/plasma-research/software/node/alias"
+	. "github.com/BANKEX/plasma-research/software/node/plasmautils/slice"
 	"github.com/ethereum/go-ethereum/crypto/sha3"
 )
 

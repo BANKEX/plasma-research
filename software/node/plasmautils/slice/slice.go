@@ -3,7 +3,7 @@ package slice
 import (
 	"sort"
 
-	"../primeset"
+	"github.com/BANKEX/plasma-research/software/node/plasmautils/primeset"
 )
 
 type Slice struct {

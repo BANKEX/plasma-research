@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"../../blockchain"
-	"../../plasmautils/slice"
-	"../../transactionManager"
 	"encoding/hex"
+	"github.com/BANKEX/plasma-research/software/node/blockchain"
+	"github.com/BANKEX/plasma-research/software/node/plasmautils/slice"
+	"github.com/BANKEX/plasma-research/software/node/transactionManager"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"

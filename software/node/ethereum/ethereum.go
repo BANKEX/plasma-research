@@ -1,17 +1,18 @@
 package ethereum
 
 import (
-	"../config"
-	"../ethereum/plasmacontract"
 	"context"
 	"crypto/ecdsa"
+	"log"
+	"math/big"
+	"strconv"
+
+	"github.com/BANKEX/plasma-research/software/node/config"
+	"github.com/BANKEX/plasma-research/software/node/ethereum/plasmacontract"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"log"
-	"math/big"
-	"strconv"
 )
 
 func Deposit(sum string) string {
@@ -119,7 +120,7 @@ func PushHashBlock(blockNumber uint32, hash []byte) {
 	}
 
 	// _, err = instance.SubmitBlocks(blockNumber, hash) // TODO: uncomment after regenerating abi
-	_, err = instance.SubmitBlocks(auth,   nil,nil) // TODO: normal params
+	_, err = instance.SubmitBlocks(auth, nil, nil) // TODO: normal params
 	if err != nil {
 		log.Println(err)
 	}

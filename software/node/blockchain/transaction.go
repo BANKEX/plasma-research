@@ -1,9 +1,9 @@
 package blockchain
 
 import (
-	. "../alias"
-	"../plasmautils/slice"
-	"../utils"
+	. "github.com/BANKEX/plasma-research/software/node/alias"
+	"github.com/BANKEX/plasma-research/software/node/plasmautils/slice"
+	"github.com/BANKEX/plasma-research/software/node/utils"
 
 	"bytes"
 	"errors"

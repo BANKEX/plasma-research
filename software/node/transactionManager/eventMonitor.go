@@ -1,18 +1,19 @@
 package transactionManager
 
 import (
-	"../config"
-	"../ethereum/plasmacontract"
-	"./eventHandlers"
 	"context"
+	"math/big"
+	"strings"
+
+	"github.com/BANKEX/plasma-research/software/node/config"
+	"github.com/BANKEX/plasma-research/software/node/ethereum/plasmacontract"
+	"github.com/BANKEX/plasma-research/software/node/transactionManager/eventHandlers"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"math/big"
-	"strings"
 )
 
 const (
@@ -44,9 +45,9 @@ func NewEventMonitor(m *TransactionManager) (*EventMonitor, error) {
 	return &result, nil
 }
 
-//// todo monitor deposit events, forward to transaction manager
-//// todo monitor withdraw events, forward to transaction manager
-//// todo if we need to send some challenges from the operator, this is the place to do it
+// // todo monitor deposit events, forward to transaction manager
+// // todo monitor withdraw events, forward to transaction manager
+// // todo if we need to send some challenges from the operator, this is the place to do it
 
 func (m *EventMonitor) loop() {
 	//

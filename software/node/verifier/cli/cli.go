@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+
 	"github.com/c-bata/go-prompt"
 )
 
@@ -17,14 +18,14 @@ func commandsInfo(d prompt.Document) []prompt.Suggest {
 
 func commandsListener(input string) {
 	switch input {
-	//case "smartContractAddress":
-	//	fmt.Println(config.GetVerifier().PlasmaContractAddress)
+	// case "smartContractAddress":
+	// 	fmt.Println(config.GetVerifier().PlasmaContractAddress)
 	case "plasmaBalance":
 		fmt.Println("Not working yet")
 	case "smartContractBalance":
 		fmt.Println("Smart Contract Balance:" + "0")
 	case "events":
-		fmt.Println ("0")
+		fmt.Println("0")
 	}
 	return
 }

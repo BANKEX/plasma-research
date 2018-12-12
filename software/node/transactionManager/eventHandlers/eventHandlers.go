@@ -1,13 +1,14 @@
 package eventHandlers
 
 import (
-	"../../blockchain"
-	"../../plasmautils/slice"
-	"../../transactionManager"
+	"log"
+
+	"github.com/BANKEX/plasma-research/software/node/blockchain"
+	"github.com/BANKEX/plasma-research/software/node/plasmautils/slice"
+	"github.com/BANKEX/plasma-research/software/node/transactionManager"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"log"
 )
 
 type Event struct {

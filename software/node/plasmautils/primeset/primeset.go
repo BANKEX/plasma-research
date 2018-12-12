@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	crypto "../plasmacrypto"
+	crypto "github.com/BANKEX/plasma-research/software/node/plasmautils/plasmacrypto"
 	"github.com/snjax/gmp"
 )
 

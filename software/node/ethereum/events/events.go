@@ -1,13 +1,13 @@
 package events
 
 import (
-	"../../blockchain"
-	"../../config"
-	"../../plasmautils/slice"
-	"../../transactionManager"
-	"../plasmacontract"
 	"context"
 	"fmt"
+	"github.com/BANKEX/plasma-research/software/node/blockchain"
+	"github.com/BANKEX/plasma-research/software/node/config"
+	"github.com/BANKEX/plasma-research/software/node/ethereum/plasmacontract"
+	"github.com/BANKEX/plasma-research/software/node/plasmautils/slice"
+	"github.com/BANKEX/plasma-research/software/node/transactionManager"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"

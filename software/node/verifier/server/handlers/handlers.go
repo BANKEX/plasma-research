@@ -1,21 +1,22 @@
 package handlers
 
 import (
-	"../../../blockchain"
-	"../../../config"
-	"../../../ethereum"
-	"../../../plasmautils/slice"
 	"bytes"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
+
+	"github.com/BANKEX/plasma-research/software/node/blockchain"
+	"github.com/BANKEX/plasma-research/software/node/config"
+	"github.com/BANKEX/plasma-research/software/node/ethereum"
+	"github.com/BANKEX/plasma-research/software/node/plasmautils/slice"
+	"github.com/gin-gonic/gin"
 )
 
 var sumRes uint
@@ -45,9 +46,9 @@ func PlasmaBalance(c *gin.Context) {
 		log.Println(err)
 	}
 
-	//for _, tx := range st {
-	//	sumRes = (tx.Slice.End - tx.Slice.Begin) * blockchain.WeiPerCoin
-	//}
+	// for _, tx := range st {
+	// 	sumRes = (tx.Slice.End - tx.Slice.Begin) * blockchain.WeiPerCoin
+	// }
 
 	c.JSON(http.StatusOK, st)
 }
@@ -98,7 +99,6 @@ func TransferHandler(c *gin.Context) {
 	}
 
 	key, _ := hex.DecodeString(config.GetVerifier().VerifierPrivateKey)
-
 
 	fmt.Println("Tx")
 	fmt.Println(len(uTx.Outputs[0].Owner))

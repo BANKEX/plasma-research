@@ -34,7 +34,7 @@ func ToECDSAPub(pub []byte) *ecdsa.PublicKey {
 }
 
 func TestSMT(t *testing.T) {
-	//res:=[]Transaction{Transaction{UnsignedTransaction{[]Input{}, []Output{}, Metadata}, []Signature{}}}
+	// res:=[]Transaction{Transaction{UnsignedTransaction{[]Input{}, []Output{}, Metadata}, []Signature{}}}
 	data := []byte(`
 	[
 		{
@@ -101,7 +101,7 @@ func TestSMT(t *testing.T) {
 	r, _ = NewSumMerkleTree(q)
 	_ = r.GetLeaves()
 
-	//fmt.Println(r.MerkleProof(5))
+	// fmt.Println(r.MerkleProof(5))
 
 }
 
