@@ -1,0 +1,13 @@
+FROM golang:latest
+RUN mkdir /app
+ADD . /app/
+WORKDIR /app/src/node/operator
+
+ENV GO111MODULE=on
+# ENV GIN_MODE=release
+
+RUN go build operator.go
+
+EXPOSE 8080
+
+ENTRYPOINT ["/app/src/node/operator/operator"]
