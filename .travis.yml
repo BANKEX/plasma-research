@@ -8,7 +8,7 @@ language: node_js
 node_js:
   - '8'
 before_install:
-  - cd ./software/smartContract
+  - cd ./src/smartContract
 install:
   - npm install
 script:
