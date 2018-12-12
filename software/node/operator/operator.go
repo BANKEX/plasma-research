@@ -15,10 +15,10 @@ func main() {
 	// Assemble block ~ each second
 	manager := transactionManager.NewTransactionManager()
 	transactionManager.NewBlockPublisher(manager)
-	_, err := transactionManager.NewEventMonitor(manager)
-	if err != nil {
-		log.Fatal(err)
-	}
+	//_, err := transactionManager.NewEventMonitor(manager)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 
 	go events.EventListener(manager)
 
@@ -37,7 +37,7 @@ func main() {
 	r.GET("/test/fund/:address", handlers.FundAddress)
 	r.GET("/test/transfer/:block/:tx/:out/:address/:key", handlers.Transact)
 
-	err = r.Run(fmt.Sprintf(":%d", config.GetOperator().OperatorPort))
+	err := r.Run(fmt.Sprintf(":%d", config.GetOperator().OperatorPort))
 	if err != nil {
 		log.Fatal(err)
 	}
