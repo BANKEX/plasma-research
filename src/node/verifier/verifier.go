@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/BANKEX/plasma-research/src/node/verifier/cli"
 	"github.com/BANKEX/plasma-research/src/node/verifier/server"
 )
 
@@ -14,6 +13,6 @@ func main() {
 
 	println("Verifier started")
 
-	cli.CLI()
+	//cli.CLI()
 
 }

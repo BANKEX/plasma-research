@@ -8,9 +8,9 @@ ADD . /app/
 WORKDIR /app/
 
 ENV GO111MODULE=on
-RUN go build -tags "nocgo" -o operator ./src/node/operator
+RUN go build -tags "nocgo" -o verifier ./src/node/verifier
 
-EXPOSE 3001
+EXPOSE 8080
 EXPOSE 8545
 
-CMD ["/app/operator"]
+CMD ["/app/verifier"]

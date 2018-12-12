@@ -279,7 +279,7 @@
     const ITEMS_LEN = "ITEMS_LEN";
 
     async function deposit() {
-        value = getInputValue("deposit_amount");
+        const value = getInputValue("deposit_amount");
         const result = await getRequest(value, "", "deposit");
         let i = localStorage.getItem(ITEMS_LEN) || 0;
         let data = JSON.stringify({date: new Date(), val: value, event_type: "Deposit", txHash: result.txHash});
@@ -289,10 +289,10 @@
     }
 
     async function transfer() {
-        value = getInputValue("transfer_amount");
-        address = getInputValue("transfer_address");
-        realValue = (value / 1e11);
-        oldInput = await plasma_balance_get();
+        const value = getInputValue("transfer_amount");
+        const address = getInputValue("transfer_address");
+        const realValue = (value / 1e11);
+        const oldInput = await plasma_balance_get();
 
         await fetch(endpoint_url + "/transfer/" + address + "/" + realValue, {
             headers: {
@@ -338,18 +338,19 @@
         return (response.json());
     }
 
-    var data = [];
-    var event_type = [];
-    var amount = [];
+    window.data = [];
+    window.event_type = [];
+    window.amount = [];
 
     function get_data_for_table() {
-        amount = [];
-        data = [];
-        event_type = [];
+        window.amount = [];
+        window.data = [];
+        window.event_type = [];
         for (let i = 0; i < localStorage.getItem(ITEMS_LEN); i++) {
-            data.push(JSON.parse(localStorage.getItem(i)).date);
-            event_type.push(JSON.parse(localStorage.getItem(i)).event_type);
-            amount.push(JSON.parse(localStorage.getItem(i)).val);
+            const item = JSON.parse(localStorage.getItem(i.toString()));
+            window.data.push(item.date);
+            window.event_type.push(item.event_type);
+            window.amount.push(item.val);
         }
     }
 
