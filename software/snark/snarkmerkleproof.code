@@ -1,0 +1,49 @@
+//template for algebraic hash
+// plasma is 24bit. so, all magnitudes limeted by 2^32-1
+// NOT IMPLEMENTED: safe algebraic hash. Going to use Pedersen commitment with libsnark on the production
+// Overflows are safe due summerkletree architecture in plasma.
+
+
+def alghash(field x, field y) -> (field):
+  field t=x*x
+  x=t*t*x+y
+  t=x*x
+  x=t*t*x+y
+  t=x*x
+  x=t*t*x+y
+  t=x*x
+  x=t*t*x+y
+  t=x*x
+  x=t*t*x+y
+  return x
+
+
+
+def compress4(field x1, field x2, field x3, field x4) -> (field):
+  return alghash(alghash(alghash(x1, x2), x3), x4)
+
+
+def s16(field offset, field[64] input) -> (field[16]):
+	field[16] result = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+	for field i in 0..16 do
+		result[i] = input[offset + i]
+	endfor
+return result
+
+
+def main(field sliceBegin, field sliceEnd, field[16] proofHash, field[16] proofLength, field[16] proofBit) -> (field):
+  field curHash = 0
+  field curLeft = sliceBegin
+  field curLength = sliceEnd - sliceBegin
+  for field i in 0..16 do
+    curHash = compress4(proofLength[i], curLength, proofHash[i], curHash)*proofBit[i]+compress4(curLength, proofLength[i], curHash, proofHash[i])*(1-proofBit[i])
+    curLeft = curLeft - proofLength[i]*proofBit[i]
+    curLength = curLength + proofLength[i]
+  endfor
+  curLeft == 0
+  //for 24bit plasma state
+  curLength == 16777215
+  return curHash
+
+
+
