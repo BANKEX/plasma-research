@@ -62,7 +62,6 @@ async function printList (listContract) {
 
   return s;
 }
-printList; // fix unused
 
 contract('OrderedIntervalList', function () {
   beforeEach(async function () {

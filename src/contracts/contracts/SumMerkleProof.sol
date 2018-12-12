@@ -12,7 +12,7 @@ library SumMerkleProof {
     uint32 end;
   }
 
-  // @dev data ordered from leaves to root. 
+  // @dev data ordered from leaves to root.
   // @dev index bits: right bit correspond leaves
   struct Proof {
     uint32 index;
@@ -22,6 +22,7 @@ library SumMerkleProof {
   }
 
   function item(bytes memory proof, uint i) internal pure returns(uint32 length, address result) {
+    // solium-disable-next-line security/no-inline-assembly
     assembly {
       length := div(mload(add(proof, add(32, mul(i, 24)))), 0x100000000000000000000000000000000000000000000000000000000)
       result := div(mload(add(proof, add(36, mul(i, 24)))), 0x1000000000000000000000000)
@@ -31,7 +32,7 @@ library SumMerkleProof {
   // @dev compute hash of the node from two child nodes
   function hash(uint32 l1, uint32 l2, address a1, address a2) internal pure returns(address) {
     return address(keccak256(abi.encodePacked(l1, l2, a1, a2)));
-  } 
+  }
 
   function sumMerkleProof(Proof memory proof, address root, uint32 rootLength) internal pure returns(bool) {
     uint depth = proof.data.length / 24;
@@ -44,10 +45,10 @@ library SumMerkleProof {
       if (index & 1 == 1) {
         curItem = hash(length, curLength, result, curItem);
         curLeft = curLeft.sub(length);
-        curLength = curLength.add(length); 
+        curLength = curLength.add(length);
       } else {
         curItem = hash(curLength, length, curItem, result);
-        curLength = curLength.add(length);  
+        curLength = curLength.add(length);
       }
       index >>= 1;
     }

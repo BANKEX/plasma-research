@@ -1,14 +1,14 @@
 pragma solidity ^0.4.24;
 
-import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import { SafeERC20 } from "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
-import { IERC721 } from "openzeppelin-solidity/contracts/token/ERC721/IERC721.sol";
-import { OrderedIntervalList } from "./OrderedIntervalList.sol";
-import { SumMerkleProof } from "./SumMerkleProof.sol";
-import { PlasmaDecoder } from "./PlasmaDecoder.sol";
-import { PlasmaBlocks } from "./PlasmaBlocks.sol";
+import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import {IERC20} from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
+import {IERC721} from "openzeppelin-solidity/contracts/token/ERC721/IERC721.sol";
+import {OrderedIntervalList} from "./OrderedIntervalList.sol";
+import {SumMerkleProof} from "./SumMerkleProof.sol";
+import {PlasmaDecoder} from "./PlasmaDecoder.sol";
+import {PlasmaBlocks} from "./PlasmaBlocks.sol";
 
 
 contract PlasmaAssets is Ownable, PlasmaBlocks {
@@ -21,14 +21,14 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
   address constant public MAIN_COIN_ASSET_ID = address(0);
   address constant public ERC721_ASSET_ID = address(1);
   uint256 constant public ASSET_DECIMALS_TRUNCATION = 10e13; //TODO: will be different for tokens
-  uint32 constant public PLASMA_ASSETS_TOTAL_SIZE = 2**24 - 1;
+  uint32 constant public PLASMA_ASSETS_TOTAL_SIZE = 2 ** 24 - 1;
 
   bytes32 private _expectedTokenAndTokenIdHash;
-  mapping (address => uint256) private _assetOffsets;
-  mapping (address => OrderedIntervalList.Data) private _assetLists;
-  mapping (address => bytes32[]) private _allDepositHashes;
-  mapping (bytes32 => bool) private _allWithdrawalHashes;
-  mapping (bytes32 => bool) private _erc721Deposits;
+  mapping(address => uint256) private _assetOffsets;
+  mapping(address => OrderedIntervalList.Data) private _assetLists;
+  mapping(address => bytes32[]) private _allDepositHashes;
+  mapping(bytes32 => bool) private _allWithdrawalHashes;
+  mapping(bytes32 => bool) private _erc721Deposits;
 
   event AssetDeposited(
     address indexed token,
@@ -73,7 +73,7 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
     _assetLists[ERC721_ASSET_ID].initialize();
   }
 
-  function assetOffsets(address asset) public view returns(uint256) {
+  function assetOffsets(address asset) public view returns (uint256) {
     return _assetOffsets[asset];
   }
 
@@ -105,7 +105,7 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
     uint256 preBalance = token.balanceOf(this);
     token.safeTransferFrom(msg.sender, this, amount);
     uint256 deposited = token.balanceOf(this).sub(preBalance);
-    
+
     emit ERC20Deposited(token, msg.sender, deposited);
     emit AssetDeposited(token, msg.sender, intervalId, begin, end);
     bytes32 hash = keccak256(abi.encodePacked(token, msg.sender, intervalId, begin, end));
@@ -121,7 +121,7 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
 
     emit ERC721Deposited(token, msg.sender, tokenId, begin);
     emit AssetDeposited(ERC721_ASSET_ID, msg.sender, intervalId, begin, end);
-    
+
     bytes32 hash = keccak256(abi.encodePacked(ERC721_ASSET_ID, msg.sender, intervalId, begin, end));
     _allDepositHashes[msg.sender].push(hash);
 
@@ -135,8 +135,8 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
     uint256 tokenId,
     bytes /*data*/
   )
-    public
-    returns(bytes4)
+  public
+  returns (bytes4)
   {
     bytes32 receivedTokenAndTokenId = keccak256(abi.encodePacked(msg.sender, tokenId));
 
@@ -151,9 +151,9 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
   function withdrawalBegin(
     bytes memory inputBytes // PlasmaDecoder.Input
   )
-    public
-    payable //TODO: Bonds
-    returns(bool)
+  public
+  payable //TODO: Bonds
+  returns (bool)
   {
     PlasmaDecoder.Input memory input = inputBytes.decodeInput();
 
@@ -167,14 +167,16 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
       input.end
     );
 
-    bytes32 inputHash = keccak256(abi.encodePacked(input.owner,
-      input.blockIndex,
-      input.txIndex,
-      input.outputIndex,
-      input.assetId,
-      input.begin,
-      input.end
-    ));
+    bytes32 inputHash = keccak256(
+      abi.encodePacked(
+        input.owner,
+        input.blockIndex,
+        input.txIndex,
+        input.outputIndex,
+        input.assetId,
+        input.begin,
+        input.end
+      ));
     _allWithdrawalHashes[inputHash] = true;
 
     return true;
@@ -186,20 +188,22 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
     uint64 blockIndex,
     uint8 spendIndex
   )
-    public
-    returns(bool)
+  public
+  returns (bool)
   {
     PlasmaDecoder.Input memory input = inputBytes.decodeInput();
     SumMerkleProof.Proof memory txProof = txProofBytes.decodeProof();
 
-    bytes32 inputHash = keccak256(abi.encodePacked(input.owner,
-      input.blockIndex,
-      input.txIndex,
-      input.outputIndex,
-      input.assetId,
-      input.begin,
-      input.end
-    ));
+    bytes32 inputHash = keccak256(
+      abi.encodePacked(
+        input.owner,
+        input.blockIndex,
+        input.txIndex,
+        input.outputIndex,
+        input.assetId,
+        input.begin,
+        input.end
+      ));
     require(_allWithdrawalHashes[inputHash], "You should start withdrawal first");
 
     require(txProof.sumMerkleProof(blocks(blockIndex), PLASMA_ASSETS_TOTAL_SIZE));
@@ -213,7 +217,7 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
   // function withdrawalChallangeExistance(
   //   ExitState state,
   //   SumMerkleProof txProof,
-  //   MerkleProof inputProof, 
+  //   MerkleProof inputProof,
   //   uint64 maxBlockIndex,
   //   MerkleProof maxBlockIndexProof
   // )
@@ -221,7 +225,7 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
   //   returns(bool)
   // {
   // }
-    
+
   function withdrawalEnd(
     bytes memory inputBytes, // PlasmaDecoder.Input
     uint64 intervalId,
@@ -230,14 +234,16 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
   ) public {
     PlasmaDecoder.Input memory input = inputBytes.decodeInput();
 
-    bytes32 inputHash = keccak256(abi.encodePacked(input.owner,
-      input.blockIndex,
-      input.txIndex,
-      input.outputIndex,
-      input.assetId,
-      input.begin,
-      input.end
-    ));
+    bytes32 inputHash = keccak256(
+      abi.encodePacked(
+        input.owner,
+        input.blockIndex,
+        input.txIndex,
+        input.outputIndex,
+        input.assetId,
+        input.begin,
+        input.end
+      ));
     require(_allWithdrawalHashes[inputHash], "You should start withdrawal first");
     delete _allWithdrawalHashes[inputHash];
 
@@ -257,7 +263,7 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
       token.approve(msg.sender, tokenId);
       return;
     }
-    
+
     IERC20(token).transfer(msg.sender, uint256(input.end).sub(input.begin));
   }
 }
