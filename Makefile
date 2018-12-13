@@ -2,7 +2,25 @@
 
 GO ?= go
 
-all: fmt vet test
+TARGETDIR := target
+
+HOSTOS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
+HOSTARCH := $(shell uname -m)
+
+GOOS ?= ${HOSTOS}
+GOARCH ?= ${HOSTARCH}
+
+# Set the execution extension for Windows.
+ifeq (${GOOS},windows)
+    EXE := .exe
+endif
+
+OS_ARCH := $(GOOS)_$(GOARCH)$(EXE)
+
+OPERATOR := ${TARGETDIR}/operator_$(OS_ARCH)
+VERIFIER := ${TARGETDIR}/verifier_$(OS_ARCH)
+
+all: fmt vet test build
 
 fmt:
 	@echo "+ $@"
@@ -24,3 +42,21 @@ coverage:
 contracts:
 	@echo "+ $@"
 	@$(MAKE) -C src/contracts all
+
+build: build/operator build/verifier
+
+build/operator:
+	@echo "+ $@"
+	${GO} build -tags "$(TAGS)" -ldflags "$(LDFLAGS)" -o ${OPERATOR} ./src/node/operator
+
+build/verifier:
+	@echo "+ $@"
+	${GO} build -tags "$(TAGS)" -ldflags "$(LDFLAGS)" -o ${OPERATOR} ./src/node/verifier
+
+docker: docker/operator docker/verifier
+
+docker/operator:
+	docker build -t plasma-operator:latest -f ./Dockerfile.operator .
+
+docker/verifier:
+	docker build -t plasma-verifier:latest -f ./Dockerfile.operator .
