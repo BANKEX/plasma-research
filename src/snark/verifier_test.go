@@ -1,17 +1,8 @@
 package main
 
 import (
-	"context"
-	"crypto/ecdsa"
-	"fmt"
-	"log"
 	"math/big"
 	"testing"
-
-	"./verifier"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 /*
@@ -35,68 +26,66 @@ func Hex2BI(s string) *big.Int {
 }
 
 func TestVerifier(t *testing.T) {
-
-	//privkey for seed 1 0x69b39aa2fb86c7172d77d4b87b459ed7643c1e4b052536561e08d7d25592b373
-
-	client, err := ethclient.Dial("http://127.0.0.1:8545/")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	privateKey, err := crypto.HexToECDSA("69b39aa2fb86c7172d77d4b87b459ed7643c1e4b052536561e08d7d25592b373")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	publicKey := privateKey.Public()
-	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
-	if !ok {
-		log.Fatal("error casting public key to ECDSA")
-	}
-
-	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
-	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	gasPrice, err := client.SuggestGasPrice(context.Background())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	auth := bind.NewKeyedTransactor(privateKey)
-	auth.Nonce = big.NewInt(int64(nonce))
-	auth.Value = big.NewInt(0)      // in wei
-	auth.GasLimit = uint64(3000000) // in units
-	auth.GasPrice = gasPrice
-
-	// key, _ := crypto.GenerateKey()
-	// auth := bind.NewKeyedTransactor(key)
-
-	// alloc := make(core.GenesisAlloc)
-	// alloc[auth.From] = core.GenesisAccount{Balance: big.NewInt(133700000)}
-	// sim := backends.NewSimulatedBackend(alloc, 6000000)
-	addr, _, contract, err := verifier.DeployVerifier(auth, client)
-
-	if err != nil {
-		log.Fatalf("could not deploy contract: %v", err)
-	}
-
-	A := [...]*big.Int{Hex2BI("0x2f1db7ed3094b2962c9ae0e37a389d35ddf13b3db562e0cd062e502201f58e9f"), Hex2BI("0x2916ada7e690230422ff96abb3285b9c037c6dcc04fd36b3742484b979e44ea1")}
-	A_p := [...]*big.Int{Hex2BI("0x215413bd49dab0b7b48bdfa162e27d4544455e3c4f4dba5c877065d328e6a4b4"), Hex2BI("0x60a7af4f7b566535ca1be7aab1d9344544aa4fc7e4436104a93b6d6e5a04ce9")}
-	B := [2][2]*big.Int{{Hex2BI("0x2fdce36547c70eefdd025c19ed8b4333eb8da402d2a05601ed18b4439d422053"), Hex2BI("0x1abf8e4b45db855a19e3198c7e0b913cd91ba00581da5924ad675f956118fb4a")}, {Hex2BI("0x2487c070c6d86aa5a5568f51a2416062b79404a4d78299c9b615db4a86393715"), Hex2BI("0x19a7ed34fdf4b7c9d0dc48ac6762009736a44e366b1399d4e8d982dbad713d96")}}
-	B_p := [...]*big.Int{Hex2BI("0x25c601e2085cc0b42fa8be22933cbc61b5aa41914b00be6761111f548f05ae70"), Hex2BI("0x6b08e7b8f765bf895cc4cfd4dd906c23f322629be4f3fa7caf84062d3fab850")}
-	C := [...]*big.Int{Hex2BI("0x1199620115c33e607d064839f75187fd75654e37db2d85bd7abfd6185f1d580a"), Hex2BI("0x2a580cd37820657b3fb5608de812c5872c3534304ab93fec605a4e9cbc37f75d")}
-	C_p := [...]*big.Int{Hex2BI("0x15a25be848f85dcf2e5aef7f82fe0a0a3b4920ab70cb3562e2abd3d88d0c7746"), Hex2BI("0x12cbcd1006d443d26ef63bd1b07fdc72ef61f829ed345276ba6f8af2bd741145")}
-	H := [...]*big.Int{Hex2BI("0x21b63c44cd103725875aa34efc928318191a3a51dd35aee6b6a40c7c932c476c"), Hex2BI("0x270eeb8c586b6cd2b55ccab34e7bdc3688022bf2d0416375e6189e76a1ec3e9f")}
-	K := [...]*big.Int{Hex2BI("0x114f3c647f4e888b92e20d10150e5b0652aa442286becf9fa38984baa35527d5"), Hex2BI("0x79270f00ad8e237330020e4b16cefb3f95f256b59db2744e2093801097a6e6e")}
-
-	input := [...]*big.Int{big.NewInt(2533788), big.NewInt(2533888), Hex2BI("0x187b247a7cfc9e02ceca0a063d086a216425e0c585a410ba8a5042e7d49440d5")}
-
-	result, _ := contract.VerifyTx(nil, A, A_p, B, B_p, C, C_p, H, K, input)
-	_ = addr
-	_ = contract
-	fmt.Println(result)
-
+	// TODO: need to wrap this test
+	// // privkey for seed 1 0x69b39aa2fb86c7172d77d4b87b459ed7643c1e4b052536561e08d7d25592b373
+	// client, err := ethclient.Dial("http://127.0.0.1:8545/")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	//
+	// privateKey, err := crypto.HexToECDSA("69b39aa2fb86c7172d77d4b87b459ed7643c1e4b052536561e08d7d25592b373")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	//
+	// publicKey := privateKey.Public()
+	// publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+	// if !ok {
+	// 	log.Fatal("error casting public key to ECDSA")
+	// }
+	//
+	// fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
+	// nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	//
+	// gasPrice, err := client.SuggestGasPrice(context.Background())
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	//
+	// auth := bind.NewKeyedTransactor(privateKey)
+	// auth.Nonce = big.NewInt(int64(nonce))
+	// auth.Value = big.NewInt(0)      // in wei
+	// auth.GasLimit = uint64(3000000) // in units
+	// auth.GasPrice = gasPrice
+	//
+	// // key, _ := crypto.GenerateKey()
+	// // auth := bind.NewKeyedTransactor(key)
+	//
+	// // alloc := make(core.GenesisAlloc)
+	// // alloc[auth.From] = core.GenesisAccount{Balance: big.NewInt(133700000)}
+	// // sim := backends.NewSimulatedBackend(alloc, 6000000)
+	// addr, _, contract, err := verifier.DeployVerifier(auth, client)
+	//
+	// if err != nil {
+	// 	log.Fatalf("could not deploy contract: %v", err)
+	// }
+	//
+	// A := [...]*big.Int{Hex2BI("0x2f1db7ed3094b2962c9ae0e37a389d35ddf13b3db562e0cd062e502201f58e9f"), Hex2BI("0x2916ada7e690230422ff96abb3285b9c037c6dcc04fd36b3742484b979e44ea1")}
+	// A_p := [...]*big.Int{Hex2BI("0x215413bd49dab0b7b48bdfa162e27d4544455e3c4f4dba5c877065d328e6a4b4"), Hex2BI("0x60a7af4f7b566535ca1be7aab1d9344544aa4fc7e4436104a93b6d6e5a04ce9")}
+	// B := [2][2]*big.Int{{Hex2BI("0x2fdce36547c70eefdd025c19ed8b4333eb8da402d2a05601ed18b4439d422053"), Hex2BI("0x1abf8e4b45db855a19e3198c7e0b913cd91ba00581da5924ad675f956118fb4a")}, {Hex2BI("0x2487c070c6d86aa5a5568f51a2416062b79404a4d78299c9b615db4a86393715"), Hex2BI("0x19a7ed34fdf4b7c9d0dc48ac6762009736a44e366b1399d4e8d982dbad713d96")}}
+	// B_p := [...]*big.Int{Hex2BI("0x25c601e2085cc0b42fa8be22933cbc61b5aa41914b00be6761111f548f05ae70"), Hex2BI("0x6b08e7b8f765bf895cc4cfd4dd906c23f322629be4f3fa7caf84062d3fab850")}
+	// C := [...]*big.Int{Hex2BI("0x1199620115c33e607d064839f75187fd75654e37db2d85bd7abfd6185f1d580a"), Hex2BI("0x2a580cd37820657b3fb5608de812c5872c3534304ab93fec605a4e9cbc37f75d")}
+	// C_p := [...]*big.Int{Hex2BI("0x15a25be848f85dcf2e5aef7f82fe0a0a3b4920ab70cb3562e2abd3d88d0c7746"), Hex2BI("0x12cbcd1006d443d26ef63bd1b07fdc72ef61f829ed345276ba6f8af2bd741145")}
+	// H := [...]*big.Int{Hex2BI("0x21b63c44cd103725875aa34efc928318191a3a51dd35aee6b6a40c7c932c476c"), Hex2BI("0x270eeb8c586b6cd2b55ccab34e7bdc3688022bf2d0416375e6189e76a1ec3e9f")}
+	// K := [...]*big.Int{Hex2BI("0x114f3c647f4e888b92e20d10150e5b0652aa442286becf9fa38984baa35527d5"), Hex2BI("0x79270f00ad8e237330020e4b16cefb3f95f256b59db2744e2093801097a6e6e")}
+	//
+	// input := [...]*big.Int{big.NewInt(2533788), big.NewInt(2533888), Hex2BI("0x187b247a7cfc9e02ceca0a063d086a216425e0c585a410ba8a5042e7d49440d5")}
+	//
+	// result, _ := contract.VerifyTx(nil, A, A_p, B, B_p, C, C_p, H, K, input)
+	// _ = addr
+	// _ = contract
+	// fmt.Println(result)
 }

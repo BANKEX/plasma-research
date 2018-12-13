@@ -1,18 +1,28 @@
-#
-# https://github.com/sc-forks/solidity-coverage/blob/master/docs/faq.md
-#
+dist: xenial
+sudo: "required"
 
-sudo: required
-dist: trusty
-language: node_js
-node_js:
-  - '8'
-before_install:
-  - cd ./src/smartContract
-install:
-  - npm install
+language: "go"
+
+go:
+- 1.11
+
+env:
+  global:
+  - GO111MODULE=on
+  matrix:
+  - BUILD_TYPE=Tests
+  - BUILD_TYPE=Contracts
+
 script:
-  - npm run lint
-  - npm run test
-after_script:
-  - npm run coverage && cat coverage/lcov.info | coveralls
+- |
+  case "${BUILD_TYPE}" in
+    Tests)
+      make all
+      ;;
+    Contracts)
+      make contracts
+      ;;
+    *)
+      echo "Unknown BUILD_TYPE value"
+      exit 1
+  esac
