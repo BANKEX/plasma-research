@@ -3,8 +3,6 @@ package transactionManager
 import (
 	"log"
 
-	"github.com/BANKEX/plasma-research/src/node/transactionManager"
-
 	"github.com/BANKEX/plasma-research/src/node/blockchain"
 	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -21,7 +19,7 @@ var Handlers = []Event{
 	{"AssetDeposited(address,address,uint64,uint64,uint64)", HandleDeposit},
 }
 
-var Manager *transactionManager.TransactionManager
+var Manager *TransactionManager
 
 type EventAssetDeposited struct {
 	Who         common.Address
