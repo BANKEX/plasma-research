@@ -1,10 +1,8 @@
-package utils
+package blockchain
 
 import (
 	"bytes"
 	"fmt"
-
-	"github.com/ethereum/go-ethereum/crypto"
 )
 
 type Item []byte
@@ -16,14 +14,6 @@ type HashFunction func(data []byte) []byte
 
 type MerkleTree struct {
 	Layers []Layer
-}
-
-func Keccak256(data []byte) []byte {
-	return crypto.Keccak256(data)
-}
-
-func Keccak160(data []byte) []byte {
-	return crypto.Keccak256(data)[12:32]
 }
 
 func NewMerkleTree(leavesData []Item, height int, hash HashFunction) *MerkleTree {

@@ -77,7 +77,7 @@ func (t *UnsignedTransaction) GetInputOwners() [][]byte {
 
 // GetMerkleRoot gets the root of merklized transaction inputs, outputs, and metadata.
 func (t *UnsignedTransaction) GetMerkleRoot() Uint160 {
-	var leaves []utils.Item
+	var leaves []Item
 
 	for _, data := range t.Inputs {
 		rlpEncoded, _ := utils.EncodeToRLP(data)
@@ -92,7 +92,7 @@ func (t *UnsignedTransaction) GetMerkleRoot() Uint160 {
 	var rlpMetadata, _ = utils.EncodeToRLP(t.Metadata)
 	leaves = append(leaves, rlpMetadata)
 
-	tree := utils.NewMerkleTree(leaves, 3, utils.Keccak160)
+	tree := NewMerkleTree(leaves, 3, utils.Keccak160)
 
 	return []byte(tree.GetRoot())
 }

@@ -80,3 +80,11 @@ func Contains(haystack [][]byte, needle []byte) bool {
 	}
 	return false
 }
+
+func Keccak256(data []byte) []byte {
+	return crypto.Keccak256(data)
+}
+
+func Keccak160(data []byte) []byte {
+	return crypto.Keccak256(data)[12:32]
+}
