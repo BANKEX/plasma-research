@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"bytes"
@@ -8,15 +8,15 @@ import (
 	"fmt"
 	"testing"
 
+	// "github.com/BANKEX/plasma-research/src/node/blockchain"
 	"github.com/BANKEX/plasma-research/src/node/config"
-	"github.com/BANKEX/plasma-research/src/node/utils"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 )
 
 func TestSign(t *testing.T) {
 	data := []byte("hello")
-	hash := utils.Keccak256(data)
+	hash := Keccak256(data)
 	privateKeyBytes, err := hex.DecodeString(config.GetOperator().MainAccountPrivateKey[2:])
 	if err != nil {
 		t.Fatal(err)
