@@ -1,0 +1,8 @@
+**/.git
+.git
+!.git/HEAD
+!.git/refs/heads
+**/*_test.go
+
+docs
+target

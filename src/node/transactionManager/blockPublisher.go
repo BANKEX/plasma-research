@@ -41,15 +41,15 @@ func (p *BlockPublisher) AssembleBlock() {
 
 	// upload to a durable storage (S3/IPFS) or write to a local file system
 	Blockchain = append(Blockchain, block)
-	//data, err := block.Serialize()
-	//if err != nil {
-	//	log.Fatalf("Failed to write block: %s", err)
-	//}
-	//err = ioutil.WriteFile(fmt.Sprintf("./blockchain/%d.bin", block.BlockNumber), data, 0666)
-	//if err != nil {
-	//	log.Fatalf("Failed to write block: %s", err)
-	//}
+	// data, err := block.Serialize()
+	// if err != nil {
+	// 	log.Fatalf("Failed to write block: %s", err)
+	// }
+	// err = ioutil.WriteFile(fmt.Sprintf("./blockchain/%d.bin", block.BlockNumber), data, 0666)
+	// if err != nil {
+	// 	log.Fatalf("Failed to write block: %s", err)
+	// }
 
 	// todo
-	//ethereum.PushHashBlock(block.BlockNumber, block.GetHash())
+	// ethereum.PushHashBlock(block.BlockNumber, block.GetHash())
 }
