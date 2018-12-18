@@ -10,6 +10,10 @@ HOSTARCH := $(shell uname -m)
 GOOS ?= ${HOSTOS}
 GOARCH ?= ${HOSTARCH}
 
+GOCMD = ./src/node/cmd
+
+TAGS = nocgo
+
 # Set the execution extension for Windows.
 ifeq (${GOOS},windows)
     EXE := .exe
@@ -47,11 +51,11 @@ build: build/operator build/verifier
 
 build/operator:
 	@echo "+ $@"
-	${GO} build -tags "$(TAGS)" -ldflags "$(LDFLAGS)" -o ${OPERATOR} ./src/node/operator
+	${GO} build -tags "$(TAGS)" -ldflags "$(LDFLAGS)" -o ${OPERATOR} ${GOCMD}/operator
 
 build/verifier:
 	@echo "+ $@"
-	${GO} build -tags "$(TAGS)" -ldflags "$(LDFLAGS)" -o ${OPERATOR} ./src/node/verifier
+	${GO} build -tags "$(TAGS)" -ldflags "$(LDFLAGS)" -o ${VERIFIER} ${GOCMD}/verifier
 
 docker: docker/operator docker/verifier
 

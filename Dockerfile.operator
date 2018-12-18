@@ -1,6 +1,6 @@
 FROM golang:1.11-alpine
 
-RUN apk add --update --no-cache linux-headers libc-dev gcc git gmp gmp-dev
+RUN apk add --update --no-cache make linux-headers libc-dev gcc git gmp gmp-dev
 
 RUN mkdir /app
 ADD . /app/
@@ -8,9 +8,9 @@ ADD . /app/
 WORKDIR /app/
 
 ENV GO111MODULE=on
-RUN go build -tags "nocgo" -o operator ./src/node/operator
+RUN make build/operator
 
 EXPOSE 3001
 EXPOSE 8545
 
-CMD ["/app/operator"]
+CMD ["/app/target/operator_linux_x86_64"]

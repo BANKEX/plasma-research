@@ -8,20 +8,23 @@ import (
 	"fmt"
 	"testing"
 
-	// "github.com/BANKEX/plasma-research/src/node/blockchain"
-	"github.com/BANKEX/plasma-research/src/node/config"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
+)
+
+const (
+	testPrivateKey = "0x240d6ad83930067d82e0803696996f743acd78d8fa6a5f6e4f148fd9def37c55"
+	testPublicKey  = "0x9b72b510f184e16bce51dfd7348ba474ce30b6ed"
 )
 
 func TestSign(t *testing.T) {
 	data := []byte("hello")
 	hash := Keccak256(data)
-	privateKeyBytes, err := hex.DecodeString(config.GetOperator().MainAccountPrivateKey[2:])
+	privateKeyBytes, err := hex.DecodeString(testPrivateKey[2:])
 	if err != nil {
 		t.Fatal(err)
 	}
-	publicAddress, err := hex.DecodeString(config.GetOperator().MainAccountPublicKey[2:])
+	publicAddress, err := hex.DecodeString(testPublicKey[2:])
 	if err != nil {
 		t.Fatal(err)
 	}
