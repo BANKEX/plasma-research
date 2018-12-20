@@ -3,21 +3,10 @@ services:
   ganache:
     image: trufflesuite/ganache-cli:latest
     ports:
-    - "8545:8545"
-    networks:
-      testing_net:
-        ipv4_address: 172.28.1.2
+      - "8545:8545"
   operator:
     image: erage/plasma_operator
     ports:
-    - "3001:3001"
-    networks:
-      testing_net:
-        ipv4_address: 172.28.1.3
-
-networks:
-  testing_net:
-    ipam:
-      driver: default
-      config:
-      - subnet: 172.28.0.0/16
+      - "3001:3001"
+    environment:
+      geth_host: http://ganache:8545
