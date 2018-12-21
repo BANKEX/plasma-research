@@ -11,6 +11,5 @@ ENV GO111MODULE=on
 RUN make build/verifier
 
 EXPOSE 8080
-EXPOSE 8545
 
 CMD ["/app/target/verifier_linux_x86_64"]

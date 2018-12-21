@@ -60,7 +60,7 @@ build/verifier:
 docker: docker/operator docker/verifier
 
 docker/operator:
-	docker build -t plasma-operator:latest -f ./Dockerfile.operator .
+	docker build -t plasma-operator:latest -f ./docker/Dockerfile.operator .
 
 docker/verifier:
-	docker build -t plasma-verifier:latest -f ./Dockerfile.operator .
+	docker build -t plasma-verifier:latest -f ./docker/Dockerfile.operator .

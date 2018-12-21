@@ -1,0 +1,17 @@
+FROM node:latest
+
+#RUN apk add --update --no-cache make linux-headers netcat-openbsd git
+
+RUN apt-get update && apt-get install -y netcat
+
+ADD ./src/contracts /
+
+RUN make node_modules
+
+
+EXPOSE 8545
+
+CMD ./scripts/run.sh
+
+
+
