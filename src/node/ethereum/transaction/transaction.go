@@ -1,6 +1,7 @@
 package transaction
 
 import (
+
 	"context"
 	"crypto/ecdsa"
 	"errors"
@@ -10,10 +11,9 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"log"
 	"math/big"
-	"regexp"
 )
 
-func SendTransactionInWei(client *ethclient.Client, value int, toAddress string, privateKey string) (string, error) {
+func SendTransactionInWei(client *ethclient.Client, privateKey string, value int, toAddress string, ) (string, error) {
 	rawPrivateKey, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
 		log.Fatal(err)
@@ -26,7 +26,7 @@ func SendTransactionInWei(client *ethclient.Client, value int, toAddress string,
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
-	err = IsValidAddress(fromAddress)
+	//err = IsValidAddress(fromAddress)
 	if err != nil {
 		return "", err
 	}
@@ -36,7 +36,7 @@ func SendTransactionInWei(client *ethclient.Client, value int, toAddress string,
 		return "", err
 	}
 
-	err = IsValidAddress(toAddress)
+	//err = IsValidAddress(toAddress)
 	if err != nil {
 		err := errors.New("failed to validate address")
 		return "", err
@@ -73,26 +73,3 @@ func SendTransactionInWei(client *ethclient.Client, value int, toAddress string,
 	return signedTx.Hash().Hex(), err
 }
 
-func IsValidAddress(iaddress interface{}) (error) {
-	re := regexp.MustCompile("^0x[0-9a-fA-F]{40}$")
-	ok := false
-	switch v := iaddress.(type) {
-	case string:
-		ok = re.MatchString(v)
-		if !ok {
-			err := errors.New("failed to validate address")
-			return err
-		}
-		return nil
-	case common.Address:
-		ok = re.MatchString(v.Hex())
-		if !ok {
-			err := errors.New("failed to validate address")
-			return err
-		}
-		return nil
-	default:
-		err := errors.New("failed to validate address")
-		return err
-	}
-}
