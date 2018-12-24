@@ -6,6 +6,9 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/BANKEX/plasma-research/src/node/config"
+	"github.com/BANKEX/plasma-research/src/node/ethereum/deposit"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"io"
 	"io/ioutil"
 	"log"
@@ -33,9 +36,9 @@ func (v *Verifier) Serve(ctx context.Context) error {
 	// go balance.UpdateBalance(&storage.Balance, conf.Plasma_contract_address)
 	// go event.Start(storage.Client, conf.Plasma_contract_address, &storage.Who, &storage.Amount, &storage.EventBlockHash, &storage.EventBlockNumber)
 
-	r := gin.Default()
-	// r := gin.New()
-	// r.Use(gin.Recovery())
+	//r := gin.Default()
+	r := gin.New()
+	r.Use(gin.Recovery())
 	r.Use(cors.Default())
 	gin.SetMode(gin.ReleaseMode)
 
@@ -91,7 +94,24 @@ func (v *Verifier) PlasmaContractAddress(c *gin.Context) {
 }
 
 func (v *Verifier) DepositHandler(c *gin.Context) {
-	result := ethereum.Deposit(c.Param("sum"))
+	client, err := ethclient.Dial(config.GetVerifier().GethHost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
+	value, _ := strconv.ParseInt(c.Param("sum"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
+	result, err := deposit.Deposit(client, config.GetVerifier().VerifierPrivateKey, config.GetVerifier().PlasmaContractAddress, value)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"txHash": result,
 	})

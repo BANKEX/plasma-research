@@ -15,56 +15,6 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-func Deposit(sum string) string {
-	client, err := ethclient.Dial(config.GetVerifier().GethHost)
-	if err != nil {
-		log.Println(err)
-	}
-
-	privateKey, err := crypto.HexToECDSA(config.GetVerifier().VerifierPrivateKey[2:])
-	if err != nil {
-		log.Println(err)
-	}
-
-	publicKey := privateKey.Public()
-	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
-	if !ok {
-		log.Println("error casting public key to ECDSA")
-	}
-
-	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
-	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
-	if err != nil {
-		log.Println(err)
-	}
-
-	gasPrice, err := client.SuggestGasPrice(context.Background())
-	if err != nil {
-		log.Println(err)
-	}
-
-	auth := bind.NewKeyedTransactor(privateKey)
-	auth.Nonce = big.NewInt(int64(nonce))
-	val, _ := strconv.ParseInt(sum, 10, 64)
-	auth.Value = big.NewInt(val)
-	auth.GasLimit = uint64(300000)
-	auth.GasPrice = gasPrice
-
-	address := common.HexToAddress(config.GetVerifier().PlasmaContractAddress)
-	instance, err := store.NewStore(address, client)
-	if err != nil {
-		log.Println(err)
-	}
-
-	tx, err := instance.Deposit(auth)
-	if err != nil {
-		log.Println(err)
-	}
-
-	return tx.Hash().String()
-
-}
-
 func GetBalance(address string) string {
 	client, err := ethclient.Dial(config.GetVerifier().GethHost)
 	if err != nil {

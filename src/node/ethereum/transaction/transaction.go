@@ -1,10 +1,9 @@
 package transaction
 
 import (
-
 	"context"
 	"crypto/ecdsa"
-	"errors"
+	"github.com/BANKEX/plasma-research/src/node/ethereum/etherUtils"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -13,7 +12,7 @@ import (
 	"math/big"
 )
 
-func SendTransactionInWei(client *ethclient.Client, privateKey string, value int, toAddress string, ) (string, error) {
+func SendTransactionInWei(client *ethclient.Client, privateKey string, value int64, toAddress string, ) (string, error) {
 	rawPrivateKey, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
 		log.Fatal(err)
@@ -26,7 +25,7 @@ func SendTransactionInWei(client *ethclient.Client, privateKey string, value int
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
-	//err = IsValidAddress(fromAddress)
+	err = etherUtils.IsValidAddress(fromAddress)
 	if err != nil {
 		return "", err
 	}
@@ -36,16 +35,13 @@ func SendTransactionInWei(client *ethclient.Client, privateKey string, value int
 		return "", err
 	}
 
-	//err = IsValidAddress(toAddress)
+	err = etherUtils.IsValidAddress(toAddress)
 	if err != nil {
-		err := errors.New("failed to validate address")
 		return "", err
 	}
 
 	rawToAddress := common.HexToAddress(toAddress)
-
-	rawValue := big.NewInt(int64(value))
-
+	rawValue := big.NewInt(value)
 	gasLimit := uint64(21000)
 	gasPrice, err := client.SuggestGasPrice(context.Background())
 	if err != nil {

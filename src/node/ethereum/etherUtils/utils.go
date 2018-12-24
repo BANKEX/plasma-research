@@ -1,9 +1,9 @@
 package etherUtils
 
 import (
+	"errors"
 	"github.com/ethereum/go-ethereum/common"
 	"regexp"
-	"errors"
 )
 
 func IsValidAddress(iaddress interface{}) (error) {
