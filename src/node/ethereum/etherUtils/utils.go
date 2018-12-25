@@ -29,3 +29,14 @@ func IsValidAddress(iaddress interface{}) (error) {
 		return err
 	}
 }
+
+func ConvertStringPrivateKeyToRaw() {
+
+}
+func ConvertStringPublicKeyToRaw() {
+
+}
+
+func ConvertPublicKeyToAddress() {
+
+}
