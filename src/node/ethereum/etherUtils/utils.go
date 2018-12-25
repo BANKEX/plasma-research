@@ -9,7 +9,7 @@ import (
 	"regexp"
 )
 
-func IsValidAddress(iaddress interface{}) (error) {
+func IsValidAddress(iaddress interface{}) error {
 	re := regexp.MustCompile("^0x[0-9a-fA-F]{40}$")
 	ok := false
 	switch v := iaddress.(type) {

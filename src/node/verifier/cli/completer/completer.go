@@ -1,8 +1,8 @@
 package completer
 
 import (
-	"github.com/c-bata/go-prompt"
 	"github.com/BANKEX/plasma-research/src/node/verifier/cli/options"
+	"github.com/c-bata/go-prompt"
 	"strings"
 )
 
