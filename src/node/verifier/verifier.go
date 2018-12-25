@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"github.com/BANKEX/plasma-research/src/node/config"
 	"github.com/BANKEX/plasma-research/src/node/ethereum/deposit"
+	"github.com/BANKEX/plasma-research/src/node/ethereum/etherUtils"
+	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/BANKEX/plasma-research/src/node/ethereum/transaction"
 	"github.com/BANKEX/plasma-research/src/node/verifier/cli/completer"
@@ -147,7 +149,17 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 					if err != nil {
 						log.Fatal(err)
 					}
-					res, err := deposit.Deposit(v.client, v.cfg.VerifierPrivateKey, v.cfg.PlasmaContractAddress, amountInt64)
+					//fmt.Println("Deposit amount: " + args[2])
+					rawPublicKey, err := etherUtils.ConvertStringPrivateKeyToRaw(v.cfg.VerifierPrivateKey)
+					if err != nil {
+						log.Fatal(err)
+					}
+					rawContractAddress := common.HexToAddress(v.cfg.PlasmaContractAddress)
+					err = etherUtils.IsValidAddress(rawContractAddress)
+					if err != nil {
+						log.Fatal(err)
+					}
+					res, err := deposit.Deposit(v.client, rawPublicKey, rawContractAddress, amountInt64)
 					if err != nil {
 						log.Fatal(err)
 					}

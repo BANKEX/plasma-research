@@ -1,8 +1,11 @@
 package etherUtils
 
 import (
+	"crypto/ecdsa"
 	"errors"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"log"
 	"regexp"
 )
 
@@ -28,15 +31,17 @@ func IsValidAddress(iaddress interface{}) (error) {
 		err := errors.New("failed to validate address")
 		return err
 	}
-
-func ConvertStringPrivateKeyToRaw() {
+}
+func ConvertStringPrivateKeyToRaw(privateKey string) (*ecdsa.PrivateKey, error) {
+	rawPrivateKey, err := crypto.HexToECDSA(privateKey)
+	if err != nil {
+		return nil, errors.New("error casting string private key to raw private key")
+		log.Println(err)
+	}
+	return rawPrivateKey, nil
 
 }
-func ConvertStringPublicKeyToRaw() {
 
+func ConvertPublicKeyToAddress(publicKeyECDSA *ecdsa.PublicKey) common.Address {
+	return crypto.PubkeyToAddress(*publicKeyECDSA)
 }
-
-func ConvertPublicKeyToAddress() {
-
-}
-
