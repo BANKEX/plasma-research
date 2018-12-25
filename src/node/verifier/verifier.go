@@ -8,9 +8,11 @@ import (
 	"fmt"
 	"github.com/BANKEX/plasma-research/src/node/config"
 	"github.com/BANKEX/plasma-research/src/node/ethereum/deposit"
+
 	"github.com/BANKEX/plasma-research/src/node/ethereum/transaction"
 	"github.com/BANKEX/plasma-research/src/node/verifier/cli/completer"
 	"github.com/c-bata/go-prompt"
+
 	"github.com/ethereum/go-ethereum/ethclient"
 	"io"
 	"io/ioutil"
@@ -67,6 +69,9 @@ func (v *Verifier) CLIToolStart() {
 }
 
 func ServerInit() (*gin.Engine, error) {
+
+	//r := gin.Default()
+
 	r := gin.New()
 	r.Use(gin.Recovery())
 	r.Use(cors.Default())

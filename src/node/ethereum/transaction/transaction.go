@@ -12,7 +12,7 @@ import (
 	"math/big"
 )
 
-func SendTransactionInWei(client *ethclient.Client, privateKey string, value int64, toAddress string) (string, error) {
+func SendTransactionInWei(client *ethclient.Client, privateKey string, value int64, toAddress string, ) (string, error) {
 	rawPrivateKey, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
 		log.Fatal(err)

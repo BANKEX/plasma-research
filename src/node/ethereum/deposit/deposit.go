@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"log"
 	"math/big"
 )
 
@@ -17,12 +18,14 @@ func Deposit(client *ethclient.Client, privateKey string, contractAddress string
 	rawPrivateKey, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
 		return "", errors.New("error casting string private key to raw private key")
+		log.Println(err)
 	}
 
 	publicKey := rawPrivateKey.Public()
 	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
 	if !ok {
 		return "", errors.New("error casting public key to ECDSA")
+		log.Println("error casting public key to ECDSA")
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)

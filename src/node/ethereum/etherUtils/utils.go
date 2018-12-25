@@ -28,7 +28,6 @@ func IsValidAddress(iaddress interface{}) (error) {
 		err := errors.New("failed to validate address")
 		return err
 	}
-}
 
 func ConvertStringPrivateKeyToRaw() {
 
@@ -40,3 +39,4 @@ func ConvertStringPublicKeyToRaw() {
 func ConvertPublicKeyToAddress() {
 
 }
+
