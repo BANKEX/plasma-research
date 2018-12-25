@@ -8,6 +8,13 @@ import (
 	"fmt"
 	"github.com/BANKEX/plasma-research/src/node/config"
 	"github.com/BANKEX/plasma-research/src/node/ethereum/deposit"
+	"github.com/BANKEX/plasma-research/src/node/ethereum/etherUtils"
+	"github.com/ethereum/go-ethereum/common"
+
+	"github.com/BANKEX/plasma-research/src/node/ethereum/transaction"
+	"github.com/BANKEX/plasma-research/src/node/verifier/cli/completer"
+	"github.com/c-bata/go-prompt"
+
 	"github.com/ethereum/go-ethereum/ethclient"
 	"io"
 	"io/ioutil"
@@ -15,6 +22,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/BANKEX/plasma-research/src/node/blockchain"
 	"github.com/BANKEX/plasma-research/src/node/ethereum"
@@ -24,24 +32,151 @@ import (
 )
 
 type Verifier struct {
-	cfg *Config
+	serverInstance *gin.Engine
+	cfg            *Config
+	client         *ethclient.Client
 }
 
 func NewVerifier(cfg *Config) (*Verifier, error) {
-	return &Verifier{}, nil
+	client, err := ethclient.Dial(cfg.GethHost)
+	if err != nil {
+		fmt.Println(err)
+	}
+	serverInstance, err := ServerInit()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &Verifier{
+		cfg:            cfg,
+		serverInstance: serverInstance,
+		client:         client,
+	}, nil
 }
 
 func (v *Verifier) Serve(ctx context.Context) error {
-	// go listeners.Checker()
-	// go balance.UpdateBalance(&storage.Balance, conf.Plasma_contract_address)
-	// go event.Start(storage.Client, conf.Plasma_contract_address, &storage.Who, &storage.Amount, &storage.EventBlockHash, &storage.EventBlockNumber)
+	go v.ServerStart(v.serverInstance)
+	v.CLIToolStart()
+	return nil
+}
+
+func (v *Verifier) CLIToolStart() {
+	fmt.Println("------------Plasma Verifier----------")
+	p := prompt.New(
+		v.CLIToolExecutor,
+		completer.Completer,
+		prompt.OptionPrefix("--> "),
+		prompt.OptionInputTextColor(prompt.Yellow),
+	)
+	p.Run()
+}
+
+func ServerInit() (*gin.Engine, error) {
 
 	//r := gin.Default()
+
 	r := gin.New()
 	r.Use(gin.Recovery())
 	r.Use(cors.Default())
 	gin.SetMode(gin.ReleaseMode)
 
+	return r, nil
+}
+
+func (v *Verifier) CLIToolExecutor(userText string) {
+	if userText == "exit" {
+		fmt.Println("Bye!")
+		os.Exit(0)
+		return
+	}
+	args := strings.Split(userText, " ")
+	if len(args) > 2 {
+		switch args[0] {
+		case "plasma":
+			switch args[1] {
+			case "smartContractAddress", "sca":
+				if len(args) == 3 {
+					fmt.Println("Smart contract address: " + args[2])
+				}
+			case "plasmaBalance", "pb":
+				if len(args) == 3 {
+					fmt.Println("Plasma balance:" + args[2])
+				}
+			case "smartContractBalance", "scb":
+				if len(args) == 3 {
+					fmt.Println("Smart contract balance:" + args[2])
+				}
+			case "events", "e":
+				if len(args) == 3 {
+					fmt.Println("Events ...")
+				}
+			}
+		case "eth":
+			switch args[1] {
+			case "smartContractAddress", "sca":
+				if len(args) == 3 {
+					fmt.Println("Smart contract address: " + args[2])
+				}
+			case "smartContractBalance", "scb":
+				if len(args) == 3 {
+					fmt.Println("Smart contract balance:" + args[2])
+				}
+			case "transfer", "tr":
+				if len(args) == 4 {
+					amountStr := args[2]
+					recipientStr := args[3]
+
+					amountInt64, err := strconv.ParseInt(amountStr, 10, 64)
+					if err != nil {
+						fmt.Println(err)
+					}
+					fmt.Println(amountStr, recipientStr)
+					transaction.SendTransactionInWei(v.client, v.cfg.VerifierPrivateKey, amountInt64, recipientStr)
+				}
+			case "accBalance", "ab":
+				if len(args) == 3 {
+					accStr := args[2]
+					fmt.Println(accStr)
+
+					//utils.AccountBalance(accStr)
+				}
+			}
+		case "main":
+			switch args[1] {
+			case "deposit", "dep":
+				if len(args) == 3 {
+					//fmt.Println("Deposit amount: " + args[2])
+					amountInt64, err := strconv.ParseInt(args[2], 10, 64)
+					if err != nil {
+						log.Fatal(err)
+					}
+					//fmt.Println("Deposit amount: " + args[2])
+					rawPublicKey, err := etherUtils.ConvertStringPrivateKeyToRaw(v.cfg.VerifierPrivateKey)
+					if err != nil {
+						log.Fatal(err)
+					}
+					rawContractAddress := common.HexToAddress(v.cfg.PlasmaContractAddress)
+					err = etherUtils.IsValidAddress(rawContractAddress)
+					if err != nil {
+						log.Fatal(err)
+					}
+					res, err := deposit.Deposit(v.client, rawPublicKey, rawContractAddress, amountInt64)
+					if err != nil {
+						log.Fatal(err)
+					}
+					fmt.Println(res)
+				}
+			case "exit", "ex":
+				if len(args) == 3 {
+					fmt.Println("Exit func")
+				}
+			}
+		}
+	} else {
+		fmt.Println("Bad args!")
+	}
+}
+
+func (v *Verifier) ServerStart(r *gin.Engine) error {
 	r.GET("/etherBalance", v.EthereumBalance)
 	r.GET("/verifiersAmount", v.VerifiersAmountHandler)
 	r.GET("/totalBalance", v.TotalBalanceHandler)
@@ -54,8 +189,11 @@ func (v *Verifier) Serve(ctx context.Context) error {
 
 	r.Static("/frontend", "frontend")
 
-	r.Run(":8080")
-
+	err := r.Run(fmt.Sprintf(":%d", v.cfg.VerifierPort))
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
 	return nil
 }
 
