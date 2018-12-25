@@ -2,8 +2,10 @@ package transactionManager
 
 import (
 	"context"
+	"log"
 	"math/big"
 	"strings"
+	"time"
 
 	"github.com/BANKEX/plasma-research/src/node/config"
 	"github.com/BANKEX/plasma-research/src/node/ethereum/plasmacontract"
@@ -44,19 +46,33 @@ func NewEventMonitor(m *TransactionManager) (*EventMonitor, error) {
 	return &result, nil
 }
 
-// // todo monitor deposit events, forward to transaction manager
-// // todo monitor withdraw events, forward to transaction manager
-// // todo if we need to send some challenges from the operator, this is the place to do it
+//// todo monitor deposit events, forward to transaction manager
+//// todo monitor withdraw events, forward to transaction manager
+//// todo if we need to send some challenges from the operator, this is the place to do it
 
 func (m *EventMonitor) loop() {
-	//
+	for {
+		result, err := m.processBlock(m.currentBlock)
+		switch result {
+		case statusSuccess:
+			log.Printf("processed block %d for events", m.currentBlock)
+			m.currentBlock++
+			break
+		case statusError:
+			log.Printf("error processing block %d for events: %s", m.currentBlock, err.Error())
+			time.Sleep(time.Second * 10)
+			break
+		case statusNoSuchBlock:
+			time.Sleep(time.Second)
+		}
+	}
 }
 
-func (m *EventMonitor) processBlock(blockNumber int64) (int, error) {
+func (m *EventMonitor) processBlock(blockNumber uint64) (int, error) {
 	contractAddress := common.HexToAddress(config.GetOperator().MainAccountPublicKey[2:])
 	query := ethereum.FilterQuery{
-		FromBlock: big.NewInt(blockNumber),
-		ToBlock:   big.NewInt(blockNumber),
+		FromBlock: big.NewInt(int64(blockNumber)),
+		ToBlock:   big.NewInt(int64(blockNumber)),
 		Addresses: []common.Address{
 			contractAddress,
 		},
@@ -79,11 +95,11 @@ func (m *EventMonitor) processLogs(logs []types.Log) error {
 		return err
 	}
 
-	for _, vLog := range logs {
+	for _, item := range logs {
 		for _, h := range Handlers {
-			if crypto.Keccak256Hash([]byte(h.Signature)).Hex() == vLog.Topics[0].Hex() {
-				for range vLog.Topics {
-					h.Handler(vLog, contractAbi)
+			if crypto.Keccak256Hash([]byte(h.Signature)).Hex() == item.Topics[0].Hex() {
+				for range item.Topics {
+					h.Handler(item, contractAbi)
 				}
 
 			}

@@ -17,6 +17,7 @@ type Event struct {
 
 var Handlers = []Event{
 	{"AssetDeposited(address,address,uint64,uint64,uint64)", HandleDeposit},
+	// {"WithdrawalBegin(address,uint32,uint32,uint8,address,uint64,uint64)", HandleDeposit},
 }
 
 var Manager *TransactionManager
