@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/BANKEX/plasma-research/src/node/config"
 	"github.com/BANKEX/plasma-research/src/node/ethereum/deposit"
 	"github.com/BANKEX/plasma-research/src/node/ethereum/etherUtils"
 	"github.com/ethereum/go-ethereum/common"
@@ -232,19 +231,24 @@ func (v *Verifier) PlasmaContractAddress(c *gin.Context) {
 }
 
 func (v *Verifier) DepositHandler(c *gin.Context) {
-	client, err := ethclient.Dial(config.GetVerifier().GethHost)
+	amountInt64, err := strconv.ParseInt(c.Param("sum"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err,
-		})
+		log.Fatal(err)
 	}
-	value, _ := strconv.ParseInt(c.Param("sum"), 10, 64)
+	//fmt.Println("Deposit amount: " + args[2])
+	rawPublicKey, err := etherUtils.ConvertStringPrivateKeyToRaw(v.cfg.VerifierPrivateKey)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err,
-		})
+		log.Fatal(err)
 	}
-	result, err := deposit.Deposit(client, config.GetVerifier().VerifierPrivateKey, config.GetVerifier().PlasmaContractAddress, value)
+	rawContractAddress := common.HexToAddress(v.cfg.PlasmaContractAddress)
+	err = etherUtils.IsValidAddress(rawContractAddress)
+	if err != nil {
+		log.Fatal(err)
+	}
+	result, err := deposit.Deposit(v.client, rawPublicKey, rawContractAddress, amountInt64)
+	if err != nil {
+		log.Fatal(err)
+	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err,
