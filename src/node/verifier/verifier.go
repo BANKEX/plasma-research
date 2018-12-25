@@ -40,11 +40,11 @@ type Verifier struct {
 func NewVerifier(cfg *Config) (*Verifier, error) {
 	client, err := ethclient.Dial(cfg.GethHost)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 	serverInstance, err := ServerInit()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	return &Verifier{
 		cfg:            cfg,

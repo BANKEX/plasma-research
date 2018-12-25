@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	"log"
 	"regexp"
 )
 
@@ -35,8 +34,7 @@ func IsValidAddress(iaddress interface{}) error {
 func ConvertStringPrivateKeyToRaw(privateKey string) (*ecdsa.PrivateKey, error) {
 	rawPrivateKey, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
-		return nil, errors.New("error casting string private key to raw private key")
-		log.Println(err)
+		return nil, err
 	}
 	return rawPrivateKey, nil
 
