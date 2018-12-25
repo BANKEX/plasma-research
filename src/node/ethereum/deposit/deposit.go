@@ -3,26 +3,26 @@ package deposit
 import (
 	"context"
 	"crypto/ecdsa"
+	"errors"
 	"github.com/BANKEX/plasma-research/src/node/ethereum/etherUtils"
 	"github.com/BANKEX/plasma-research/src/node/ethereum/plasmacontract"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"log"
 	"math/big"
 )
 
 func Deposit(client *ethclient.Client, privateKey string, contractAddress string, value int64) (string, error) {
 	rawPrivateKey, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
-		log.Println(err)
+		return "", errors.New("error casting string private key to raw private key")
 	}
 
 	publicKey := rawPrivateKey.Public()
 	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
 	if !ok {
-		log.Println("error casting public key to ECDSA")
+		return "", errors.New("error casting public key to ECDSA")
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
