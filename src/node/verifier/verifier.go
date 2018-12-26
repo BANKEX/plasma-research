@@ -11,6 +11,7 @@ import (
 	"github.com/BANKEX/plasma-research/src/node/ethereum/deposit"
 	"github.com/BANKEX/plasma-research/src/node/ethereum/etherUtils"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 
 	"github.com/BANKEX/plasma-research/src/node/ethereum/transaction"
 	"github.com/BANKEX/plasma-research/src/node/verifier/cli/completer"
@@ -149,7 +150,7 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 					if !ok {
 						log.Fatal(fmt.Errorf("given value not integer"))
 					}
-					rawPublicKey, err := etherUtils.ConvertStringPrivateKeyToRaw(v.cfg.VerifierPrivateKey)
+					rawPublicKey, err := crypto.HexToECDSA(v.cfg.VerifierPrivateKey)
 					if err != nil {
 						log.Fatal(err)
 					}
@@ -236,7 +237,7 @@ func (v *Verifier) DepositHandler(c *gin.Context) {
 		log.Fatal(fmt.Errorf("given value not integer"))
 	}
 
-	rawPublicKey, err := etherUtils.ConvertStringPrivateKeyToRaw(v.cfg.VerifierPrivateKey)
+	rawPublicKey, err := crypto.HexToECDSA(v.cfg.VerifierPrivateKey)
 	if err != nil {
 		log.Fatal(err)
 	}

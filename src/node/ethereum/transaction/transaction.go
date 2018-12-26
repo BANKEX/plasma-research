@@ -2,14 +2,14 @@ package transaction
 
 import (
 	"context"
-	"crypto/ecdsa"
+	"log"
+	"math/big"
+
 	"github.com/BANKEX/plasma-research/src/node/ethereum/etherUtils"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"log"
-	"math/big"
 )
 
 func SendTransactionInWei(client *ethclient.Client, privateKey string, value int64, toAddress string) (string, error) {
@@ -18,17 +18,7 @@ func SendTransactionInWei(client *ethclient.Client, privateKey string, value int
 		log.Fatal(err)
 	}
 
-	publicKey := rawPrivateKey.Public()
-	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
-	if !ok {
-		log.Fatal("error casting public key to ECDSA")
-	}
-
-	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
-	err = etherUtils.IsValidAddress(fromAddress)
-	if err != nil {
-		return "", err
-	}
+	fromAddress := crypto.PubkeyToAddress(rawPrivateKey.PublicKey)
 
 	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {
