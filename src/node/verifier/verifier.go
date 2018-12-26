@@ -6,6 +6,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"math/big"
+
 	"github.com/BANKEX/plasma-research/src/node/ethereum/deposit"
 	"github.com/BANKEX/plasma-research/src/node/ethereum/etherUtils"
 	"github.com/ethereum/go-ethereum/common"
@@ -143,12 +145,10 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 			switch args[1] {
 			case "deposit", "dep":
 				if len(args) == 3 {
-					//fmt.Println("Deposit amount: " + args[2])
-					amountInt64, err := strconv.ParseInt(args[2], 10, 64)
-					if err != nil {
-						log.Fatal(err)
+					value, ok := big.NewInt(0).SetString(args[2], 10)
+					if !ok {
+						log.Fatal(fmt.Errorf("given value not integer"))
 					}
-					//fmt.Println("Deposit amount: " + args[2])
 					rawPublicKey, err := etherUtils.ConvertStringPrivateKeyToRaw(v.cfg.VerifierPrivateKey)
 					if err != nil {
 						log.Fatal(err)
@@ -158,11 +158,11 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 					if err != nil {
 						log.Fatal(err)
 					}
-					res, err := deposit.Deposit(v.client, rawPublicKey, rawContractAddress, amountInt64)
+					res, err := deposit.Deposit(context.TODO(), rawContractAddress, v.client, rawPublicKey, value)
 					if err != nil {
 						log.Fatal(err)
 					}
-					fmt.Println(res)
+					fmt.Println(res.Hash().String())
 				}
 			case "exit", "ex":
 				if len(args) == 3 {
@@ -231,11 +231,11 @@ func (v *Verifier) PlasmaContractAddress(c *gin.Context) {
 }
 
 func (v *Verifier) DepositHandler(c *gin.Context) {
-	amountInt64, err := strconv.ParseInt(c.Param("sum"), 10, 64)
-	if err != nil {
-		log.Fatal(err)
+	value, ok := big.NewInt(0).SetString(c.Param("sum"), 10)
+	if !ok {
+		log.Fatal(fmt.Errorf("given value not integer"))
 	}
-	//fmt.Println("Deposit amount: " + args[2])
+
 	rawPublicKey, err := etherUtils.ConvertStringPrivateKeyToRaw(v.cfg.VerifierPrivateKey)
 	if err != nil {
 		log.Fatal(err)
@@ -245,7 +245,7 @@ func (v *Verifier) DepositHandler(c *gin.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	result, err := deposit.Deposit(v.client, rawPublicKey, rawContractAddress, amountInt64)
+	result, err := deposit.Deposit(context.TODO(), rawContractAddress, v.client, rawPublicKey, value)
 	if err != nil {
 		log.Fatal(err)
 	}
