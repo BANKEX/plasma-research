@@ -3,63 +3,35 @@ package deposit
 import (
 	"context"
 	"crypto/ecdsa"
-	"github.com/BANKEX/plasma-research/src/node/ethereum/etherUtils"
-	"github.com/BANKEX/plasma-research/src/node/ethereum/plasmacontract"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethclient"
-	"log"
 	"math/big"
+
+	"github.com/BANKEX/plasma-research/src/node/ethereum/plasmacontract"
+	"github.com/BANKEX/plasma-research/src/node/utils"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-func Deposit(client *ethclient.Client, privateKey string, contractAddress string, value int64) (string, error) {
-	rawPrivateKey, err := crypto.HexToECDSA(privateKey)
-	if err != nil {
-		log.Println(err)
-	}
+const gasLimitForDeposit = uint64(300000)
 
-	publicKey := rawPrivateKey.Public()
-	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
-	if !ok {
-		log.Println("error casting public key to ECDSA")
-	}
-
-	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
-	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+func Deposit(ctx context.Context, contractAddress common.Address, client *ethclient.Client, key *ecdsa.PrivateKey, value *big.Int) (*types.Transaction, error) {
+	instance, err := store.NewStore(contractAddress, client)
 	if err != nil {
-		return "", err
-	}
-	err = etherUtils.IsValidAddress(fromAddress)
-	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	gasPrice, err := client.SuggestGasPrice(context.Background())
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	auth := bind.NewKeyedTransactor(rawPrivateKey)
-	auth.Nonce = big.NewInt(int64(nonce))
-	auth.Value = big.NewInt(value)
-	auth.GasLimit = uint64(300000)
-	auth.GasPrice = gasPrice
-	address := common.HexToAddress(contractAddress)
-	err = etherUtils.IsValidAddress(address)
+	opts := utils.GetTxOpts(ctx, key, gasLimitForDeposit, gasPrice)
+	opts.Value = value
+
+	tx, err := instance.Deposit(opts)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	instance, err := store.NewStore(address, client)
-	if err != nil {
-		return "", err
-	}
-
-	tx, err := instance.Deposit(auth)
-	if err != nil {
-		return "", err
-	}
-
-	return tx.Hash().String(), nil
+	return tx, nil
 }

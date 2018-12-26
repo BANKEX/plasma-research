@@ -2,11 +2,17 @@ package utils
 
 import (
 	"bytes"
+	"context"
+	"crypto/ecdsa"
 	"encoding/gob"
 	"encoding/hex"
+	"math/big"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/gin-gonic/contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 // StructureToBytes allows to convert structure into bytes array
@@ -87,4 +93,22 @@ func Keccak256(data []byte) []byte {
 
 func Keccak160(data []byte) []byte {
 	return crypto.Keccak256(data)[12:32]
+}
+
+// GetTxOpts - support function for all keyed ethereum interaction
+func GetTxOpts(ctx context.Context, key *ecdsa.PrivateKey, gasLimit uint64, gasPrice *big.Int) *bind.TransactOpts {
+	opts := bind.NewKeyedTransactor(key)
+	opts.Context = ctx
+	opts.GasLimit = gasLimit
+	opts.GasPrice = gasPrice
+
+	return opts
+}
+
+func NewGinServer() *gin.Engine {
+	r := gin.New()
+	r.Use(gin.Recovery())
+	r.Use(cors.Default())
+	gin.SetMode(gin.ReleaseMode)
+	return r
 }

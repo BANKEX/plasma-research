@@ -1,7 +1,10 @@
 package verifier
 
 import (
+	"fmt"
+
 	"github.com/caarlos0/env"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 type Config struct {
@@ -20,5 +23,10 @@ func NewConfig() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if !common.IsHexAddress(cfg.PlasmaContractAddress) {
+		return nil, fmt.Errorf("given contract address %s is invalid", cfg.PlasmaContractAddress)
+	}
+
 	return cfg, nil
 }
