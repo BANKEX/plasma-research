@@ -67,19 +67,24 @@ func (v *Verifier) Serve(ctx context.Context) error {
 
 func (v *Verifier) CLIToolStart() {
 	log.Println("------------Plasma Verifier----------")
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println("Failed to create interactive console: ", r)
-			fmt.Println("Running in non-interactive mode")
-		}
-	}()
-	p := prompt.New(
-		v.CLIToolExecutor,
-		completer.Completer,
-		prompt.OptionPrefix("--> "),
-		prompt.OptionInputTextColor(prompt.Yellow),
-	)
-	p.Run()
+
+	if len(os.Args) > 1 {
+		v.CLIToolExecutor(strings.Join(os.Args[1:], " "))
+	} else {
+		defer func() {
+			if r := recover(); r != nil {
+				fmt.Println("Failed to create interactive console: ", r)
+				fmt.Println("Running in non-interactive mode")
+			}
+		}()
+		p := prompt.New(
+			v.CLIToolExecutor,
+			completer.Completer,
+			prompt.OptionPrefix("--> "),
+			prompt.OptionInputTextColor(prompt.Yellow),
+		)
+		p.Run()
+	}
 }
 
 func (v *Verifier) CLIToolExecutor(userText string) {
