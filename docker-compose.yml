@@ -1,12 +1,30 @@
 version: "3"
 services:
   ganache:
-    image: trufflesuite/ganache-cli:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.blockchain
     ports:
       - "8545:8545"
   operator:
-    image: erage/plasma_operator
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.operator
     ports:
       - "3001:3001"
     environment:
       geth_host: http://ganache:8545
+    restart: on-failure
+    depends_on:
+      - ganache
+  verifier:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.verifier
+    ports:
+    - "8080:8080"
+    environment:
+      geth_host: http://ganache:8545
+    restart: on-failure
+    depends_on:
+      - operator

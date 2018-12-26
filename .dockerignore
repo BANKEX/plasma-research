@@ -6,3 +6,5 @@
 
 docs
 target
+/src/contracts/node_modules
+build

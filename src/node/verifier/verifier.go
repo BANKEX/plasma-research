@@ -46,7 +46,7 @@ func NewVerifier(cfg *Config) (*Verifier, error) {
 		return nil, err
 	}
 
-	key, err := crypto.HexToECDSA(cfg.VerifierPrivateKey)
+	key, err := crypto.HexToECDSA(cfg.VerifierPrivateKey[2:])
 	if err != nil {
 		return nil, err
 	}
