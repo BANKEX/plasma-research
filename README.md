@@ -1,4 +1,4 @@
-# plasma-research [![Build Status](https://travis-ci.org/BANKEX/plasma-research.svg?branch=master)](https://travis-ci.org/BANKEX/plasma-research) [![Go Report Card](https://goreportcard.com/badge/github.com/BANKEX/plasma-research)]
+# plasma-research [![Build Status](https://travis-ci.org/BANKEX/plasma-research.svg?branch=master)](https://travis-ci.org/BANKEX/plasma-research) [![Go Report Card](https://goreportcard.com/badge/github.com/BANKEX/plasma-research)](https://goreportcard.com/report/github.com/BANKEX/plasma-research)
 That repo contains docs and code snippets related to BANKEX Plasma implementation.
 At the moment we focused on implementation of plasma cashflow model improved by zk-S[NT]ARK exclusion proofs for history compression
 
