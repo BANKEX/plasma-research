@@ -4,10 +4,10 @@ FROM node:latest
 
 RUN apt-get update && apt-get install -y netcat
 
-ADD ./src/contracts /
-
+WORKDIR /app/
+ADD ./src/contracts/package.json ./src/contracts/package-lock.json ./src/contracts/Makefile /app/
 RUN make node_modules
-
+ADD ./src/contracts /app/
 
 EXPOSE 8545
 
