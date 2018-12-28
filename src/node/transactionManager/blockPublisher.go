@@ -1,12 +1,13 @@
 package transactionManager
 
 import (
-	"github.com/BANKEX/plasma-research/src/node/config"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"log"
 	"time"
 
 	"github.com/BANKEX/plasma-research/src/node/blockchain"
+	"github.com/BANKEX/plasma-research/src/node/config"
+
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 const (
