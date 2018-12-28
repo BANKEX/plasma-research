@@ -23,4 +23,3 @@ To implement an exchange operation, we need a single transaction signed by both 
 All the research we do, we going to document in the form of Yellow Paper.
 At the moment we have following separate docs that cover different parts of our application:
 - [Architecture overview](https://github.com/BANKEX/plasma-research/blob/master/docs/architecture.md)
-- [Block structure](https://github.com/BANKEX/plasma-research/blob/master/docs/block-structure.md)
