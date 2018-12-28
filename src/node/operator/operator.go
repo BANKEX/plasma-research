@@ -26,9 +26,12 @@ type Operator struct {
 
 func NewOperator(cfg *Config) (*Operator, error) {
 	manager := transactionManager.NewTransactionManager()
-	publisher := transactionManager.NewBlockPublisher(manager)
+	publisher, err := transactionManager.NewBlockPublisher(manager)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	eventMonitor, err := transactionManager.NewEventMonitor(manager)
+	eventMonitor, err := transactionManager.NewEventMonitor(manager, publisher)
 	if err != nil {
 		log.Fatal(err)
 	}
