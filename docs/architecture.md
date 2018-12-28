@@ -1,66 +1,266 @@
-# Open Plasma Architecture
+# Plasma Cashflow data model
 
-## Description
-Our plasma implementation target to be fast enough to provide speed and bandwidth applicable for the NFC payments, transactions from IoT devices and mid-frequency trading on decentralized exchanges.
-
-Another goal is to provide support of multi assets features in plasma. It means we are going to embed such a notion as the asset Id into the low-level transaction objects. 
-
-Below we are going to describe technical decisions and trade-offs that we take in our Plasma Implementation.
-
-IMPORTANT
-- TODO: describe process of creation different type of assets
-- TODO: describe rules and process of exchange different type of assets
- 
-
-## Plasma owner application
-Plasma owner application, i.e., block producer, is the core part of Plasma.
-It receives signed transactions from plasma clients and builds blocks contains non-controversial transactions with the high speed.
-Headers of that blocks are published on the smart contract with a certain frequency that is lower than a frequency of block producing in plasma.
-- TODO: Some notions or specifications of block creations frequency in Plasma
- 
-Headers of the block include the root hash of Merkle tree that has the hash of transaction objects in the leaves.
-- TODO: describe block header structure in details
-Our implementation of block producer apps has written in Go and available in open source
-The main bottle-neck that we meet is a database that should maintain an enormous amount of UTXO object and perform high-speed read-write operations and be fault tolerant at the same time.
-We were able to resolve that issue by using multi-instance deployment of Foundation DB. 
-Foundation DB is high-performance key-value storage that has almost linear performances scaling (linear to the amount of Foundation DB deployments)
-- TODO: Describe the architecture of app the app - Foundation DB nodes, go app architecture - workers
-- TODO: Design and add the reference to the separate page that should contain REST or GraphQL API of worker app
+## Amounts, multipliers, differences from Prime and more
 
 
-### Block structure
-In our implementation Block is JSON object that includes transactions encoded on [RLP](https://github.com/ethereum/wiki/wiki/RLP) format
-We use RLP because it supported in the ethereum smart contract.
-The detailed structure of the block is provided [here](https://github.com/BANKEX/plasma-research/blob/master/docs/block-structure.md)
+We use 250bit hashes (lesser bits of $Z_p$ numbers) and Pedersen hash function and 128bit for values.
 
-## Plasma client application
-The client-side app is an integral part of Plasma Protocol it entrusted with functions of blocks verification that published by plasma owner.
-In case of violations like double spend, plasma client can launch exit game procedure via triggering method on the smart contract.
+Transaction hash algorithm and structure is simpliferd due zkSNARK optimization.
 
-- TODO: describe checks that verifier do, or put a reference to the standard verification algorithms that we had implemented
-- TODO: describe the behavior of the plasma client if blocks are no published at all (no updates on smart contract)
-- TODO: describe the behavior of the plasma client if blocks header are published on the smart contact but block itself no published in the plasma network
-- TODO: describe withdraw and deposit from client-side point of view
-- TODO: mention that the balance of the user is the total amount of UTXOx
-- TODO: mention that is cheaper to do withdraw after merging serval UTXOs
+All signatures are made on baby jubjub curve with pedersen hashes. So, we need to map baby jubjub addresses to ethereum addresses.
 
-Besides primary functionality in further versions of plasma, we are going to add fast withdraw feature to plasma.
-- TODO: Describe the implementation of fast withdraw
+Address is base58 encoded uint256 number
 
-## Ethereum Smart Contract
-The smart contract is key part of that links Plasma side-chain and Ethereum main-net.
-It guarantees that plasma operator can't steal funds of plasma participants and any of the participants can send withdraw the request at any time
 
-TODO: Полная спецификация на все методы и структуры данных смарт контракта.
+## Solidity
 
-## Appendixes
+
+### Merkle trees and proofs
+
+### General data types
+
+We use this types as strucures or RLP structures and compute hash of them as is (without merkelization or something like this).
+#### TXInput
+
+Here is input to a transaction. You may consider it as pointer to any output in the blockchain. Note: amount may be lesser than the output. It is valid, if one output has many inputs with different parts of the segment.
+
+```solidity
+struct TXInput
+{
+    bool isNull,
+    uint256 owner, 
+    uint64 blockIndex, 
+    uint32 txIndex,
+    uint256 txContentHash,
+    uint8 outputIndex, 
+    Segment amount
+}
+```
+#### TXOutput
+
+You may consider it as owned segment.
+
+```solidity
+struct TXOutput
+{
+    bool IsNull,
+    uint256 owner, 
+    Segment amount
+}
+```
+
+#### Segment
+
+Segment with begin and end.
+
+```solidity
+struct Segment
+{
+    uint128 begin,
+    uint128 end
+}
+```
+
+#### Signature
+
+```solidity
+struct Signature {
+    bool isNull,
+    uint8 v,
+    uint256 r,
+    uint256 s
+}
+```
+
+
+
+### Complex data types
+
+
+
+
+
+#### Transaction
+
+Transaction may be passed into functions as following object:
+
+``` solidity
+struct Transaction {
+    Input[2] inputs,
+    Output[2] outputs,
+    uint64 maxBlockIndex,
+    Signature[2] signatures
+}
+```
+
+Some of inputs, outputs or signatures may be NULL. 
+
+##### Transaction hash computation
+
+Arguments are limited by 2736030358979909402780800718157159386076813972158567259200215660948447373041 (it is about 250 bits)
+
+```PedersenHash(x1,x2,x3) = PedersenHash(PedersenHash(x1, x2), x3)```
+
+We linearize TransactionContent and compute the hash.
+It is enough to store only TransactionContentHashes at leaves of SumMerkleTree, because signatures are cryptographically bounded to inputs of the transactions. If the operator do not provide signatures, blocks are considered to be withheld.
+
+
+
+
+
+### Plasma state
+
+#### Plasma chain
+
+
+```solidity
+hashmap(uint64 => uint240) sumMerkleRoot;
+```
+
+First 32 bits are used for transactional blocks. Second 32 bits are used for deposit or withdrawal blocks (mined on the contract).
+
+It is enough for 8000 years of plasma lifetime (if we mine transactional block for each 5 minutes) and 9 years to exhaust exitability if the operator stops blocks producing.
+
+Deposit blocks creates assets from nothing and withdrawal blocks burn assets.
+
+We do not publish slice here, because it must corresponds total plasma space.
+
+
+
+#### Exit state
+
+```solidity
+hashmap(uint256 => bool) exitStateHashmap;
+```
+
+The list of unchallanged and not finalized exits
+
+
+#### Deposit state
+
+```solidity
+OrderedLinkedList deposit;
+```
+
+Here is list of deposited segments.
+
+
+
+### General methods
+
+```solidity
+function deposit(OrderedLinkedListItem depositSlot) external payable returns(bool);
+```
+
+Transaction may be banned and transaction may be increased priority for txContentHash 
+
+### Priority increasing game
+
+#### PriorityState
+``` Solidity
+struct PriorityState {
+    TransactionContent txContent, //unsigned transaction
+    uint256 txContentHash, 
+    Signature s, // at least one signature
+    uint256 timestamp
+}
+
+//storage
+
+mapping (uint256 => bool) priorityChallenges // mapping keccak256(priorityState) => bool of all active priority challenges
+
+mapping (uint256 => uint64) txFix // priority fix for transacion. 2^64-1 for banned transactions, zero is default value
+
+```
+
+
+
+```Solidity
+function priorityBegin(
+    TransactionContent txContent,
+    uint256txContentHash,
+    Signature s
+)
+
+struct priorityChallengeHash(
+    PriorityState state,
+    Groth16Proof snarkProof // proof that hash is invalid
+)
+
+// spend of one input of state.txContent
+// txContentHash, txBlockIndex is information abot spending tx
+struct priorityChallengeSpend(
+    PriorityState state,
+    uint256[3] txContentHash, //ContentHash of 2 inputs and spending tx
+    uint64[3] txBlockIndex, // BlockIndex of 2 inputs and spending tx
+    Groth16Proof snarkProof // proof of inclusion tx into , spending part of state.point
+) external returns (bool);
+
+
+// accept signature differs from state.s
+function prioritySignatureCollect(
+    PriorityState state,
+    Signature s
+)
+
+```
 
 ### Exit game
 
-We suppose to use standard [More Viable Plasma](https://ethresear.ch/t/more-viable-plasma/2160) exit game with some additions.
-As we are going to support atomic swaps with multiple transaction source owners, one of a participant may have not all signatures of the transaction. 
-So, we need to set up one more exit game branch with signatures collection.
+#### ExitState
 
-![exit game schema](https://raw.githubusercontent.com/BANKEX/plasma-research/master/docs/assets/plasma_exit_game.svg?sanitize=true)
+Here is exit state. `TXInput` is not an input of any included transaction. You may consider it as pointer to any output or input of withdrawal transaction.
+
+Hashing algorithm is standard (keccak256 of blob). It is enough
+
+```
+struct ExitState {
+    TXInput point,
+    uint256 timestamp
+}
+```
+
+```Solidity
+function withdrawalBegin(
+    Input point 
+) external payable returns (bool);
+
+function withdrawalChallangeSpend(
+    ExitState state, 
+    uint256[3] txContentHash,
+    uint64[3] txBlockIndex, 
+    Groth16Proof snarkProof // proof of inclusion tx into , spending part of state.point
+) external returns (bool);
+
+function withdrawalChallangeExistance(
+    ExitState state,
+    Groth16Proof snarkProof // proof of exclusion state.point from state.point.blockIndex
+) external returns (bool);
+
+function withdrawalChallangeHash(
+    ExitState state,
+    Groth16Proof snarkProof // proof that txContextHash is wrong
+) external returns (bool);
+
+function withdrawalChallangeConcurrent(
+
+) returns (bool);
 
 
+// finalize. If transaction is banned by txContentHash, reject exit procedure
+function withdrawalEnd(ExitState state)
+```
+
+
+## SNARKs
+
+### zkSNARK proof
+
+```solidity
+struct Groth16Proof
+{
+    uint256[2] A;
+    uint256[2][2] B;
+    uint256[2] C;
+}
+```
