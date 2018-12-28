@@ -13,6 +13,14 @@ env:
   - BUILD_TYPE=Tests
   - BUILD_TYPE=Contracts
 
+cache:
+  directories:
+    - node_modules
+    - $HOME/.npm
+    - $HOME/gopath/pkg/mod
+#    - $HOME/.cache/go-build
+
+
 script:
 - |
   case "${BUILD_TYPE}" in

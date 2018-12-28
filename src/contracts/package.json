@@ -15,7 +15,7 @@
     "eslint-plugin-standard": "^4.0.0",
     "ethereumjs-util": "^6.0.0",
     "ethjs-abi": "^0.2.1",
-    "ganache-cli": "^6.2.3",
+    "ganache-cli": "^6.2.5",
     "openzeppelin-solidity": "2.0.0",
     "solidity-coverage": "^0.5.11",
     "solidity-rlp": "^1.1.0",

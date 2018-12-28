@@ -17,17 +17,13 @@ func argumentsCompleter(args []string) []prompt.Suggest {
 	}
 	first := args[0]
 	switch first {
-	case "plasma":
-		if len(args) == 2 {
-			return prompt.FilterHasPrefix(options.PlasmaOptions, args[1], true)
-		}
 	case "eth":
 		if len(args) == 2 {
 			return prompt.FilterHasPrefix(options.EthOptions, args[1], true)
 		}
-	case "main":
+	case "plasma":
 		if len(args) == 2 {
-			return prompt.FilterHasPrefix(options.MainOptions, args[1], true)
+			return prompt.FilterHasPrefix(options.PlasmaOptions, args[1], true)
 		}
 	}
 	return []prompt.Suggest{}
