@@ -24,7 +24,7 @@ start_ganache() {
     --account="0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501209,1000000000000000000000000"
   )
 
-  node_modules/.bin/ganache-cli --gasLimit 0xfffffffffff --host 0.0.0.0 --port "$ganache_port" "${accounts[@]}" 2>&1 >> /var/log/ganache.log &
+  node_modules/.bin/ganache-cli --db="./data/" --gasLimit 0xfffffffffff --host 0.0.0.0 --port "$ganache_port" "${accounts[@]}" &
 
   ganache_pid=$!
 }
@@ -35,7 +35,5 @@ else
   echo "Starting our own ganache instance"
   start_ganache
 fi
-
-node_modules/.bin/truffle migrate --network=ganache "$@"
 
 wait ${ganache_pid}
