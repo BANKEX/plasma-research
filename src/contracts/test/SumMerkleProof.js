@@ -4,20 +4,15 @@ const { keccak256, bufferToHex } = require('ethereumjs-util');
 const EVMRevert = require('./helpers/EVMRevert');
 const EVMThrow = require('./helpers/EVMThrow');
 
+var assert = require('assert');
+
 require('chai')
   .use(require('chai-as-promised'))
   .use(require('chai-bignumber')(web3.BigNumber))
   .should();
 
 const SumMerkleProofWrapper = artifacts.require('SumMerkleProofWrapper');
-
-const to256bits = function (blocks) {
-  return blocks.map(b => (new BigNumber(b)).toString(16, 64)).concat(['']).reduce((a, b) => a + b);
-};
-
-const to160bits = function (blocks) {
-  return blocks.map(b => (new BigNumber(b)).toString(16, 40)).concat(['']).reduce((a, b) => a + b);
-};
+const SumMerkleProof = artifacts.require('SumMerkleProof');
 
 const be32 = function (x) {
   return x.toBuffer('be', 32).slice(-4);
@@ -88,11 +83,49 @@ const genRandProof = function (depth) {
   };
 };
 
-contract('SumMerkleTree', function ([_, wallet1, wallet2, wallet3, wallet4, wallet5]) {
-  it('should return true', async function () {
-    // const { index, begin, end, item, proof, curItem, curLength } = genRandProof(10);
-    // (await sumMerkleProof.functions.sumMerkleProofTest(
-    //   index, begin, end, item, proof, curItem, curLength
-    // ).call()).should.be.true;
+contract('SumMerkleProofWrapper', function ([_, wallet1, wallet2, wallet3, wallet4, wallet5]) {
+
+  let wrapper;
+
+  beforeEach(async function () {
+    wrapper = await SumMerkleProofWrapper.new();
+  });
+
+  it('should verify valid proof', async function () {
+    // That proof was generated in Go code
+    const root = '0x37c7f5efafd7761d94ec936360e27fbeae4dd877';
+    const rootLength = '16777215';
+    const index = 1;
+    const begin = 1;
+    const end = 2;
+    const item = '0xfa61c529e022344b84ca026c1fb1214e8bac9afa';
+    const proofSteps = '0x' +
+      '00000001dcc703c0e500b653ca82273b7bfad8045d85a470' +
+      '00000003d146cb615b8dac6a78641afd24d8c3296cf43a07' +
+      '00fffffadcc703c0e500b653ca82273b7bfad8045d85a470';
+
+    const result = await wrapper.sumMerkleProofTest(index, begin, end, item, proofSteps, root, rootLength);
+    assert.strictEqual(result, true);
+    console.log(result);
+  });
+
+  it('shouldn\'t verify invalid proof', async function () {
+    // That proof was generated in Go code
+    const root = '0x37c7f5efafd7761d94ec936360e27fbeae4dd877';
+    const rootLength = '16777215';
+    const index = 1;
+    const begin = 1;
+    const end = 2;
+    const item = '0xfa61c529e022344b84ca026c1fb1214e8bac9afa';
+
+    // Make proof wrong by replacing 4 bytes with 0xDEADBEEF
+    const proofSteps = '0x' +
+      '00000001dcc703c0e500b653ca82273b7bfad804DEADBEEF' +
+      '00000003d146cb615b8dac6a78641afd24d8c329DEADBEEF' +
+      '00fffffadcc703c0e500b653ca82273b7bfad804DEADBEEF';
+
+    const result = await wrapper.sumMerkleProofTest(index, begin, end, item, proofSteps, root, rootLength);
+    assert.strictEqual(result, false);
+    console.log(result);
   });
 });
