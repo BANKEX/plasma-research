@@ -26,7 +26,7 @@ var WeiPerCoin uint = 1e11
 type UnsignedBlockHeader struct {
 	BlockNumber    uint32         `json:"blockNumber"`
 	PreviousHash   Uint256        `json:"previousHash"`
-	MerkleRoot     SumMerkleNode  `json:"merkleRoot"`
+	MerkleRoot     SumTreeRoot    `json:"merkleRoot"`
 	RSAAccumulator Uint2048       `json:"rsaAccumulator"`
 	hash           Uint256        // private variable because it should not be serialized
 	merkleTree     *SumMerkleTree // private variable because it should not be serialized
@@ -117,12 +117,13 @@ func (b *Block) Sign(key []byte) error {
 
 // CalculateMerkleRoot calculates merkle root for transactions in the block.
 func (b *Block) CalculateMerkleRoot() error {
-	tree, err := NewSumMerkleTree(b.Transactions)
+	leaves, err := PrepareLeaves(b.Transactions)
 	if err != nil {
 		return err
 	}
+	tree := NewSumMerkleTree(leaves)
 	b.merkleTree = tree
-	b.MerkleRoot = b.merkleTree.NodeList[0] // .GetRoot()
+	b.MerkleRoot = b.merkleTree.GetRoot()
 	return nil
 }
 

@@ -1,40 +1,13 @@
 package blockchain
 
 import (
-	"crypto/ecdsa"
-	"crypto/elliptic"
 	"encoding/json"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
-
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 )
 
-func Sign(hash []byte, prv *ecdsa.PrivateKey) (sig []byte, err error) {
-	if len(hash) != 32 {
-		return nil, fmt.Errorf("hash is required to be exactly 32 bytes (%d)", len(hash))
-	}
-
-	sig, err = secp256k1.Sign(hash, common.LeftPadBytes(prv.D.Bytes(), prv.Params().BitSize/8))
-	return
-}
-
-func Ecrecover(hash, sig []byte) ([]byte, error) {
-	return secp256k1.RecoverPubkey(hash, sig)
-}
-
-func ToECDSAPub(pub []byte) *ecdsa.PublicKey {
-	if len(pub) == 0 {
-		return nil
-	}
-	x, y := elliptic.Unmarshal(secp256k1.S256(), pub)
-	return &ecdsa.PublicKey{Curve: secp256k1.S256(), X: x, Y: y}
-}
-
 func TestSMT(t *testing.T) {
-	// res:=[]Transaction{Transaction{UnsignedTransaction{[]Input{}, []Output{}, Metadata}, []Signature{}}}
 	data := []byte(`
 	[
 		{
@@ -64,7 +37,6 @@ func TestSMT(t *testing.T) {
 				"maxBlockNumber":100
 			}
 		},
-
 		{
 			"inputs": [
 				{
@@ -97,28 +69,26 @@ func TestSMT(t *testing.T) {
 
 	q := make([]Transaction, 0)
 	json.Unmarshal(data, &q)
-	var r *SumMerkleTree
-	r, _ = NewSumMerkleTree(q)
-	_ = r.GetLeaves()
+	var sumTree *SumMerkleTree
 
-	// fmt.Println(r.MerkleProof(5))
+	txs, err := PrepareLeaves(q)
+	if err != nil {
+		assert.Error(t, err)
+	}
 
-}
+	sumTree = NewSumMerkleTree(txs)
 
-func TestSig(t *testing.T) {
-	message := "hello"
-	hashRaw := crypto.Keccak256([]byte(message))
-	privateKey, _ := crypto.HexToECDSA("69b39aa2fb86c7172d77d4b87b459ed7643c1e4b052536561e08d7d25592b373")
+	root := sumTree.GetRoot()
+	fmt.Printf("rootHash = %x\n", root.Hash)
+	fmt.Printf("rootLength = %x\n", root.Length)
 
-	publicKey := privateKey.Public()
-	publicKeyECDSA, _ := publicKey.(*ecdsa.PublicKey)
+	leaf := sumTree.Leafs[1];
+	fmt.Printf("Begin = %d\n", leaf.Begin)
+	fmt.Printf("End = %d\n", leaf.End)
+	proof := sumTree.GetProof(1)
 
-	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
-	fmt.Println(fromAddress)
-	_ = fromAddress
-	sig, _ := Sign(hashRaw, privateKey)
-	rec, _ := Ecrecover(hashRaw, sig)
-	pubKey := ToECDSAPub(rec)
-	recoveredAddr := crypto.PubkeyToAddress(*pubKey)
-	fmt.Println(recoveredAddr)
+	fmt.Printf("Item=%x\n", proof.Item)
+	for _, item := range proof.Data {
+		fmt.Printf("%x%x\n", item.Length, item.Hash)
+	}
 }
