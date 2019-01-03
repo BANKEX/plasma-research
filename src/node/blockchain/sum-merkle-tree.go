@@ -2,10 +2,11 @@ package blockchain
 
 import (
 	"fmt"
+	"sort"
+
 	. "github.com/BANKEX/plasma-research/src/node/alias"
 	. "github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
 	. "github.com/BANKEX/plasma-research/src/node/utils"
-	"sort"
 )
 
 type SumTreeRoot struct {
@@ -243,28 +244,16 @@ func FillGapsWithSlices(src []Slice) []Slice {
 
 	var result []Slice
 
+	if src[0].Begin != 0 {
+		emptySlice := Slice{Begin: 0, End: src[0].Begin}
+		result = append(result, emptySlice)
+	}
+
 	for i := 0; i <= len(src); i++ {
 
-		// TODO: Should be out of the cycle
-		// Add initial zero slice if needed
-		if i == 0 && src[i].Begin != 0 {
-			emptySlice := Slice{Begin: 0, End: src[i].Begin}
-			result = append(result, emptySlice)
-		}
-
-		// TODO: Should be out of the cycle
-		// Handle last slice and add final empty slice if needed
 		if i == len(src)-1 {
 			result = append(result, src[i])
-
-			if src[i].End != plasmaLength {
-				emptySlice := Slice{
-					Begin: src[i].End,
-					End:   plasmaLength,
-				}
-				result = append(result, emptySlice)
-			}
-			return result // !!! Attention, The actual end of the function is Here !!!
+			break
 		}
 
 		el := src[i]
@@ -278,6 +267,14 @@ func FillGapsWithSlices(src []Slice) []Slice {
 			}
 			result = append(result, emptySlice)
 		}
+	}
+
+	if result[len(result)-1].End != plasmaLength {
+		emptySlice := Slice{
+			Begin: src[len(src)-1].End,
+			End:   plasmaLength,
+		}
+		result = append(result, emptySlice)
 	}
 
 	return result
