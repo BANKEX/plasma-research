@@ -241,13 +241,17 @@ const plasmaLength = 0x00FFFFFF
 // 1) It fill the gaps between segments with empty slices
 // TODO: NOTE: It doesn't merge a slices even if they are neighbors - as I remember such improvement can speedup plasma
 func FillGapsWithSlices(src []Slice) []Slice {
-
 	var result []Slice
 
 	if src[0].Begin != 0 {
 		emptySlice := Slice{Begin: 0, End: src[0].Begin}
 		result = append(result, emptySlice)
 	}
+
+	// if src[0].Begin == 0 && src[0].End != src[1].Begin{
+	// 	emptySlice := Slice{Begin: src[0].End, End: src[1].Begin}
+	// 	result = append(result, emptySlice)
+	// }
 
 	for i := 0; i <= len(src); i++ {
 
@@ -260,7 +264,7 @@ func FillGapsWithSlices(src []Slice) []Slice {
 		nextEl := src[i+1]
 
 		result = append(result, el)
-		if nextEl.Begin-el.End > 1 {
+		if nextEl.Begin-el.End >= 1 {
 			emptySlice := Slice{
 				Begin: el.End,
 				End:   nextEl.Begin,

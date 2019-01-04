@@ -136,7 +136,7 @@ func TestMiddleElement(t *testing.T) {
 	fmt.Println("TestMiddleElement:")
 	fmt.Println(res)
 
-	if res[1].Begin != 1 || res[1].End != 6 {
+	if res[1].Begin != 1 || res[1].End != 2 {
 		t.Error(res[1])
 		fmt.Println("True: [{0 1} {1 2} {2 4} {4 16777215}]")
 	}
