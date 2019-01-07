@@ -135,5 +135,5 @@ func TestFillGapsOneSlice(t *testing.T) {
 		fmt.Sprint(FillGaps(threeSlices)))
 
 	// Return just one slice is source collection is empty
-	// assert.Equal(t, "[{0 16777215}]", fmt.Sprint(FillGaps([]Slice{})))
+	assert.Equal(t, "[{0 16777215}]", fmt.Sprint(FillGaps([]Slice{})))
 }
