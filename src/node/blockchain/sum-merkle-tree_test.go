@@ -96,111 +96,44 @@ func TestSMT(t *testing.T) {
 	fmt.Println()
 }
 
-func TestFirstElement(t *testing.T) {
-	slice := []Slice{Slice{Begin: 1, End: 2}}
-	res := FillGapsWithSlices(slice)
+func TestFillGapsOneSlice(t *testing.T) {
 
-	// [{0 1} {1 2} {2 16777215]}]
-	fmt.Println("TestFirstElement:")
-	fmt.Println(res)
-
-	if res[0].Begin != 0 || res[0].End != 1 {
-		t.Error(res[0])
-		fmt.Println("True: [{0 1} {1 2} {2 16777215]}]")
+	onSingleElement := func(b uint32, e uint32) string {
+		slices := []Slice{{Begin: b, End: e}}
+		return fmt.Sprint(FillGaps(slices))
 	}
 
-	fmt.Println()
-}
+	// Slice at the beginning
+	assert.Equal(t, "[{0 1} {1 16777215}]", onSingleElement(0, 1))
+	// Slice in the middle
+	assert.Equal(t, "[{0 1000} {1000 2000} {2000 16777215}]", onSingleElement(1000, 2000))
+	// Slice at the end
+	assert.Equal(t, "[{0 16777200} {16777200 16777215}]", onSingleElement(16777200, 16777215))
 
-func TestLastElement(t *testing.T) {
-	slice := []Slice{Slice{Begin: 2, End: 4}}
-	res := FillGapsWithSlices(slice)
-
-	// [{0 2} {2 4} {4 16777215}]
-	fmt.Println("TestLastElement:")
-	fmt.Println(res)
-
-	if res[len(res)-1].Begin != 4 || res[len(res)-1].End != plasmaLength {
-		fmt.Println(res[len(res)-1])
-		t.Error(res[len(res)-1])
-		fmt.Println("True: [{0 2} {2 4} {4 16777215}]")
-	}
-	fmt.Println()
-}
-
-func TestMiddleElement(t *testing.T) {
-	slice := []Slice{Slice{Begin: 0, End: 1}, Slice{Begin: 2, End: 4}}
-	res := FillGapsWithSlices(slice)
-
-	// [{0 1} {1 2} {2 4} {4 16777215}]
-	fmt.Println("TestMiddleElement:")
-	fmt.Println(res)
-
-	if res[1].Begin != 1 || res[1].End != 2 {
-		t.Error(res[1])
-		fmt.Println("True: [{0 1} {1 2} {2 4} {4 16777215}]")
-	}
-	fmt.Println()
-}
-
-func TestFirstAndLastElement(t *testing.T) {
-	slice := []Slice{Slice{Begin: 8, End: 10}, Slice{Begin: 15, End: 20}}
-	res := FillGapsWithSlices(slice)
-
-	// [{0 8} {8 10} {10 15} {15 20} {20 16777215}]
-
-	fmt.Println("TestFirstAndLastElement:")
-	fmt.Println(res)
-
-	if res[0].Begin != 0 || res[0].End != 8 {
-		t.Error(res[0])
-		fmt.Println("True: [{0 8} {8 10} {10 15} {15 20} {20 16777215}]")
+	///
+	onDoubleElement := func(b1 uint32, e1 uint32, b2 uint32, e2 uint32) string {
+		slices := []Slice{
+			{Begin: b1, End: e1},
+			{Begin: b2, End: e2},
+		}
+		return fmt.Sprint(FillGaps(slices))
 	}
 
-	if res[len(res)-1].Begin != 20 || res[len(res)-1].End != plasmaLength {
-		fmt.Println(res[len(res)-1])
-		fmt.Println("True: [{0 8} {8 10} {10 15} {15 20} {20 16777215}]")
+	// Slices at the beginning and at the end
+	assert.Equal(t, "[{0 10} {10 16777000} {16777000 16777215}]", onDoubleElement(0, 10, 16777000, 16777215))
+
+	// Two Slices in the middle
+	assert.Equal(t, "[{0 100} {100 200} {200 500} {500 600} {600 16777215}]", onDoubleElement(100, 200, 500, 600))
+
+	// Fill gaps between three slices
+	threeSlices := []Slice{
+		{0, 10},
+		{200, 500},
+		{3000, 16777215},
 	}
-	fmt.Println()
-}
+	assert.Equal(t, "[{0 10} {10 200} {200 500} {500 3000} {3000 16777215}]",
+		fmt.Sprint(FillGaps(threeSlices)))
 
-func TestAllElements(t *testing.T) {
-	slice := []Slice{Slice{Begin: 2, End: 3}, Slice{Begin: 100, End: 300}}
-	res := FillGapsWithSlices(slice)
-
-	// [{0 2} {2 3} {3 100} {100 300} {300 16777215}]
-
-	fmt.Println("TestAllElements:")
-	fmt.Println(res)
-
-	// 1
-	if res[0].Begin != 0 || res[0].End != 2 {
-		t.Error(res[0])
-		fmt.Println("True: [{0 2} {2 3} {3 100} {100 300} {300 16777215}]")
-	}
-
-	// 2
-	if res[1].Begin != 2 || res[1].End != 3 {
-		t.Error(res[1])
-		fmt.Println("True: [{0 2} {2 3} {3 100} {100 300} {300 16777215}]")
-	}
-
-	// 3
-	if res[2].Begin != 3 || res[2].End != 100 {
-		t.Error(res[2])
-		fmt.Println("True: [{0 2} {2 3} {3 100} {100 300} {300 16777215}]")
-	}
-
-	// 4
-	if res[3].Begin != 100 || res[3].End != 300 {
-		t.Error(res[3])
-		fmt.Println("True: [{0 2} {2 3} {3 100} {100 300} {300 16777215}]")
-	}
-
-	// 5
-	if res[len(res)-1].Begin != 300 || res[len(res)-1].End != plasmaLength {
-		t.Error(res[len(res)-1])
-		fmt.Println("True: [{0 2} {2 3} {3 100} {100 300} {300 16777215}]")
-	}
-	fmt.Println()
+	// Return just one slice is source collection is empty
+	// assert.Equal(t, "[{0 16777215}]", fmt.Sprint(FillGaps([]Slice{})))
 }
