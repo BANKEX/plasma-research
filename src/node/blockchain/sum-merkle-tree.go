@@ -244,45 +244,28 @@ func FillGaps(src []Slice) []Slice {
 	// It doesn't merge a slices even if they are neighbors
 	// as I remember such improvement can speedup plasma
 
-	if len(src) == 0 {
-		return []Slice{{0, plasmaLength}}
-	}
-
 	var result []Slice
 
-	if src[0].Begin != 0 {
-		emptySlice := Slice{Begin: 0, End: src[0].Begin}
-		result = append(result, emptySlice)
-	}
+	pos := uint32(0)
+	for i := 0; i <= len(src)-1; i++ {
 
-	// if src[0].Begin == 0 && src[0].End != src[1].Begin{
-	// 	emptySlice := Slice{Begin: src[0].End, End: src[1].Begin}
-	// 	result = append(result, emptySlice)
-	// }
+		item := src[i]
 
-	for i := 0; i <= len(src); i++ {
-
-		if i == len(src)-1 {
-			result = append(result, src[i])
-			break
-		}
-
-		el := src[i]
-		nextEl := src[i+1]
-
-		result = append(result, el)
-		if nextEl.Begin-el.End >= 1 {
+		if pos < item.Begin {
 			emptySlice := Slice{
-				Begin: el.End,
-				End:   nextEl.Begin,
+				Begin: pos,
+				End:   item.Begin,
 			}
 			result = append(result, emptySlice)
 		}
+
+		result = append(result, item)
+		pos = item.End
 	}
 
-	if result[len(result)-1].End != plasmaLength {
+	if pos != plasmaLength {
 		emptySlice := Slice{
-			Begin: src[len(src)-1].End,
+			Begin: pos,
 			End:   plasmaLength,
 		}
 		result = append(result, emptySlice)
