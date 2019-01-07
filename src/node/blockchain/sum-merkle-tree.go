@@ -67,7 +67,7 @@ func PrepareLeaves(transactions []Transaction) ([]*SumTreeNode, error) {
 		}
 	}
 
-	slices = FillGapsWithSlices(slices)
+	slices = FillGaps(slices)
 
 	var leaves []*SumTreeNode
 	for _, slice := range slices {
@@ -233,14 +233,17 @@ func (tree *SumMerkleTree) GetRoot() SumTreeRoot {
 	}
 }
 
-// 2^24 - 1
-// 16777215
-const plasmaLength = 0x00FFFFFF
+// We use 24 bits to define plasma slices space
+// 2^24 - 1 = 0x00FFFFFF
+const plasmaLength = 16777215
 
-// Fill plasma range space with segments, src slices should be sorted
-// 1) It fill the gaps between segments with empty slices
-// TODO: NOTE: It doesn't merge a slices even if they are neighbors - as I remember such improvement can speedup plasma
-func FillGapsWithSlices(src []Slice) []Slice {
+// Fill plasma range space with Slices, src slices should be sorted first
+func FillGaps(src []Slice) []Slice {
+
+	// TODO: Slice Merge
+	// It doesn't merge a slices even if they are neighbors
+	// as I remember such improvement can speedup plasma
+
 	var result []Slice
 
 	if src[0].Begin != 0 {
