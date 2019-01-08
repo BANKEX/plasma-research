@@ -9,6 +9,32 @@ import (
 )
 
 func TestSMT(t *testing.T) {
+
+	type Data struct {
+		Info []struct {
+			Inputs []struct {
+				BlockNumber  int   `json:"blockNumber"`
+				TxNumber     int   `json:"txNumber"`
+				OutputNumber int   `json:"outputNumber"`
+				Owner        []int `json:"owner"`
+				Slice        struct {
+					Begin uint32 `json:"begin"`
+					End   uint32 `json:"end"`
+				}
+			}
+			Outputs []struct {
+				Owner []int `json:"owner"`
+				Slice []struct {
+					Begin uint32 `json:"begin"`
+					End   uint32 `json:"end"`
+				}
+			}
+			Metadata struct {
+				MaxBlockNumber int `json:"maxBlockNumber"`
+			}
+		}
+	}
+
 	data := []byte(`
 	[
 		{
