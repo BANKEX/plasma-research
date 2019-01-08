@@ -37,7 +37,7 @@ func TestSMT(t *testing.T) {
 		}
 	}
 
-	jsonFile, err := os.Open("../../contracts/test/info.json")
+	jsonFile, err := os.Open("../../contracts/test/conf.json")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -118,7 +118,7 @@ func TestSMT(t *testing.T) {
 
 	q := make([]Transaction, 0)
 	json.Unmarshal(data, &q)
-	fmt.Println(q)
+
 	var sumTree *SumMerkleTree
 
 	txs, err := PrepareLeaves(q)
