@@ -1,9 +1,7 @@
 const BigNumber = require('bn.js');
 const { keccak256, bufferToHex } = require('ethereumjs-util');
-
 const EVMRevert = require('./helpers/EVMRevert');
 const EVMThrow = require('./helpers/EVMThrow');
-
 var assert = require('assert');
 
 require('chai')
@@ -84,7 +82,6 @@ const genRandProof = function (depth) {
 };
 
 contract('SumMerkleProofWrapper', function ([_, wallet1, wallet2, wallet3, wallet4, wallet5]) {
-
   let wrapper;
 
   beforeEach(async function () {
@@ -128,9 +125,12 @@ contract('SumMerkleProofWrapper', function ([_, wallet1, wallet2, wallet3, walle
   });
 
   it('should verify valid proof represented as rlp bytes', async function () {
-      const sumMerkleRoot = '0x37c7f5efafd7761d94ec936360e27fbeae4dd877';
-      const rlpEncodedProof = "0xf86301c2010294fa61c529e022344b84ca026c1fb1214e8bac9afab84800000001dcc703c0e500b653ca82273b7bfad8045d85a47000000003d146cb615b8dac6a78641afd24d8c3296cf43a0700fffffadcc703c0e500b653ca82273b7bfad8045d85a470";
-      const result = await wrapper.sumMerkleProofFromBytesTest(sumMerkleRoot, rlpEncodedProof);
-      assert.strictEqual(result, true);
+    const sumMerkleRoot = '0x37c7f5efafd7761d94ec936360e27fbeae4dd877';
+    const rlpEncodedProof = '0xf86301c2010294fa61c529e022344b84ca026c1fb1214e8bac9afab84800000001dcc703c0e500b65' +
+      '3ca82273b7bfad8045d85a47000000003d146cb615b8dac6a78641afd24d8c3296cf43a0700fffffadcc703c0e500b653ca82273b' +
+      '7bfad8045d85a470';
+
+    const result = await wrapper.sumMerkleProofFromBytesTest(sumMerkleRoot, rlpEncodedProof);
+    assert.strictEqual(result, true);
   });
 });
