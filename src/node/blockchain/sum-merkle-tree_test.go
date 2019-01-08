@@ -98,20 +98,20 @@ func TestSMT(t *testing.T) {
 
 func TestFillGapsOneSlice(t *testing.T) {
 
-	onSingleElement := func(b uint32, e uint32) string {
+	oneSlice := func(b uint32, e uint32) string {
 		slices := []Slice{{Begin: b, End: e}}
 		return fmt.Sprint(FillGaps(slices))
 	}
 
 	// Slice at the beginning
-	assert.Equal(t, "[{0 1} {1 16777215}]", onSingleElement(0, 1))
+	assert.Equal(t, "[{0 1} {1 16777215}]", oneSlice(0, 1))
 	// Slice in the middle
-	assert.Equal(t, "[{0 1000} {1000 2000} {2000 16777215}]", onSingleElement(1000, 2000))
+	assert.Equal(t, "[{0 1000} {1000 2000} {2000 16777215}]", oneSlice(1000, 2000))
 	// Slice at the end
-	assert.Equal(t, "[{0 16777200} {16777200 16777215}]", onSingleElement(16777200, 16777215))
+	assert.Equal(t, "[{0 16777200} {16777200 16777215}]", oneSlice(16777200, 16777215))
 
 	///
-	onDoubleElement := func(b1 uint32, e1 uint32, b2 uint32, e2 uint32) string {
+	twoSlices := func(b1 uint32, e1 uint32, b2 uint32, e2 uint32) string {
 		slices := []Slice{
 			{Begin: b1, End: e1},
 			{Begin: b2, End: e2},
@@ -120,10 +120,10 @@ func TestFillGapsOneSlice(t *testing.T) {
 	}
 
 	// Slices at the beginning and at the end
-	assert.Equal(t, "[{0 10} {10 16777000} {16777000 16777215}]", onDoubleElement(0, 10, 16777000, 16777215))
+	assert.Equal(t, "[{0 10} {10 16777000} {16777000 16777215}]", twoSlices(0, 10, 16777000, 16777215))
 
 	// Two Slices in the middle
-	assert.Equal(t, "[{0 100} {100 200} {200 500} {500 600} {600 16777215}]", onDoubleElement(100, 200, 500, 600))
+	assert.Equal(t, "[{0 100} {100 200} {200 500} {500 600} {600 16777215}]", twoSlices(100, 200, 500, 600))
 
 	// Fill gaps between three slices
 	threeSlices := []Slice{
