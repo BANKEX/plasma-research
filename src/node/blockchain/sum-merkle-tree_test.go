@@ -113,8 +113,8 @@ func TestFillGapsOneSlice(t *testing.T) {
 	///
 	twoSlices := func(b1 uint32, e1 uint32, b2 uint32, e2 uint32) string {
 		slices := []Slice{
-			{Begin: b1, End: e1},
-			{Begin: b2, End: e2},
+			{b1, e1},
+			{b2, e2},
 		}
 		return fmt.Sprint(FillGaps(slices))
 	}
@@ -126,13 +126,16 @@ func TestFillGapsOneSlice(t *testing.T) {
 	assert.Equal(t, "[{0 100} {100 200} {200 500} {500 600} {600 16777215}]", twoSlices(100, 200, 500, 600))
 
 	// Fill gaps between three slices
-	threeSlices := []Slice{
-		{0, 10},
-		{200, 500},
-		{3000, 16777215},
+	threeSlices := func(b1 uint32, e1 uint32, b2 uint32, e2 uint32, b3 uint32, e3 uint32) string {
+		slices := []Slice{
+			{b1, e1},
+			{b2, e2},
+			{b3, e3},
+		}
+		return fmt.Sprint(FillGaps(slices))
 	}
-	assert.Equal(t, "[{0 10} {10 200} {200 500} {500 3000} {3000 16777215}]",
-		fmt.Sprint(FillGaps(threeSlices)))
+
+	assert.Equal(t, "[{0 10} {10 200} {200 500} {500 3000} {3000 16777215}]", threeSlices(0, 10, 200, 500, 3000, 16777215))
 
 	// Return just one slice is source collection is empty
 	assert.Equal(t, "[{0 16777215}]", fmt.Sprint(FillGaps([]Slice{})))
