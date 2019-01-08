@@ -2,11 +2,10 @@ package blockchain
 
 import (
 	"fmt"
-	"sort"
-
 	. "github.com/BANKEX/plasma-research/src/node/alias"
 	. "github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
 	. "github.com/BANKEX/plasma-research/src/node/utils"
+	"sort"
 )
 
 type SumTreeRoot struct {
@@ -16,7 +15,6 @@ type SumTreeRoot struct {
 }
 
 type SumTreeNode struct {
-	//
 	Begin uint32
 	End   uint32
 
@@ -29,17 +27,20 @@ type SumTreeNode struct {
 	Parent *SumTreeNode
 }
 
-type ProofStep struct {
-	Length []byte  // 4 bytes
-	Hash   Uint160 // 20 bytes
-}
-
-// Proof has the same structure as proof in Solidity
+// Index: Bit index of the element in the tree
+// Slice: Slice that stored inside a leaf with corresponding index
+// Item: Hash ot the transaction associated with a slice
+// Data: List of proof steps
 type SumMerkleTreeProof struct {
 	Index uint32
 	Slice Slice
 	Item  Uint160
 	Data  []ProofStep
+}
+
+type ProofStep struct {
+	Length []byte  // 4 bytes
+	Hash   Uint160 // 20 bytes
 }
 
 // Use this first when assemble blocks
@@ -182,8 +183,8 @@ func (tree *SumMerkleTree) GetProof(leafIndex uint32) SumMerkleTreeProof {
 		}
 
 		// 4 + 20 byte
-		//step := append(uint32BE(node.Length), node.Hash...)
-		//proofSteps = append(proofSteps, step...)
+		// step := append(uint32BE(node.Length), node.Hash...)
+		// proofSteps = append(proofSteps, step...)
 
 		step := ProofStep{uint32BE(node.Length), node.Hash}
 		proofSteps = append(proofSteps, step)
@@ -195,6 +196,32 @@ func (tree *SumMerkleTree) GetProof(leafIndex uint32) SumMerkleTreeProof {
 	return result
 }
 
+func (tree *SumMerkleTree) GetRlpEncodedProof(leafIndex uint32) []byte {
+	proof := tree.GetProof(leafIndex)
+
+	var data []byte
+	for _, proofItem := range proof.Data {
+		data = append(data, proofItem.Length...)
+		data = append(data, proofItem.Hash...)
+	}
+
+	tmp := struct {
+		Index uint32
+		Slice Slice
+		Item  []byte
+		Data  []byte
+	}{
+		proof.Index,
+		proof.Slice,
+		proof.Item,
+		data,
+	}
+
+	rlp, _ := EncodeToRLP(tmp)
+	return rlp
+}
+
+// Function generates
 //func (tree *SumMerkleTree) GetProof(leafIndex uint32) []byte {
 //
 //	index := uint32(0)
@@ -240,10 +267,7 @@ const plasmaLength = 16777215
 // Fill plasma range space with Slices, src slices should be sorted first
 func FillGaps(src []Slice) []Slice {
 
-	// TODO: Slice Merge
-	// It doesn't merge a slices even if they are neighbors
-	// as I remember such improvement can speedup plasma
-
+	// TODO(artall64): Slice Merge, it doesn't merge a slices even if they are neighbors as I remember such improvement can be useful
 	var result []Slice
 
 	pos := uint32(0)

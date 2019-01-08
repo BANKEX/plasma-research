@@ -3,10 +3,9 @@ package blockchain
 import (
 	"encoding/json"
 	"fmt"
-	"testing"
-
 	. "github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestSMT(t *testing.T) {
@@ -93,7 +92,8 @@ func TestSMT(t *testing.T) {
 	for _, item := range proof.Data {
 		fmt.Printf("%x%x\n", item.Length, item.Hash)
 	}
-	fmt.Println()
+
+	fmt.Printf("RlpEncoded=%x\n", sumTree.GetRlpEncodedProof(1))
 }
 
 func TestFillGapsOneSlice(t *testing.T) {
