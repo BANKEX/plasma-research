@@ -20,15 +20,15 @@ func TestSMT(t *testing.T) {
 				OutputNumber int   `json:"outputNumber"`
 				Owner        []int `json:"owner"`
 				Slice        struct {
-					Begin uint32 `json:"begin"`
-					End   uint32 `json:"end"`
+					Begin int `json:"begin"`
+					End   int `json:"end"`
 				}
 			}
 			Outputs []struct {
 				Owner []int `json:"owner"`
-				Slice []struct {
-					Begin uint32 `json:"begin"`
-					End   uint32 `json:"end"`
+				Slice struct {
+					Begin int `json:"begin"`
+					End   int `json:"end"`
 				}
 			}
 			Metadata struct {
@@ -52,69 +52,17 @@ func TestSMT(t *testing.T) {
 		fmt.Println(err)
 	}
 
-	//var data Dataw
-	//
-	//json.Unmarshal(byteValue, &data)
+	type Result struct {
+		RootHash        string   `json:"rootHash"`
+		RootLength      string   `json:"rootLength"`
+		Begin           string   `json:"begin"`
+		End             string   `json:"end"`
+		Item            string   `json:"item"`
+		ItemsLenAndHash []string `json:"itemsLenAndHash"`
+		RlpEncoded      string   `json:"rlpEncoded"`
+	}
 
-	//
-	//data := []byte(`
-	//[
-	//	{
-	//		"inputs": [
-	//			{
-	//				"blockNumber":1,
-	//				"txNumber":1,
-	//				"outputNumber":1,
-	//				"owner":[212, 94, 140, 187, 90, 4, 197, 233, 140, 235, 41, 216, 173, 145, 71, 238, 13, 15, 62, 194],
-	//				"slice": {
-	//					"begin": 1,
-	//					"end": 2
-	//				}
-	//			}
-	//
-	//		],
-	//		"outputs": [
-	//			{
-	//				"owner":[212, 94, 140, 187, 90, 4, 197, 233, 140, 235, 41, 216, 173, 145, 71, 238, 13, 15, 62, 194],
-	//				"slice": {
-	//					"begin": 1,
-	//					"end": 2
-	//				}
-	//			}
-	//		],
-	//		"metadata": {
-	//			"maxBlockNumber":100
-	//		}
-	//	},
-	//	{
-	//		"inputs": [
-	//			{
-	//				"blockNumber":1,
-	//				"txNumber":1,
-	//				"outputNumber":1,
-	//				"owner":[212, 94, 140, 187, 90, 4, 197, 233, 140, 235, 41, 216, 173, 145, 71, 238, 13, 15, 62, 194],
-	//				"slice": {
-	//					"begin": 4,
-	//					"end": 5
-	//				}
-	//			}
-	//
-	//		],
-	//		"outputs": [
-	//			{
-	//				"owner":[212, 94, 140, 187, 90, 4, 197, 233, 140, 235, 41, 216, 173, 145, 71, 238, 13, 15, 62, 194],
-	//				"slice": {
-	//					"begin": 4,
-	//					"end": 5
-	//				}
-	//			}
-	//		],
-	//		"metadata": {
-	//			"maxBlockNumber":100
-	//		}
-	//	}
-	//]
-	//`)
+	var result Result
 
 	q := make([]Transaction, 0)
 	json.Unmarshal(data, &q)
@@ -129,20 +77,30 @@ func TestSMT(t *testing.T) {
 	sumTree = NewSumMerkleTree(txs)
 
 	root := sumTree.GetRoot()
-	fmt.Printf("rootHash = %x\n", root.Hash)
-	fmt.Printf("rootLength = %x\n", root.Length)
+
+	result.RootHash = fmt.Sprintf("%x", root.Hash)
+	result.RootLength = fmt.Sprintf("%x", root.Length)
 
 	leaf := sumTree.Leafs[1]
-	fmt.Printf("Begin = %d\n", leaf.Begin)
-	fmt.Printf("End = %d\n", leaf.End)
-	proof := sumTree.GetProof(1)
 
-	fmt.Printf("Item=%x\n", proof.Item)
+	result.Begin = fmt.Sprintf("%d", leaf.Begin)
+	result.End = fmt.Sprintf("%d", leaf.End)
+
+	proof := sumTree.GetProof(1)
+	result.Item = fmt.Sprintf("%x", proof.Item)
+
 	for _, item := range proof.Data {
-		fmt.Printf("%x%x\n", item.Length, item.Hash)
+		result.ItemsLenAndHash = append(result.ItemsLenAndHash, fmt.Sprintf("%x%x", item.Length, item.Hash))
 	}
 
-	fmt.Printf("RlpEncoded=%x\n", sumTree.GetRlpEncodedProof(1))
+	result.RlpEncoded = fmt.Sprintf("%x", sumTree.GetRlpEncodedProof(1))
+
+	resultJSON, _ := json.Marshal(result)
+	err = ioutil.WriteFile("../../contracts/test/result.json", resultJSON, 0644)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 }
 
 func TestFillGapsOneSlice(t *testing.T) {
