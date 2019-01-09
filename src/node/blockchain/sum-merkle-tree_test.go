@@ -37,7 +37,7 @@ func TestSMT(t *testing.T) {
 		}
 	}
 
-	jsonFile, err := os.Open("conf.json")
+	jsonFile, err := os.Open("sum-tree-sample.json")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -95,8 +95,9 @@ func TestSMT(t *testing.T) {
 
 	result.RlpEncoded = fmt.Sprintf("%x", sumTree.GetRlpEncodedProof(1))
 
-	resultJSON, _ := json.Marshal(result)
-	err = ioutil.WriteFile("../../contracts/test/result.json", resultJSON, 0644)
+	resultJSON, _ := json.MarshalIndent(result, "", "  ")
+
+	err = ioutil.WriteFile("../../contracts/test/sample-merkle-proof.json", resultJSON, 0644)
 	if err != nil {
 		fmt.Println(err)
 	}
