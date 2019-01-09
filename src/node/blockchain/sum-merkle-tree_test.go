@@ -37,7 +37,7 @@ func TestSMT(t *testing.T) {
 		}
 	}
 
-	jsonFile, err := os.Open("../../contracts/test/conf.json")
+	jsonFile, err := os.Open("conf.json")
 	if err != nil {
 		fmt.Println(err)
 	}
