@@ -3,11 +3,14 @@ const { keccak256, bufferToHex } = require('ethereumjs-util');
 const EVMRevert = require('./helpers/EVMRevert');
 const EVMThrow = require('./helpers/EVMThrow');
 var assert = require('assert');
+var fs = require('fs');
 
 require('chai')
   .use(require('chai-as-promised'))
   .use(require('chai-bignumber')(web3.BigNumber))
   .should();
+
+var resultJSON = JSON.parse(fs.readFileSync('test/result.json'));
 
 const SumMerkleProofWrapper = artifacts.require('SumMerkleProofWrapper');
 const SumMerkleProof = artifacts.require('SumMerkleProof');
@@ -90,16 +93,16 @@ contract('SumMerkleProofWrapper', function ([_, wallet1, wallet2, wallet3, walle
 
   it('should verify valid proof', async function () {
     // That proof was generated in Go code
-    const root = '0x37c7f5efafd7761d94ec936360e27fbeae4dd877';
-    const rootLength = '16777215';
+    const root = "0x" + resultJSON.rootHash;
+    const rootLength = "0x" + resultJSON.rootLength;
     const index = 1;
-    const begin = 1;
-    const end = 2;
-    const item = '0xfa61c529e022344b84ca026c1fb1214e8bac9afa';
-    const proofSteps = '0x' +
-      '00000001dcc703c0e500b653ca82273b7bfad8045d85a470' +
-      '00000003d146cb615b8dac6a78641afd24d8c3296cf43a07' +
-      '00fffffadcc703c0e500b653ca82273b7bfad8045d85a470';
+    const begin = resultJSON.begin;
+    const end = resultJSON.end;
+    const item = "0x" + resultJSON.item;
+      const proofSteps = '0x' +
+        resultJSON.itemsLenAndHash[0] +
+        resultJSON.itemsLenAndHash[1] +
+        resultJSON.itemsLenAndHash[2];
 
     const result = await wrapper.sumMerkleProofTest(index, begin, end, item, proofSteps, root, rootLength);
     assert.strictEqual(result, true);
@@ -107,28 +110,27 @@ contract('SumMerkleProofWrapper', function ([_, wallet1, wallet2, wallet3, walle
 
   it('shouldn\'t verify invalid proof', async function () {
     // That proof was generated in Go code
-    const root = '0x37c7f5efafd7761d94ec936360e27fbeae4dd877';
-    const rootLength = '16777215';
+    const root = "0x" + resultJSON.rootHash;
+    const rootLength = "0x" + resultJSON.rootLength;
     const index = 1;
-    const begin = 1;
-    const end = 2;
-    const item = '0xfa61c529e022344b84ca026c1fb1214e8bac9afa';
+    const begin = resultJSON.begin;
+    const end = resultJSON.end;
+    const item = "0x" + resultJSON.item;
 
     // Make proof wrong by replacing 4 bytes with 0xDEADBEEF
-    const proofSteps = '0x' +
-      '00000001dcc703c0e500b653ca82273b7bfad804DEADBEEF' +
-      '00000003d146cb615b8dac6a78641afd24d8c329DEADBEEF' +
-      '00fffffadcc703c0e500b653ca82273b7bfad804DEADBEEF';
+    stepOne = resultJSON.itemsLenAndHash[0].slice(0,40) + "DEADBEEF";
+    stepTwo = resultJSON.itemsLenAndHash[1].slice(0,40) + "DEADBEEF";
+    stepThree = resultJSON.itemsLenAndHash[2].slice(0,40) + "DEADBEEF";
+    const proofSteps = '0x' + stepOne + stepTwo + stepThree;
 
     const result = await wrapper.sumMerkleProofTest(index, begin, end, item, proofSteps, root, rootLength);
     assert.strictEqual(result, false);
   });
 
   it('should verify valid proof represented as rlp bytes', async function () {
-    const sumMerkleRoot = '0x37c7f5efafd7761d94ec936360e27fbeae4dd877';
-    const rlpEncodedProof = '0xf86301c2010294fa61c529e022344b84ca026c1fb1214e8bac9afab84800000001dcc703c0e500b65' +
-      '3ca82273b7bfad8045d85a47000000003d146cb615b8dac6a78641afd24d8c3296cf43a0700fffffadcc703c0e500b653ca82273b' +
-      '7bfad8045d85a470';
+    const sumMerkleRoot = "0x" + resultJSON.rootHash;
+    const rlpEncodedProof = "0x" + resultJSON.rlpEncoded;
+
 
     const result = await wrapper.sumMerkleProofFromBytesTest(sumMerkleRoot, rlpEncodedProof);
     assert.strictEqual(result, true);
