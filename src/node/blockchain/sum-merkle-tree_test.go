@@ -129,12 +129,10 @@ func TestPrepareLeaves(t *testing.T) {
 
 	fTxList = append(fTxList, fTx)
 
-	fResult, fErr := PrepareLeaves(fTxList)
+	_, fErr := PrepareLeaves(fTxList)
 	fExpected := fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
 		fTxInput1.Slice.Begin, fTxInput1.Slice.End, fTxInput2.Slice.Begin, fTxInput2.Slice.End)
 
-	// If len(Result) == 0 => PrepareLeaves returned error
-	assert.Equal(t, 0, len(fResult))
 	assert.Equal(t, fExpected, fErr)
 
 	// Second check
@@ -163,12 +161,11 @@ func TestPrepareLeaves(t *testing.T) {
 
 	sTxList = append(sTxList, sTx)
 
-	sResult, sErr := PrepareLeaves(sTxList)
+	_, sErr := PrepareLeaves(sTxList)
 
 	sExpected := fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
 		sTxInput2.Slice.Begin, sTxInput2.Slice.End, sTxInput3.Slice.Begin, sTxInput3.Slice.End)
 
-	assert.Equal(t, 0, len(sResult))
 	assert.Equal(t, sExpected, sErr)
 
 	// Third check
@@ -196,11 +193,10 @@ func TestPrepareLeaves(t *testing.T) {
 
 	tTxList = append(tTxList, tTx)
 
-	tResult, tErr := PrepareLeaves(tTxList)
+	_, tErr := PrepareLeaves(tTxList)
 	tExpected := fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
 		tTxInput1.Slice.Begin, tTxInput1.Slice.End, tTxInput2.Slice.Begin, tTxInput2.Slice.End)
 
-	assert.Equal(t, 0, len(tResult))
 	assert.Equal(t, tExpected, tErr)
 
 }
