@@ -3,11 +3,12 @@ package blockchain
 import (
 	"encoding/json"
 	"fmt"
-	. "github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
 	"testing"
+
+	. "github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSMT(t *testing.T) {
@@ -101,6 +102,106 @@ func TestSMT(t *testing.T) {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+}
+
+func TestPrepareLeaves(t *testing.T) {
+
+	// First check
+
+	var fTxList []Transaction
+	var fTx Transaction
+
+	// 2 Inputs with intersected slices
+
+	fTxInput1 := Input{Output: Output{
+		Slice: Slice{10, 20},
+	}}
+
+	fTxInput2 := Input{Output: Output{
+		Slice: Slice{14, 28},
+	}}
+
+	//
+
+	fTx.Inputs = append(fTx.Inputs, fTxInput1)
+	fTx.Inputs = append(fTx.Inputs, fTxInput2)
+
+	fTxList = append(fTxList, fTx)
+
+	fResult, fErr := PrepareLeaves(fTxList)
+	fExpected := fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
+		fTxInput1.Slice.Begin, fTxInput1.Slice.End, fTxInput2.Slice.Begin, fTxInput2.Slice.End)
+
+	// If len(Result) == 0 => PrepareLeaves returned error
+	assert.Equal(t, 0, len(fResult))
+	assert.Equal(t, fExpected, fErr)
+
+	// Second check
+	var sTxList []Transaction
+	var sTx Transaction
+
+	// 3 Inputs with 2 intersected slices (sTxInput2 - sTxInput3)
+
+	sTxInput1 := Input{Output: Output{
+		Slice: Slice{4, 7},
+	}}
+
+	sTxInput2 := Input{Output: Output{
+		Slice: Slice{8, 19},
+	}}
+
+	sTxInput3 := Input{Output: Output{
+		Slice: Slice{12, 31},
+	}}
+
+	//
+
+	sTx.Inputs = append(sTx.Inputs, sTxInput1)
+	sTx.Inputs = append(sTx.Inputs, sTxInput2)
+	sTx.Inputs = append(sTx.Inputs, sTxInput3)
+
+	sTxList = append(sTxList, sTx)
+
+	sResult, sErr := PrepareLeaves(sTxList)
+
+	sExpected := fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
+		sTxInput2.Slice.Begin, sTxInput2.Slice.End, sTxInput3.Slice.Begin, sTxInput3.Slice.End)
+
+	assert.Equal(t, 0, len(sResult))
+	assert.Equal(t, sExpected, sErr)
+
+	// Third check
+
+	var tTxList []Transaction
+	var tTx Transaction
+
+	// 3 Inputs with 3 intersected slices
+
+	tTxInput1 := Input{Output: Output{
+		Slice: Slice{2, 7},
+	}}
+
+	tTxInput2 := Input{Output: Output{
+		Slice: Slice{4, 10},
+	}}
+
+	tTxInput3 := Input{Output: Output{
+		Slice: Slice{5, 30},
+	}}
+
+	tTx.Inputs = append(tTx.Inputs, tTxInput1)
+	tTx.Inputs = append(tTx.Inputs, tTxInput2)
+	tTx.Inputs = append(tTx.Inputs, tTxInput3)
+
+	tTxList = append(tTxList, tTx)
+
+	tResult, tErr := PrepareLeaves(tTxList)
+	tExpected := fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
+		tTxInput1.Slice.Begin, tTxInput1.Slice.End, tTxInput2.Slice.Begin, tTxInput2.Slice.End)
+
+	assert.Equal(t, 0, len(tResult))
+	assert.Equal(t, tExpected, tErr)
 
 }
 
