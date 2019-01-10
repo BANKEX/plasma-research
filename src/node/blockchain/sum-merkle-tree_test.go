@@ -105,100 +105,89 @@ func TestSMT(t *testing.T) {
 
 }
 
-func TestPrepareLeaves(t *testing.T) {
+func TestPrepareLeavesIntersectedSlices(t *testing.T) {
 
-	// First check
+	var TxList []Transaction
+	var Tx Transaction
 
-	var fTxList []Transaction
-	var fTx Transaction
-
-	// 2 Inputs with intersected slices
-
-	fTxInput1 := Input{Output: Output{
-		Slice: Slice{10, 20},
-	}}
-
-	fTxInput2 := Input{Output: Output{
-		Slice: Slice{14, 28},
-	}}
-
-	//
-
-	fTx.Inputs = append(fTx.Inputs, fTxInput1)
-	fTx.Inputs = append(fTx.Inputs, fTxInput2)
-
-	fTxList = append(fTxList, fTx)
-
-	_, fErr := PrepareLeaves(fTxList)
-	fExpected := fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
-		fTxInput1.Slice.Begin, fTxInput1.Slice.End, fTxInput2.Slice.Begin, fTxInput2.Slice.End)
-
-	assert.Equal(t, fExpected, fErr)
-
-	// Second check
-	var sTxList []Transaction
-	var sTx Transaction
-
-	// 3 Inputs with 2 intersected slices (sTxInput2 - sTxInput3)
-
-	sTxInput1 := Input{Output: Output{
+	TxInput1 := Input{Output: Output{
 		Slice: Slice{4, 7},
 	}}
 
-	sTxInput2 := Input{Output: Output{
+	TxInput2 := Input{Output: Output{
 		Slice: Slice{8, 19},
 	}}
 
-	sTxInput3 := Input{Output: Output{
+	TxInput3 := Input{Output: Output{
 		Slice: Slice{12, 31},
 	}}
 
-	//
+	Tx.Inputs = append(Tx.Inputs, TxInput1)
+	Tx.Inputs = append(Tx.Inputs, TxInput2)
+	Tx.Inputs = append(Tx.Inputs, TxInput3)
 
-	sTx.Inputs = append(sTx.Inputs, sTxInput1)
-	sTx.Inputs = append(sTx.Inputs, sTxInput2)
-	sTx.Inputs = append(sTx.Inputs, sTxInput3)
+	TxList = append(TxList, Tx)
 
-	sTxList = append(sTxList, sTx)
+	_, err := PrepareLeaves(TxList)
 
-	_, sErr := PrepareLeaves(sTxList)
+	expectedError := fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
+		TxInput2.Slice.Begin, TxInput2.Slice.End, TxInput3.Slice.Begin, TxInput3.Slice.End)
 
-	sExpected := fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
-		sTxInput2.Slice.Begin, sTxInput2.Slice.End, sTxInput3.Slice.Begin, sTxInput3.Slice.End)
+	assert.Equal(t, expectedError, err)
+}
 
-	assert.Equal(t, sExpected, sErr)
+func TestPrepareLeavesNotIntersectedSlices(t *testing.T) {
+	var TxList []Transaction
+	var Tx Transaction
 
-	// Third check
-
-	var tTxList []Transaction
-	var tTx Transaction
-
-	// 3 Inputs with 3 intersected slices
-
-	tTxInput1 := Input{Output: Output{
-		Slice: Slice{2, 7},
+	TxInput1 := Input{Output: Output{
+		Slice: Slice{1, 2},
 	}}
 
-	tTxInput2 := Input{Output: Output{
-		Slice: Slice{4, 10},
+	TxInput2 := Input{Output: Output{
+		Slice: Slice{4, 19},
 	}}
 
-	tTxInput3 := Input{Output: Output{
-		Slice: Slice{5, 30},
+	TxInput3 := Input{Output: Output{
+		Slice: Slice{22, 23},
 	}}
 
-	tTx.Inputs = append(tTx.Inputs, tTxInput1)
-	tTx.Inputs = append(tTx.Inputs, tTxInput2)
-	tTx.Inputs = append(tTx.Inputs, tTxInput3)
+	Tx.Inputs = append(Tx.Inputs, TxInput1)
+	Tx.Inputs = append(Tx.Inputs, TxInput2)
+	Tx.Inputs = append(Tx.Inputs, TxInput3)
 
-	tTxList = append(tTxList, tTx)
+	TxList = append(TxList, Tx)
 
-	_, tErr := PrepareLeaves(tTxList)
-	tExpected := fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
-		tTxInput1.Slice.Begin, tTxInput1.Slice.End, tTxInput2.Slice.Begin, tTxInput2.Slice.End)
+	result, err := PrepareLeaves(TxList)
 
-	assert.Equal(t, tExpected, tErr)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, 7, len(result))
+}
 
+func TestPrepareLeavesCoincidienceStartAndEndOfSlices(t *testing.T) {
+
+	var TxList []Transaction
+	var Tx Transaction
+
+	TxInput1 := Input{Output: Output{
+		Slice: Slice{1, 2},
+	}}
+
+	TxInput2 := Input{Output: Output{
+		Slice: Slice{2, 3},
+	}}
+
+	Tx.Inputs = append(Tx.Inputs, TxInput1)
+	Tx.Inputs = append(Tx.Inputs, TxInput2)
+
+	TxList = append(TxList, Tx)
+
+	_, err := PrepareLeaves(TxList)
+
+	expectedError := fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
+		TxInput1.Slice.Begin, TxInput1.Slice.End, TxInput2.Slice.Begin, TxInput2.Slice.End)
+
+	assert.Equal(t, expectedError, err)
 }
 
 func TestFillGapsOneSlice(t *testing.T) {
