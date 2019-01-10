@@ -52,14 +52,15 @@ func (p *TransactionManager) ValidateInputs(t *blockchain.Transaction) error {
 }
 
 func (p *TransactionManager) SubmitTransaction(t *blockchain.Transaction) error {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-
 	// check that transaction is fully valid
 	err := t.Validate()
 	if err != nil {
 		return err
 	}
+
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
 	err = p.ValidateInputs(t)
 	if err != nil {
 		return err
