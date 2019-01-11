@@ -106,34 +106,22 @@ func TestSMT(t *testing.T) {
 }
 
 func TestPrepareLeavesIntersectedSlices(t *testing.T) {
+	slices := []Slice{{1, 10}, {5, 20}}
 
-	var TxList []Transaction
-	var Tx Transaction
-
-	TxInput1 := Input{Output: Output{
-		Slice: Slice{4, 7},
-	}}
-
-	TxInput2 := Input{Output: Output{
-		Slice: Slice{8, 19},
-	}}
-
-	TxInput3 := Input{Output: Output{
-		Slice: Slice{12, 31},
-	}}
-
-	Tx.Inputs = append(Tx.Inputs, TxInput1)
-	Tx.Inputs = append(Tx.Inputs, TxInput2)
-	Tx.Inputs = append(Tx.Inputs, TxInput3)
-
-	TxList = append(TxList, Tx)
-
-	_, err := PrepareLeaves(TxList)
+	err := IntersectedCheck(slices)
 
 	expectedError := fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
-		TxInput2.Slice.Begin, TxInput2.Slice.End, TxInput3.Slice.Begin, TxInput3.Slice.End)
+		slices[0].Begin, slices[0].End, slices[1].Begin, slices[1].End)
 
 	assert.Equal(t, expectedError, err)
+}
+
+func TestPrepareLeavesCoincidienceBeginAndEndOfSlices(t *testing.T) {
+	slices := []Slice{{1, 2}, {2, 3}}
+
+	err := IntersectedCheck(slices)
+
+	assert.Equal(t, nil, err)
 }
 
 func TestPrepareLeavesNotIntersectedSlices(t *testing.T) {
@@ -162,32 +150,6 @@ func TestPrepareLeavesNotIntersectedSlices(t *testing.T) {
 
 	assert.Equal(t, nil, err)
 	assert.Equal(t, 7, len(result))
-}
-
-func TestPrepareLeavesCoincidienceStartAndEndOfSlices(t *testing.T) {
-
-	var TxList []Transaction
-	var Tx Transaction
-
-	TxInput1 := Input{Output: Output{
-		Slice: Slice{1, 2},
-	}}
-
-	TxInput2 := Input{Output: Output{
-		Slice: Slice{2, 3},
-	}}
-
-	Tx.Inputs = append(Tx.Inputs, TxInput1)
-	Tx.Inputs = append(Tx.Inputs, TxInput2)
-
-	TxList = append(TxList, Tx)
-
-	_, err := PrepareLeaves(TxList)
-
-	expectedError := fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
-		TxInput1.Slice.Begin, TxInput1.Slice.End, TxInput2.Slice.Begin, TxInput2.Slice.End)
-
-	assert.Equal(t, expectedError, err)
 }
 
 func TestFillGapsOneSlice(t *testing.T) {
