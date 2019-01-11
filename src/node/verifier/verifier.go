@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/contrib/static"
 	"io"
 	"io/ioutil"
 	"log"
@@ -208,7 +209,7 @@ func (v *Verifier) ServerStart(r *gin.Engine) error {
 	r.GET("/exit", v.ExitHandler)
 	r.GET("/latestBlock", v.LatestBlockHandler)
 
-	r.Static("/frontend", "../src/node/verifier/frontend")
+	r.Use(static.Serve("/", static.LocalFile("../src/node/verifier/frontend", true)))
 
 	err := r.Run(fmt.Sprintf(":%d", v.cfg.VerifierPort))
 	if err != nil {
