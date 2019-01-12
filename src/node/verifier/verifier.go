@@ -230,7 +230,7 @@ func (v *Verifier) PlasmaBalance(c *gin.Context) {
 
 	st := make([]blockchain.Input, 0)
 
-	resp, err := http.Get("http://localhost:3001/utxo/" + v.cfg.VerifierPublicKey)
+	resp, err := http.Get(v.cfg.OperatorHost + "/utxo/" + v.cfg.VerifierPublicKey)
 	if err != nil {
 		log.Println(err)
 	}
