@@ -336,7 +336,7 @@ func (v *Verifier) ExitHandler(c *gin.Context) {
 
 func (v *Verifier) LatestBlockHandler(c *gin.Context) {
 	st := struct {
-		LastBlock string `json:"lastBlock"`
+		LastBlock uint32 `json:"lastBlock"`
 	}{}
 
 	resp, err := http.Get("http://localhost:3001/status")
