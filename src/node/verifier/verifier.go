@@ -139,26 +139,30 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 				} else {
 					fmt.Println("Bad args!")
 				}
-			case "balance":
+			case "balance", "bal":
 				if len(args) == 3 {
-
-					client, err := ethclient.Dial("https://mainnet.infura.io")
+					balanceFloat, err := GetETHAccountBalance(args[2])
 					if err != nil {
-						log.Fatal(err)
+						fmt.Println(err)
+					} else {
+						fmt.Printf("Balance of account %s : %f\n", args[2], balanceFloat)
 					}
-
-					ctx := context.Background()
-
-					account := common.HexToAddress(args[2])
-
-					balance, err := client.BalanceAt(ctx, account, nil)
+				} else {
+					fmt.Println("Bad args!")
+				}
+			// TODO:check this method
+			// now not work correctly
+			case "ownerBalance", "obal":
+				if len(args) == 2 {
+					fmt.Println(v.cfg.VerifierPublicKey)
+					balanceFloat, err := GetETHAccountBalance(v.cfg.VerifierPublicKey)
 					if err != nil {
-						log.Fatal(err)
+						fmt.Println(err)
+					} else {
+						fmt.Printf("Balance of account %s : %f\n", v.cfg.VerifierPublicKey, balanceFloat)
 					}
-					ethBalance, _ := strconv.ParseFloat(balance.String(), 64)
-
-					balanceFloat := ethBalance / math.Pow(10, 18)
-					fmt.Printf("Balance of account %s : %f\n", args[2], balanceFloat)
+				} else {
+					fmt.Println("Bad args!")
 				}
 			default:
 				fmt.Println("Bad args!")
@@ -248,6 +252,25 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 					for _, tx := range txs {
 						fmt.Printf("%d:%d:%d -> %d coins", tx.BlockIndex, tx.TxIndex, tx.OutputIndex, tx.Slice.End-tx.Slice.Begin)
 					}
+
+				} else {
+					fmt.Println("Not anought args!")
+				}
+			// TODO:check this method
+			// now not work correctly
+			case "balance", "bal":
+				if len(args) == 2 {
+
+					st := make([]blockchain.Input, 0)
+
+					resp, err := req.Get("http://localhost:3001/utxo/" + v.cfg.VerifierPublicKey)
+					if err != nil {
+						fmt.Println(err)
+					}
+
+					resp.ToJSON(&st)
+
+					fmt.Println(st)
 
 				} else {
 					fmt.Println("Not anought args!")
@@ -542,4 +565,26 @@ func findTransaction(slice []blockchain.Input, block, tx uint32, out byte) *bloc
 		}
 	}
 	return nil
+}
+
+func GetETHAccountBalance(address string) (float64, error) {
+
+	client, err := ethclient.Dial("https://mainnet.infura.io")
+	if err != nil {
+		return 0, err
+	}
+
+	ctx := context.Background()
+
+	account := common.HexToAddress(address)
+
+	balance, err := client.BalanceAt(ctx, account, nil)
+	if err != nil {
+		return 0, err
+	}
+	ethBalance, _ := strconv.ParseFloat(balance.String(), 64)
+
+	balanceFloat := ethBalance / math.Pow(10, 18)
+
+	return balanceFloat, err
 }
