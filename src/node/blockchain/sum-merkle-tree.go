@@ -58,7 +58,8 @@ func (t SumMerkleTree) MerkleProof(Index uint32) SumMerkleProof {
 		}
 		curCell = (curCell - 1) >> 1
 	}
-	res.Slice = Slice{left, left + length}
+	res.Slice.Begin = left
+	res.Slice.End = left + length
 	return res
 }
 

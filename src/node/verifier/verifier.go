@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/BANKEX/plasma-research/src/node/types"
 	"github.com/gin-gonic/contrib/static"
 	"io"
 	"io/ioutil"
@@ -335,11 +336,9 @@ func (v *Verifier) ExitHandler(c *gin.Context) {
 }
 
 func (v *Verifier) LatestBlockHandler(c *gin.Context) {
-	st := struct {
-		LastBlock string `json:"lastBlock"`
-	}{}
+	st := types.LastBlock{}
 
-	resp, err := http.Get("http://localhost:3001/status")
+	resp, err := http.Get(v.cfg.OperatorHost + "/status")
 	if err != nil {
 		log.Println(err)
 	}
