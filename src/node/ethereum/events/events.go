@@ -132,10 +132,8 @@ func EventListener(m *transactionManager.TransactionManager) {
 	manager = m
 
 	for {
-		for {
-			if !GetEvent() {
-				break
-			}
+		if !GetEvent() {
+			break
 		}
 	}
 }
