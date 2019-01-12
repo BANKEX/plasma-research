@@ -64,3 +64,4 @@ docker/operator:
 
 docker/verifier:
 	docker build -t plasma-verifier:latest -f ./docker/Dockerfile.operator .
+
