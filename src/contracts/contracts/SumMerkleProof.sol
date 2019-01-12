@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-import "./SafeMath32.sol";
+import {SafeMath32} from "./SafeMath32.sol";
 
 
 library SumMerkleProof {
