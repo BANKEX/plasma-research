@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/BANKEX/plasma-research/src/node/types"
 	"github.com/gin-gonic/contrib/static"
 	"io"
 	"io/ioutil"
@@ -230,7 +231,7 @@ func (v *Verifier) PlasmaBalance(c *gin.Context) {
 
 	st := make([]blockchain.Input, 0)
 
-	resp, err := http.Get("http://localhost:3001/utxo/" + v.cfg.VerifierPublicKey)
+	resp, err := http.Get(v.cfg.OperatorHost + "/utxo/" + v.cfg.VerifierPublicKey)
 	if err != nil {
 		log.Println(err)
 	}
@@ -335,11 +336,8 @@ func (v *Verifier) ExitHandler(c *gin.Context) {
 }
 
 func (v *Verifier) LatestBlockHandler(c *gin.Context) {
-	st := struct {
-		LastBlock uint32 `json:"lastBlock"`
-	}{}
-
-	resp, err := http.Get("http://localhost:3001/status")
+	st := types.LastBlock{}
+	resp, err := http.Get(v.cfg.OperatorHost + "/status")
 	if err != nil {
 		log.Println(err)
 	}

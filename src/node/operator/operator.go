@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"github.com/BANKEX/plasma-research/src/node/ethereum/plasmacontract"
+	"github.com/BANKEX/plasma-research/src/node/types"
 	"log"
 	"net/http"
 	"strconv"
@@ -101,15 +103,17 @@ func (o *Operator) GetUtxos(c *gin.Context) {
 
 // returns last plasma block number etc.
 func (o *Operator) GetStatus(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"lastBlock": o.txManager.GetLastBlockNumber(),
-	})
+	st := types.LastBlock{}
+	st.LastBlock = strconv.Itoa(int(o.txManager.GetLastBlockNumber()))
+	c.JSON(http.StatusOK, st)
 }
 
 // returns contract address and abi
 func (o *Operator) GetConfig(c *gin.Context) {
-	// todo not implemented
-	c.JSON(http.StatusOK, nil)
+	info := types.OperatorInfo{}
+	info.Config = o.cfg
+	info.ABI = store.StoreABI
+	c.JSON(http.StatusOK, info)
 }
 
 // ==== debug handlers =====
