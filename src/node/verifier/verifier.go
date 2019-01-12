@@ -334,12 +334,9 @@ func (v *Verifier) PlasmaBalance(c *gin.Context) {
 		log.Println(err)
 	}
 	err = json.Unmarshal(body, &st)
-
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
-
-	resp.ToJSON(&st)
 
 	c.JSON(http.StatusOK, st)
 }
