@@ -10,6 +10,7 @@ var InitialOptions = []prompt.Suggest{
 
 var EthOptions = []prompt.Suggest{
 	{Text: "transfer", Description: "tr: Transfer -  eth tr 0.4(eth) 0x4ED6..."},
+	{Text: "balance", Description: "bal: Balance of eth account - eth bal 0x4ED6..."},
 }
 
 var PlasmaOptions = []prompt.Suggest{
