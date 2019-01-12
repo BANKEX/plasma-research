@@ -6,8 +6,8 @@ import (
 
 type Config struct {
 	OperatorPort          int    `env:"operator_port" envDefault:"3001"`
-	MainAccountPrivateKey string `env:"main_account_private_key" envDefault:"0x240d6ad83930067d82e0803696996f743acd78d8fa6a5f6e4f148fd9def37c55"`
-	MainAccountPublicKey  string `env:"main_account_public_key" envDefault:"0x9b72b510f184e16bce51dfd7348ba474ce30b6ed"`
+	MainAccountPrivateKey string `env:"main_account_private_key" envDefault:"0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501200"`
+	MainAccountPublicKey  string `env:"main_account_public_key" envDefault:"0xDf08F82De32B8d460adbE8D72043E3a7e25A3B39"`
 	PlasmaContractAddress string `env:"plasma_contract_address" envDefault:"0x08190c080ff35a9686674ee77d4e5e2f01064886"`
 	GethHost              string `env:"geth_host" envDefault:"http://172.28.1.2:8545"`
 	GethAccount           string `env:"geth_account" envDefault:"ws://127.0.0.1:8545"`
