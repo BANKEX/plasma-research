@@ -210,9 +210,15 @@ func (v *Verifier) ServerStart(r *gin.Engine) error {
 	r.GET("/exit", v.ExitHandler)
 	r.GET("/latestBlock", v.LatestBlockHandler)
 
-	r.Use(static.Serve("/", static.LocalFile("../src/node/verifier/frontend", true)))
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	pathToStatic := dir + "/src/node/verifier/frontend"
 
-	err := r.Run(fmt.Sprintf(":%d", v.cfg.VerifierPort))
+	r.Use(static.Serve("/", static.LocalFile(pathToStatic, true)))
+
+	err = r.Run(fmt.Sprintf(":%d", v.cfg.VerifierPort))
 	if err != nil {
 		log.Fatal(err)
 		return err
