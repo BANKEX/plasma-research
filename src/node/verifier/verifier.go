@@ -33,6 +33,8 @@ import (
 	"github.com/BANKEX/plasma-research/src/node/ethereum"
 	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
 	"github.com/gin-gonic/gin"
+	"github.com/imroc/req"
+	"math"
 )
 
 type Verifier struct {
@@ -92,110 +94,190 @@ func (v *Verifier) CLIToolStart() {
 
 func (v *Verifier) CLIToolExecutor(userText string) {
 	if userText == "quit" {
-		log.Println("Bye!")
+		fmt.Println("Bye!")
 		os.Exit(0)
 		return
 	}
-	args := strings.Split(userText, " ")
-	if len(args) >= 2 {
-		switch args[0] {
+
+	var arguments []string
+
+	argsWithSpace := strings.Split(userText, " ")
+
+	for _, j := range argsWithSpace {
+		if len(j) > 0 {
+			arguments = append(arguments, j)
+		}
+	}
+
+	if len(arguments) > 2 {
+		firstWorld := arguments[0]
+		switch firstWorld {
 		case "eth":
-			switch args[1] {
+			secondWorld := arguments[1]
+			switch secondWorld {
 			case "transfer", "tr":
-				if len(args) == 4 {
-					value, ok := big.NewInt(0).SetString(args[2], 10)
+				if len(arguments) == 4 {
+
+					value, ok := big.NewInt(0).SetString(arguments[2], 10)
+
 					if !ok {
-						log.Fatalf("")
+						fmt.Println("Bad int!")
 					}
 
-					if !common.IsHexAddress(args[3]) {
-						log.Fatal(fmt.Errorf("given to address %s is not valid ethereum address", args[3]))
+					if !common.IsHexAddress(arguments[3]) {
+						fmt.Println(fmt.Errorf("given to address %s is not valid ethereum address", arguments[3]))
 					}
-					to := common.HexToAddress(args[3])
+
+					to := common.HexToAddress(arguments[3])
 
 					tx, err := transaction.SendTransactionInWei(context.TODO(), v.client, v.key, value, to)
 					if err != nil {
-						log.Fatal(err)
+						fmt.Println(err)
+					} else {
+						fmt.Printf("transaction sended: %s", tx.Hash().String())
 					}
-					log.Printf("transaction sended: %s", tx.Hash().String())
+				} else if len(arguments) < 4 {
+					fmt.Println("Not anough arguments!")
+				} else {
+					fmt.Println("Bad arguments!")
 				}
+			case "balance", "bal":
+				if len(arguments) == 3 {
+					balanceFloat, err := GetETHAccountBalance(arguments[2])
+					if err != nil {
+						fmt.Println(err)
+					} else {
+						fmt.Printf("Balance of account %s : %f\n", arguments[2], balanceFloat)
+					}
+				} else {
+					fmt.Println("Bad arguments!")
+				}
+				// TODO:check this method
+				// now not work correctly
+			case "ownerBalance", "ob":
+				if len(arguments) == 2 {
+					fmt.Println(v.cfg.VerifierEthereumAddress)
+					balanceFloat, err := GetETHAccountBalance(v.cfg.VerifierEthereumAddress)
+					if err != nil {
+						fmt.Println(err)
+					} else {
+						fmt.Printf("Balance of account %s : %f\n", v.cfg.VerifierEthereumAddress, balanceFloat)
+					}
+				} else {
+					fmt.Println("Bad arguments!")
+				}
+			default:
+				fmt.Println("Bad arguments!")
 			}
 		case "plasma":
-			switch args[1] {
+			secondWorld := arguments[1]
+			switch secondWorld {
 			case "deposit", "dep":
-				if len(args) == 3 {
-					value, ok := big.NewInt(0).SetString(args[2], 10)
-					if !ok {
-						log.Fatal(fmt.Errorf("given value not integer"))
+				if len(arguments) == 3 {
+					value, ok := big.NewInt(0).SetString(arguments[2], 10)
+					switch ok {
+					case true:
+						rawContractAddress := common.HexToAddress(v.cfg.PlasmaContractAddress)
+						res, err := deposit.Deposit(context.TODO(), rawContractAddress, v.client, v.key, value)
+						if err != nil {
+							fmt.Println(err)
+						} else {
+							fmt.Println(res.Hash().String())
+						}
+					case false:
+						fmt.Println("Error!")
 					}
-					rawContractAddress := common.HexToAddress(v.cfg.PlasmaContractAddress)
-					res, err := deposit.Deposit(context.TODO(), rawContractAddress, v.client, v.key, value)
-					if err != nil {
-						log.Fatal(err)
-					}
-					fmt.Println(res.Hash().String())
+				} else if len(arguments) < 3 {
+					fmt.Println("Not enough arguments!")
+				} else {
+					fmt.Println("Bad arguments!")
 				}
 			case "transfer", "tr":
-				if len(args) == 7 {
-					block, err := strconv.ParseUint(args[2], 10, 32)
+				if len(arguments) == 7 {
+					block, err := strconv.ParseUint(arguments[2], 10, 32)
 					if err != nil {
-						log.Fatalf("")
+						fmt.Println(err)
 					}
-					txN, err := strconv.ParseUint(args[3], 10, 32)
+					txN, err := strconv.ParseUint(arguments[3], 10, 32)
 					if err != nil {
-						log.Fatalf("")
+						fmt.Println(err)
 					}
-					out, err := strconv.ParseUint(args[4], 10, 8)
+					out, err := strconv.ParseUint(arguments[4], 10, 8)
 					if err != nil {
-						log.Fatalf("")
-					}
-
-					value, err := strconv.ParseUint(args[5], 10, 32)
-					if err != nil {
-						log.Fatalf("")
-					}
-					if !common.IsHexAddress(args[6]) {
-						log.Fatal(fmt.Errorf("given to address %s is not valid ethereum address", args[6]))
-					}
-					to, err := hex.DecodeString(args[6][2:])
-					if err != nil {
-						log.Fatalf("")
+						fmt.Println(err)
 					}
 
-					txs, err := v.getTransactionHistory(v.cfg.VerifierPublicKey)
+					value, err := strconv.ParseUint(arguments[5], 10, 32)
 					if err != nil {
-						log.Fatal("error ", err)
+						fmt.Println(err)
+					}
+					if !common.IsHexAddress(arguments[6]) {
+						fmt.Println(fmt.Errorf("given to address %s is not valid ethereum address", arguments[6]))
+					}
+					to, err := hex.DecodeString(arguments[6][2:])
+					if err != nil {
+						fmt.Println(err)
+					}
+
+					txs, err := v.getTransactionHistory(v.cfg.VerifierEthereumAddress)
+					if err != nil {
+						fmt.Println(err)
 					}
 
 					in := findTransaction(txs, uint32(block), uint32(txN), byte(out))
 					if in == nil {
-						log.Fatal("no such output")
+						fmt.Println("no such output")
 					}
 
 					_, err = v.sendToOperatorPlasmaTx(in, uint32(value), to)
 					if err != nil {
-						log.Fatal("error ", err)
+						fmt.Println(err)
 					}
+				} else if len(arguments) < 7 {
+					fmt.Println("Not anought arguments!")
+				} else {
+					fmt.Println("Bad arguments!")
 				}
 			case "utxo":
-				if len(args) == 2 {
-					txs, err := v.getTransactionHistory(v.cfg.VerifierPublicKey)
+				if len(arguments) == 2 {
+					txs, err := v.getTransactionHistory(v.cfg.VerifierEthereumAddress)
 					if err != nil {
-						log.Fatal("error ", err)
+						fmt.Println("error ", err)
 					}
-					log.Printf("Utxo list for %s:", v.cfg.VerifierPublicKey)
+
+					fmt.Printf("Utxo list for %s:", v.cfg.VerifierEthereumAddress)
+
 					for _, tx := range txs {
-						log.Printf("%d:%d:%d -> %d coins", tx.BlockIndex, tx.TxIndex, tx.OutputIndex, tx.Slice.End-tx.Slice.Begin)
+						fmt.Printf("%d:%d:%d -> %d coins", tx.BlockIndex, tx.TxIndex, tx.OutputIndex, tx.Slice.End-tx.Slice.Begin)
 					}
+
+				} else {
+					fmt.Println("Not anought arguments!")
+				}
+
+				// TODO:check this method
+				// now not work correctly
+			case "balance", "bal":
+				if len(arguments) == 2 {
+					st := make([]blockchain.Input, 0)
+					resp, err := req.Get(v.cfg.OperatorHost + "/utxo/" + v.cfg.VerifierEthereumAddress)
+					if err != nil {
+						fmt.Println(err)
+					}
+					resp.ToJSON(&st)
+					fmt.Println(st)
+
+				} else {
+					fmt.Println("Not anought arguments!")
 				}
 			case "exit", "ex":
-				if len(args) == 3 {
+				if len(arguments) == 3 {
 					fmt.Println("Exit func")
 				}
+			default:
+				fmt.Println("Bad arguments!")
 			}
 		}
-	} else {
-		fmt.Println("Bad args!")
 	}
 }
 
@@ -220,14 +302,14 @@ func (v *Verifier) ServerStart(r *gin.Engine) error {
 
 	err = r.Run(fmt.Sprintf(":%d", v.cfg.VerifierPort))
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 		return err
 	}
 	return nil
 }
 
 func (v *Verifier) EthereumBalance(c *gin.Context) {
-	response := ethereum.GetBalance(v.cfg.VerifierPublicKey)
+	response := ethereum.GetBalance(v.cfg.VerifierEthereumAddress)
 	c.JSON(http.StatusOK, gin.H{
 		"balance": response,
 	})
@@ -237,7 +319,7 @@ func (v *Verifier) PlasmaBalance(c *gin.Context) {
 
 	st := make([]blockchain.Input, 0)
 
-	resp, err := http.Get(v.cfg.OperatorHost + "/utxo/" + v.cfg.VerifierPublicKey)
+	resp, err := http.Get(v.cfg.OperatorHost + "/utxo/" + v.cfg.VerifierEthereumAddress)
 	if err != nil {
 		log.Println(err)
 	}
@@ -247,8 +329,9 @@ func (v *Verifier) PlasmaBalance(c *gin.Context) {
 		log.Println(err)
 	}
 	err = json.Unmarshal(body, &st)
+
 	if err != nil {
-		log.Println(err)
+		fmt.Println(err)
 	}
 
 	c.JSON(http.StatusOK, st)
@@ -263,13 +346,13 @@ func (v *Verifier) PlasmaContractAddress(c *gin.Context) {
 func (v *Verifier) DepositHandler(c *gin.Context) {
 	value, ok := big.NewInt(0).SetString(c.Param("sum"), 10)
 	if !ok {
-		log.Fatal(fmt.Errorf("given value not integer"))
+		fmt.Println(fmt.Errorf("given value not integer"))
 	}
 
 	rawContractAddress := common.HexToAddress(v.cfg.PlasmaContractAddress)
 	result, err := deposit.Deposit(context.TODO(), rawContractAddress, v.client, v.key, value)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -342,6 +425,7 @@ func (v *Verifier) ExitHandler(c *gin.Context) {
 }
 
 func (v *Verifier) LatestBlockHandler(c *gin.Context) {
+
 	st := types.LastBlock{}
 	resp, err := http.Get(v.cfg.OperatorHost + "/status")
 	if err != nil {
@@ -353,8 +437,10 @@ func (v *Verifier) LatestBlockHandler(c *gin.Context) {
 		log.Println(err)
 	}
 	err = json.Unmarshal(body, &st)
+
 	if err != nil {
-		log.Println(err)
+
+		fmt.Println(err)
 	}
 
 	c.JSON(http.StatusOK, st.LastBlock)
@@ -385,19 +471,15 @@ func (v *Verifier) HistoryTxHandler(c *gin.Context) {
 }
 
 func (v *Verifier) getTransactionHistory(address string) ([]blockchain.Input, error) {
-	res, err := http.Get(v.cfg.OperatorHost + "/utxo/" + address)
-	if err != nil {
-		return nil, err
-	}
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
 	result := make([]blockchain.Input, 0)
-	err = json.Unmarshal(body, &result)
+
+	resp, err := req.Get(v.cfg.OperatorHost + "/utxo/" + address)
 	if err != nil {
-		return nil, err
+		fmt.Println(err)
 	}
+
+	resp.ToJSON(&result)
+
 	return result, nil
 }
 
@@ -475,4 +557,26 @@ func findTransaction(slice []blockchain.Input, block, tx uint32, out byte) *bloc
 		}
 	}
 	return nil
+}
+
+func GetETHAccountBalance(address string) (float64, error) {
+
+	client, err := ethclient.Dial("https://mainnet.infura.io")
+	if err != nil {
+		return 0, err
+	}
+
+	ctx := context.Background()
+
+	account := common.HexToAddress(address)
+
+	balance, err := client.BalanceAt(ctx, account, nil)
+	if err != nil {
+		return 0, err
+	}
+	ethBalance, _ := strconv.ParseFloat(balance.String(), 64)
+
+	balanceFloat := ethBalance / math.Pow(10, 18)
+
+	return balanceFloat, err
 }
