@@ -43,8 +43,8 @@ type ProofStep struct {
 	Hash   Uint160 // 20 bytes
 }
 
-// for test
-func IntersectedCheck(slices []Slice) error {
+
+func HasIntersection(slices []Slice) error {
 	for i := 0; i < len(slices)-1; i++ {
 		if slices[i].End > slices[i+1].Begin {
 			return fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
@@ -72,11 +72,10 @@ func PrepareLeaves(transactions []Transaction) ([]*SumTreeNode, error) {
 		return slices[i].Begin < slices[j].Begin
 	})
 
-	for i := 0; i < len(slices)-1; i++ {
-		if slices[i].End > slices[i+1].Begin {
-			return nil, fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
-				slices[i].Begin, slices[i].End, slices[i+1].Begin, slices[i+1].End)
-		}
+
+	err := HasIntersection(slices)
+	if err != nil{
+		return nil, err
 	}
 
 	slices = FillGaps(slices)

@@ -109,7 +109,7 @@ func TestSMT(t *testing.T) {
 func TestPrepareLeavesIntersectedSlices(t *testing.T) {
 	slices := []Slice{{1, 10}, {5, 20}}
 
-	err := IntersectedCheck(slices)
+	err := HasIntersection(slices)
 
 	expectedError := fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
 		slices[0].Begin, slices[0].End, slices[1].Begin, slices[1].End)
@@ -120,7 +120,7 @@ func TestPrepareLeavesIntersectedSlices(t *testing.T) {
 func TestPrepareLeavesCoincidienceBeginAndEndOfSlices(t *testing.T) {
 	slices := []Slice{{1, 2}, {2, 3}}
 
-	err := IntersectedCheck(slices)
+	err := HasIntersection(slices)
 
 	assert.Equal(t, nil, err)
 }
