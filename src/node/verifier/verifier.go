@@ -92,56 +92,66 @@ func (v *Verifier) CLIToolStart() {
 	}
 }
 
+func splitAndTrimArgs(userText string) []string {
+	var result []string
+	// NOTE: can got problems with tabs, '\n', and so on
+	for _, j := range strings.Split(userText, " ") {
+		if len(j) > 0 {
+			result = append(result, j)
+		}
+	}
+	return result
+}
+
+func parseBigInt(s string) (*big.Int, bool) {
+	return big.NewInt(0).SetString(s, 10)
+}
+
 func (v *Verifier) CLIToolExecutor(userText string) {
-	if userText == "quit" {
+	arguments := splitAndTrimArgs(userText)
+
+	if len(arguments) < 1 {
+		return
+	}
+
+	command := arguments[0]
+	if command == "quit" {
 		fmt.Println("Bye!")
 		os.Exit(0)
 		return
 	}
 
-	var arguments []string
-
-	argsWithSpace := strings.Split(userText, " ")
-
-	for _, j := range argsWithSpace {
-		if len(j) > 0 {
-			arguments = append(arguments, j)
-		}
-	}
-
-	if len(arguments) < 2 {
-		fmt.Println("Not anough arguments!")
-	}
-
-	firstWorld := arguments[0]
-	switch firstWorld {
+	switch command {
 	case "eth":
 		secondWorld := arguments[1]
 		switch secondWorld {
 		case "transfer", "tr":
-			if len(arguments) < 4 || len(arguments) > 4 {
+			if len(arguments) != 4 {
 				fmt.Println(options.Eth["transfer"])
-			} else if len(arguments) == 4 {
-
-				value, ok := big.NewInt(0).SetString(arguments[2], 10)
-
-				if !ok {
-					fmt.Println("Bad int!")
-				}
-
-				if !common.IsHexAddress(arguments[3]) {
-					fmt.Println(fmt.Errorf("given to address %s is not valid ethereum address", arguments[3]))
-				}
-
-				to := common.HexToAddress(arguments[3])
-
-				tx, err := transaction.SendTransactionInWei(context.TODO(), v.client, v.key, value, to)
-				if err != nil {
-					fmt.Println(err)
-				} else {
-					fmt.Printf("transaction sended: %s", tx.Hash().String())
-				}
+				return
 			}
+
+			amountInWeiArg, toAddressArg := arguments[2], arguments[3]
+			amountInWei, ok := parseBigInt(amountInWeiArg)
+			if !ok {
+				fmt.Println("Can't parse amount of ether in wei")
+				return
+			}
+
+			if !common.IsHexAddress(toAddressArg) {
+				fmt.Printf("Given address '%s' is not valid ethereum address\n", toAddressArg)
+				return
+			}
+			to := common.HexToAddress(toAddressArg)
+
+			tx, err := transaction.SendTransactionInWei(context.TODO(), v.client, v.key, amountInWei, to)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			fmt.Printf("transaction sended: %s", tx.Hash().String())
+
 		case "balance", "bal":
 			if len(arguments) < 3 || len(arguments) > 3 {
 				fmt.Println(options.Eth["balance"])
