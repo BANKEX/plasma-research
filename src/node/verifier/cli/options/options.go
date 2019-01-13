@@ -2,26 +2,24 @@ package options
 
 import "github.com/c-bata/go-prompt"
 
-
 var Initial = map[string]string{
-	"eth":"ETH functions",
-	"plasma":"ETH functions",
-	"quit":"Quit from app",
+	"eth":    "ETH functions",
+	"plasma": "ETH functions",
+	"quit":   "Quit from app",
 }
 var Eth = map[string]string{
-	"transfer":"tr: Transfer -  eth tr 4 0x4ED6d26c6885247fA22746AB2c5328076597a5DF",
-	"balance":"bal: Balance of eth account - eth bal 0x4ED6d26c6885247fA22746AB2c5328076597a5DF",
-	"ownerBalance":"obal: Balance of user(config) eth account - eth obal",
+	"transfer":     "tr: Transfer -  eth tr 4 0x4ED6d26c6885247fA22746AB2c5328076597a5DF",
+	"balance":      "bal: Balance of eth account - eth bal 0x4ED6d26c6885247fA22746AB2c5328076597a5DF",
+	"ownerBalance": "obal: Balance of user(config) eth account - eth obal",
 }
 
 var Plasma = map[string]string{
-	"deposit":"dep: Deposit - plasma dep value",
-	"balance":"bal: Plasma balance - plasma bal",
-	"transfer":"tr: Transfer - plasma tr block txN out value address",
-	"utxo":"utxo: List UTXOs from plasma - plasma utxo",
-	"exit":"ex: Exit from plasma - plasma exit",
+	"deposit":  "dep: Deposit - plasma dep value",
+	"balance":  "bal: Plasma balance - plasma bal",
+	"transfer": "tr: Transfer - plasma tr block txN out value address",
+	"utxo":     "utxo: List UTXOs from plasma - plasma utxo",
+	"exit":     "ex: Exit from plasma - plasma exit",
 }
-
 
 var InitialOptions = []prompt.Suggest{
 	{Text: "eth", Description: Initial["eth"]},

@@ -31,10 +31,10 @@ import (
 	"github.com/BANKEX/plasma-research/src/node/blockchain"
 	"github.com/BANKEX/plasma-research/src/node/ethereum"
 	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
+	"github.com/BANKEX/plasma-research/src/node/verifier/cli/options"
 	"github.com/gin-gonic/gin"
 	"github.com/imroc/req"
 	"math"
-	"github.com/BANKEX/plasma-research/src/node/verifier/cli/options"
 )
 
 type Verifier struct {
@@ -234,13 +234,13 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 				}
 			}
 		case "utxo":
-			if len(arguments) < 2 || len(arguments) > 2{
+			if len(arguments) < 2 || len(arguments) > 2 {
 				fmt.Println(options.Plasma["utxo"])
 			} else if len(arguments) == 2 {
 				txs, err := v.getTransactionHistory(v.cfg.VerifierEthereumAddress)
 				if err != nil {
 					fmt.Println("error ", err)
-				}else{
+				} else {
 					fmt.Printf("Utxo list for %s:", v.cfg.VerifierEthereumAddress)
 
 					for _, tx := range txs {
