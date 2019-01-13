@@ -121,7 +121,7 @@ func (b *Block) CalculateMerkleRoot() error {
 	if err != nil {
 		return err
 	}
-	tree := NewSumMerkleTree(leaves)
+	tree := NewSumMerkleTree(leaves, utils.Keccak160)
 	b.merkleTree = tree
 	b.MerkleRoot = b.merkleTree.GetRoot()
 	return nil

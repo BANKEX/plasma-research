@@ -3,6 +3,7 @@ package blockchain
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/BANKEX/plasma-research/src/node/utils"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -75,7 +76,7 @@ func TestSMT(t *testing.T) {
 		assert.Error(t, err)
 	}
 
-	sumTree = NewSumMerkleTree(txs)
+	sumTree = NewSumMerkleTree(txs, utils.Keccak160)
 
 	root := sumTree.GetRoot()
 

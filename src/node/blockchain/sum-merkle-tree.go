@@ -112,7 +112,7 @@ func uint32BE(n uint32) []byte {
 	return []byte{byte(n >> 24), byte(n >> 16), byte(n >> 8), byte(n)}
 }
 
-func concatAndHash(left *SumTreeNode, right *SumTreeNode) Uint160 {
+func concatAndHash(left *SumTreeNode, right *SumTreeNode, hashFunc HashFunction) Uint160 {
 	l1, l2 := left.Length, right.Length
 	h1, h2 := left.Hash, right.Hash
 
@@ -120,10 +120,10 @@ func concatAndHash(left *SumTreeNode, right *SumTreeNode) Uint160 {
 	d2 := append(h1, h2...)
 
 	result := append(d1, d2...)
-	return Keccak160(result)
+	return hashFunc(result)
 }
 
-func NewSumMerkleTree(leafs []*SumTreeNode) *SumMerkleTree {
+func NewSumMerkleTree(leafs []*SumTreeNode, hashFunc HashFunction) *SumMerkleTree {
 	var tree SumMerkleTree
 	tree.Leafs = leafs
 
@@ -142,7 +142,7 @@ func NewSumMerkleTree(leafs []*SumTreeNode) *SumMerkleTree {
 				buckets = buckets[2:]
 
 				length := left.Length + right.Length
-				hash := concatAndHash(left, right)
+				hash := concatAndHash(left, right, hashFunc)
 
 				node := SumTreeNode{
 					Hash:   hash,
@@ -231,37 +231,6 @@ func (tree *SumMerkleTree) GetRlpEncodedProof(leafIndex uint32) []byte {
 	rlp, _ := EncodeToRLP(tmp)
 	return rlp
 }
-
-// Function generates
-//func (tree *SumMerkleTree) GetProof(leafIndex uint32) []byte {
-//
-//	index := uint32(0)
-//	var curr = tree.Leafs[leafIndex]
-//	var proofSteps []byte
-//
-//	for i := uint(0); curr.Parent != nil; i++ {
-//
-//		var node *SumTreeNode
-//		if curr.Right != nil {
-//			node = curr.Right
-//
-//		} else {
-//			// We have left node - it means we are at the right
-//			node = curr.Left
-//			// set bit in index
-//			index |= 1 << i
-//		}
-//
-//		// 4 + 20 byte
-//		step := append(uint32BE(node.Length), node.Hash...)
-//		proofSteps = append(proofSteps, step...)
-//
-//		curr = curr.Parent
-//	}
-//
-//	result := append(uint32BE(index), proofSteps...)
-//	return result
-//}
 
 func (tree *SumMerkleTree) GetRoot() SumTreeRoot {
 	r := tree.Root
