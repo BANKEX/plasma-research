@@ -25,6 +25,7 @@ services:
     - "8080:8080"
     environment:
       geth_host: http://ganache:8545
+      operator_host: http://operator:3001
     restart: on-failure
     depends_on:
       - operator
