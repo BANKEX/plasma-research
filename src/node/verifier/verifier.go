@@ -99,34 +99,36 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 		return
 	}
 
-	var args []string
+	var arguments []string
 
 	argsWithSpace := strings.Split(userText, " ")
 
 	for _, j := range argsWithSpace {
 		if len(j) > 0 {
-			args = append(args, j)
+			arguments = append(arguments, j)
 		}
 	}
 
-	if len(args) > 2 {
-		switch args[0] {
+	if len(arguments) > 2 {
+		firstWorld := arguments[0]
+		switch firstWorld {
 		case "eth":
-			switch args[1] {
+			secondWorld := arguments[1]
+			switch secondWorld {
 			case "transfer", "tr":
-				if len(args) == 4 {
+				if len(arguments) == 4 {
 
-					value, ok := big.NewInt(0).SetString(args[2], 10)
+					value, ok := big.NewInt(0).SetString(arguments[2], 10)
 
 					if !ok {
 						fmt.Println("Bad int!")
 					}
 
-					if !common.IsHexAddress(args[3]) {
-						fmt.Println(fmt.Errorf("given to address %s is not valid ethereum address", args[3]))
+					if !common.IsHexAddress(arguments[3]) {
+						fmt.Println(fmt.Errorf("given to address %s is not valid ethereum address", arguments[3]))
 					}
 
-					to := common.HexToAddress(args[3])
+					to := common.HexToAddress(arguments[3])
 
 					tx, err := transaction.SendTransactionInWei(context.TODO(), v.client, v.key, value, to)
 					if err != nil {
@@ -134,50 +136,46 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 					} else {
 						fmt.Printf("transaction sended: %s", tx.Hash().String())
 					}
-				} else if len(args) < 4 {
-					fmt.Println("Not anough args!")
+				} else if len(arguments) < 4 {
+					fmt.Println("Not anough arguments!")
 				} else {
-					fmt.Println("Bad args!")
+					fmt.Println("Bad arguments!")
 				}
 			case "balance", "bal":
-				if len(args) == 3 {
-					balanceFloat, err := GetETHAccountBalance(args[2])
+				if len(arguments) == 3 {
+					balanceFloat, err := GetETHAccountBalance(arguments[2])
 					if err != nil {
 						fmt.Println(err)
 					} else {
-						fmt.Printf("Balance of account %s : %f\n", args[2], balanceFloat)
+						fmt.Printf("Balance of account %s : %f\n", arguments[2], balanceFloat)
 					}
 				} else {
-					fmt.Println("Bad args!")
+					fmt.Println("Bad arguments!")
 				}
-			// TODO:check this method
-			// now not work correctly
-			case "ownerBalance", "obal":
-				if len(args) == 2 {
-					fmt.Println(v.cfg.VerifierPublicKey)
-					balanceFloat, err := GetETHAccountBalance(v.cfg.VerifierPublicKey)
+				// TODO:check this method
+				// now not work correctly
+			case "ownerBalance", "ob":
+				if len(arguments) == 2 {
+					fmt.Println(v.cfg.VerifierEthereumAddress)
+					balanceFloat, err := GetETHAccountBalance(v.cfg.VerifierEthereumAddress)
 					if err != nil {
 						fmt.Println(err)
 					} else {
-						fmt.Printf("Balance of account %s : %f\n", v.cfg.VerifierPublicKey, balanceFloat)
+						fmt.Printf("Balance of account %s : %f\n", v.cfg.VerifierEthereumAddress, balanceFloat)
 					}
 				} else {
-					fmt.Println("Bad args!")
+					fmt.Println("Bad arguments!")
 				}
 			default:
-				fmt.Println("Bad args!")
+				fmt.Println("Bad arguments!")
 			}
 		case "plasma":
-			switch args[1] {
-
+			secondWorld := arguments[1]
+			switch secondWorld {
 			case "deposit", "dep":
-
-				if len(args) == 3 {
-
-					value, ok := big.NewInt(0).SetString(args[2], 10)
-
+				if len(arguments) == 3 {
+					value, ok := big.NewInt(0).SetString(arguments[2], 10)
 					switch ok {
-
 					case true:
 						rawContractAddress := common.HexToAddress(v.cfg.PlasmaContractAddress)
 						res, err := deposit.Deposit(context.TODO(), rawContractAddress, v.client, v.key, value)
@@ -189,39 +187,39 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 					case false:
 						fmt.Println("Error!")
 					}
-				} else if len(args) < 3 {
-					fmt.Println("Not anought args!")
+				} else if len(arguments) < 3 {
+					fmt.Println("Not enough arguments!")
 				} else {
-					fmt.Println("Bad args!")
+					fmt.Println("Bad arguments!")
 				}
 			case "transfer", "tr":
-				if len(args) == 7 {
-					block, err := strconv.ParseUint(args[2], 10, 32)
+				if len(arguments) == 7 {
+					block, err := strconv.ParseUint(arguments[2], 10, 32)
 					if err != nil {
 						fmt.Println(err)
 					}
-					txN, err := strconv.ParseUint(args[3], 10, 32)
+					txN, err := strconv.ParseUint(arguments[3], 10, 32)
 					if err != nil {
 						fmt.Println(err)
 					}
-					out, err := strconv.ParseUint(args[4], 10, 8)
-					if err != nil {
-						fmt.Println(err)
-					}
-
-					value, err := strconv.ParseUint(args[5], 10, 32)
-					if err != nil {
-						fmt.Println(err)
-					}
-					if !common.IsHexAddress(args[6]) {
-						fmt.Println(fmt.Errorf("given to address %s is not valid ethereum address", args[6]))
-					}
-					to, err := hex.DecodeString(args[6][2:])
+					out, err := strconv.ParseUint(arguments[4], 10, 8)
 					if err != nil {
 						fmt.Println(err)
 					}
 
-					txs, err := v.getTransactionHistory(v.cfg.VerifierPublicKey)
+					value, err := strconv.ParseUint(arguments[5], 10, 32)
+					if err != nil {
+						fmt.Println(err)
+					}
+					if !common.IsHexAddress(arguments[6]) {
+						fmt.Println(fmt.Errorf("given to address %s is not valid ethereum address", arguments[6]))
+					}
+					to, err := hex.DecodeString(arguments[6][2:])
+					if err != nil {
+						fmt.Println(err)
+					}
+
+					txs, err := v.getTransactionHistory(v.cfg.VerifierEthereumAddress)
 					if err != nil {
 						fmt.Println(err)
 					}
@@ -235,52 +233,49 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 					if err != nil {
 						fmt.Println(err)
 					}
-				} else if len(args) < 7 {
-					fmt.Println("Not anought args!")
+				} else if len(arguments) < 7 {
+					fmt.Println("Not anought arguments!")
 				} else {
-					fmt.Println("Bad args!")
+					fmt.Println("Bad arguments!")
 				}
 			case "utxo":
-				if len(args) == 2 {
-					txs, err := v.getTransactionHistory(v.cfg.VerifierPublicKey)
+				if len(arguments) == 2 {
+					txs, err := v.getTransactionHistory(v.cfg.VerifierEthereumAddress)
 					if err != nil {
 						fmt.Println("error ", err)
 					}
 
-					fmt.Printf("Utxo list for %s:", v.cfg.VerifierPublicKey)
+					fmt.Printf("Utxo list for %s:", v.cfg.VerifierEthereumAddress)
 
 					for _, tx := range txs {
 						fmt.Printf("%d:%d:%d -> %d coins", tx.BlockIndex, tx.TxIndex, tx.OutputIndex, tx.Slice.End-tx.Slice.Begin)
 					}
 
 				} else {
-					fmt.Println("Not anought args!")
+					fmt.Println("Not anought arguments!")
 				}
-			// TODO:check this method
-			// now not work correctly
+
+				// TODO:check this method
+				// now not work correctly
 			case "balance", "bal":
-				if len(args) == 2 {
-
+				if len(arguments) == 2 {
 					st := make([]blockchain.Input, 0)
-
-					resp, err := req.Get("http://localhost:3001/utxo/" + v.cfg.VerifierPublicKey)
+					resp, err := req.Get(v.cfg.OperatorHost + "/utxo/" + v.cfg.VerifierEthereumAddress)
 					if err != nil {
 						fmt.Println(err)
 					}
-
 					resp.ToJSON(&st)
-
 					fmt.Println(st)
 
 				} else {
-					fmt.Println("Not anought args!")
+					fmt.Println("Not anought arguments!")
 				}
 			case "exit", "ex":
-				if len(args) == 3 {
+				if len(arguments) == 3 {
 					fmt.Println("Exit func")
 				}
 			default:
-				fmt.Println("Bad args!")
+				fmt.Println("Bad arguments!")
 			}
 		}
 	}
@@ -314,7 +309,7 @@ func (v *Verifier) ServerStart(r *gin.Engine) error {
 }
 
 func (v *Verifier) EthereumBalance(c *gin.Context) {
-	response := ethereum.GetBalance(v.cfg.VerifierPublicKey)
+	response := ethereum.GetBalance(v.cfg.VerifierEthereumAddress)
 	c.JSON(http.StatusOK, gin.H{
 		"balance": response,
 	})
@@ -324,7 +319,7 @@ func (v *Verifier) PlasmaBalance(c *gin.Context) {
 
 	st := make([]blockchain.Input, 0)
 
-	resp, err := http.Get(v.cfg.OperatorHost + "/utxo/" + v.cfg.VerifierPublicKey)
+	resp, err := http.Get(v.cfg.OperatorHost + "/utxo/" + v.cfg.VerifierEthereumAddress)
 	if err != nil {
 		log.Println(err)
 	}
@@ -334,8 +329,9 @@ func (v *Verifier) PlasmaBalance(c *gin.Context) {
 		log.Println(err)
 	}
 	err = json.Unmarshal(body, &st)
+
 	if err != nil {
-		log.Println(err)
+		fmt.Println(err)
 	}
 
 	c.JSON(http.StatusOK, st)
@@ -443,10 +439,9 @@ func (v *Verifier) LatestBlockHandler(c *gin.Context) {
 	err = json.Unmarshal(body, &st)
 
 	if err != nil {
+
 		fmt.Println(err)
 	}
-
-	resp.ToJSON(&st)
 
 	c.JSON(http.StatusOK, st.LastBlock)
 }
