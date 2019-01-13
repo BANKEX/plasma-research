@@ -43,7 +43,6 @@ type ProofStep struct {
 	Hash   Uint160 // 20 bytes
 }
 
-
 func HasIntersection(slices []Slice) error {
 	for i := 0; i < len(slices)-1; i++ {
 		if slices[i].End > slices[i+1].Begin {
@@ -72,9 +71,8 @@ func PrepareLeaves(transactions []Transaction) ([]*SumTreeNode, error) {
 		return slices[i].Begin < slices[j].Begin
 	})
 
-
 	err := HasIntersection(slices)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
