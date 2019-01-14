@@ -126,7 +126,7 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 		secondWorld := arguments[1]
 		switch secondWorld {
 
-		case "transfer", "tr":
+		case "transfer":
 			if len(arguments) != 4 {
 				fmt.Println(options.Eth["transfer"])
 				return
@@ -153,7 +153,7 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 
 			fmt.Printf("transaction sended: %s", tx.Hash().String())
 
-		case "balance", "bal":
+		case "balance":
 			if len(arguments) != 3 {
 				fmt.Println(options.Eth["balance"])
 				return
@@ -165,7 +165,7 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 			}
 			fmt.Printf("Balance of account %s : %f\n", arguments[2], balanceFloat)
 
-		case "ownerBalance", "obal":
+		case "ownerBalance":
 			if len(arguments) != 2 {
 				fmt.Println(options.Eth["ownerBalance"])
 				return
@@ -186,7 +186,7 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 	case "plasma":
 		secondWorld := arguments[1]
 		switch secondWorld {
-		case "deposit", "dep":
+		case "deposit":
 			if len(arguments) != 3 {
 				fmt.Println(options.Plasma["deposit"])
 				return
@@ -206,7 +206,7 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 				fmt.Println(options.Plasma["deposit"])
 				return
 			}
-		case "transfer", "tr":
+		case "transfer":
 			if len(arguments) != 7 {
 				fmt.Println(options.Plasma["transfer"])
 				return
@@ -276,7 +276,7 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 				fmt.Printf("%d:%d:%d -> %d coins", tx.BlockIndex, tx.TxIndex, tx.OutputIndex, tx.Slice.End-tx.Slice.Begin)
 			}
 
-		case "balance", "bal":
+		case "balance":
 			if len(arguments) != 2 {
 				fmt.Println(options.Plasma["balance"])
 				return
@@ -291,7 +291,7 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 			resp.ToJSON(&st)
 			fmt.Println(st)
 
-		case "exit", "ex":
+		case "exit":
 			if len(arguments) != 2 {
 				fmt.Println(options.Plasma["exit"])
 				return

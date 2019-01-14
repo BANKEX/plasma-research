@@ -8,17 +8,17 @@ var Initial = map[string]string{
 	"quit":   "Quit from app",
 }
 var Eth = map[string]string{
-	"transfer":     "example transfer 4 wei:\neth transfer 4 0x4ED6d26c6885247fA22746AB2c5328076597a5DF\n or \neth tr 4 0x4ED6d26c6885247fA22746AB2c5328076597a5DF",
-	"balance":      "example get balance of account 0x4ED6d26c6885247fA22746AB2c5328076597a5DF\neth balance 0x4ED6d26c6885247fA22746AB2c5328076597a5DF\n or \neth bal 0x4ED6d26c6885247fA22746AB2c5328076597a5DF",
-	"ownerBalance": "example get balance of user(config) eth account\neth ownerBalance\n or \neth obal",
+	"transfer":     "example transfer 4 wei:\neth transfer 4 0x4ED6d26c6885247fA22746AB2c5328076597a5DF",
+	"balance":      "example get balance of account 0x4ED6d26c6885247fA22746AB2c5328076597a5DF:\neth balance 0x4ED6d26c6885247fA22746AB2c5328076597a5DF",
+	"ownerBalance": "example get balance of user(config) eth account:\neth ownerBalance",
 }
 
 var Plasma = map[string]string{
-	"deposit":  "dep: Deposit - plasma dep value",
-	"balance":  "bal: Plasma balance - plasma bal",
-	"transfer": "tr: Transfer - plasma tr block txN out value address",
-	"utxo":     "utxo: List UTXOs from plasma - plasma utxo",
-	"exit":     "ex: Exit from plasma - plasma exit",
+	"deposit":  "example deposit 1 wei:\nplasma deposit 1",
+	"balance":  "example get balance of plasma:\nplasma balance",
+	"transfer": "example transfer:\nplasma tr block txN out value address",
+	"utxo":     "example get list UTXOs from plasma:\nplasma utxo",
+	"exit":     "example exit from plasma:\nplasma exit",
 }
 
 var InitialOptions = []prompt.Suggest{
