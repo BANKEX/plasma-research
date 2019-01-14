@@ -9,6 +9,14 @@ ganache_running() {
   nc -z localhost "$ganache_port"
 }
 
+# Ganache use first address to make migration (0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501200)
+# Since contract is ownable we will assign address to operator
+# The second one(0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501201) will be assigned to verifier
+#
+#
+# Private Key to Address mapping 
+# 0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501200 -> 0xDf08F82De32B8d460adbE8D72043E3a7e25A3B39
+# 0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501201 -> 0x6704Fbfcd5Ef766B287262fA2281C105d57246a6
 start_ganache() {
   # We define 10 accounts with balance 1M ether, needed for high-value tests.
   local accounts=(
@@ -25,7 +33,7 @@ start_ganache() {
   )
 
   node_modules/.bin/ganache-cli --db="./data/" --gasLimit 0xfffffffffff --host 0.0.0.0 --port "$ganache_port" "${accounts[@]}" &
-
+  node_modules/.bin/truffle migrate --network=ganache
   ganache_pid=$!
 }
 
@@ -37,3 +45,4 @@ else
 fi
 
 wait ${ganache_pid}
+
