@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
-	"os"
 
 	"github.com/BANKEX/plasma-research/src/node/cmd"
 	"github.com/BANKEX/plasma-research/src/node/operator"
@@ -16,17 +14,14 @@ func main() {
 }
 
 func run(app cmd.AppContext) error {
-
 	cfg, err := operator.NewConfig()
 	if err != nil {
-		log.Printf("failed parse configs: %s", err)
-		os.Exit(1)
+		return fmt.Errorf("failed parse configs: %s", err)
 	}
 
 	o, err := operator.NewOperator(cfg)
 	if err != nil {
-		log.Printf("failed to build operator instance: %s", err)
-		os.Exit(1)
+		return fmt.Errorf("failed to build operator instance: %s", err)
 	}
 
 	ctx := context.Background()
