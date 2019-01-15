@@ -7,22 +7,22 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/BANKEX/plasma-research/src/node/types"
-	"github.com/gin-gonic/contrib/static"
 	"io"
 	"log"
+	"math"
 	"math/big"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 
-	"github.com/BANKEX/plasma-research/src/node/ethereum/deposit"
+	"github.com/BANKEX/plasma-research/src/node/types"
+	"github.com/gin-gonic/contrib/static"
+
 	"github.com/BANKEX/plasma-research/src/node/utils"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
-	"github.com/BANKEX/plasma-research/src/node/ethereum/transaction"
 	"github.com/BANKEX/plasma-research/src/node/verifier/cli/completer"
 	"github.com/c-bata/go-prompt"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -33,18 +33,19 @@ import (
 	"github.com/BANKEX/plasma-research/src/node/verifier/cli/options"
 	"github.com/gin-gonic/gin"
 	"github.com/imroc/req"
-	"math"
 )
 
 type Verifier struct {
 	rpcServer *gin.Engine
 	cfg       *Config
-	client    *ethclient.Client
 	key       *ecdsa.PrivateKey
+	eth       *ethereum.Ethereum
 }
 
 func NewVerifier(cfg *Config) (*Verifier, error) {
-	client, err := ethclient.Dial(cfg.GethHost)
+	plasmaContractAddress := common.HexToAddress(cfg.PlasmaContractAddress)
+
+	eth, err := ethereum.NewEthereum(cfg.GethHost, plasmaContractAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -57,8 +58,8 @@ func NewVerifier(cfg *Config) (*Verifier, error) {
 	return &Verifier{
 		cfg:       cfg,
 		rpcServer: utils.NewGinServer(),
-		client:    client,
 		key:       key,
+		eth:       eth,
 	}, nil
 }
 
@@ -144,7 +145,7 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 			}
 			to := common.HexToAddress(toAddressArg)
 
-			tx, err := transaction.SendTransactionInWei(context.TODO(), v.client, v.key, amountInWei, to)
+			tx, err := v.eth.SendTransactionInWei(context.TODO(), v.key, amountInWei, to)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -195,7 +196,7 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 			switch ok {
 			case true:
 				rawContractAddress := common.HexToAddress(v.cfg.PlasmaContractAddress)
-				res, err := deposit.Deposit(context.TODO(), rawContractAddress, v.client, v.key, value)
+				res, err := v.eth.Deposit(context.TODO(), rawContractAddress, v.key, value)
 				if err != nil {
 					fmt.Println(err)
 					return
@@ -334,7 +335,12 @@ func (v *Verifier) ServerStart(r *gin.Engine) error {
 }
 
 func (v *Verifier) EthereumBalance(c *gin.Context) {
-	response := ethereum.GetBalance(v.cfg.VerifierEthereumAddress)
+	addr := common.HexToAddress(v.cfg.VerifierEthereumAddress)
+	response, err := v.eth.GetBalance(context.TODO(), addr)
+	if err != nil {
+		log.Printf("failed to get verifier eth balance: %s", err)
+		// TODO: handle error
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"balance": response,
 	})
@@ -372,7 +378,7 @@ func (v *Verifier) DepositHandler(c *gin.Context) {
 	}
 
 	rawContractAddress := common.HexToAddress(v.cfg.PlasmaContractAddress)
-	result, err := deposit.Deposit(context.TODO(), rawContractAddress, v.client, v.key, value)
+	result, err := v.eth.Deposit(context.TODO(), rawContractAddress, v.key, value)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
@@ -576,7 +582,6 @@ func findTransaction(slice []blockchain.Input, block, tx uint32, out byte) *bloc
 }
 
 func GetETHAccountBalance(address string) (float64, error) {
-
 	client, err := ethclient.Dial("https://mainnet.infura.io")
 	if err != nil {
 		return 0, err
