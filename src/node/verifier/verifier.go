@@ -345,7 +345,7 @@ func (v *Verifier) PlasmaBalance(c *gin.Context) {
 	st := make([]blockchain.Input, 0)
 
 	resp, err := req.Get(v.cfg.OperatorHost + "/utxo/" + v.cfg.VerifierEthereumAddress)
-	if err != nil{
+	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
@@ -450,7 +450,7 @@ func (v *Verifier) LatestBlockHandler(c *gin.Context) {
 	st := types.LastBlock{}
 
 	resp, err := req.Get(v.cfg.OperatorHost + "/status")
-	if err != nil{
+	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
