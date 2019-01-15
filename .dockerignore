@@ -7,4 +7,5 @@
 docs
 target
 /src/contracts/node_modules
+/src/contracts/build
 build
