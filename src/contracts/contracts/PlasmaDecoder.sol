@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import { RLPReader } from "solidity-rlp/contracts/RLPReader.sol";
 import { SumMerkleProof } from "./SumMerkleProof.sol";
@@ -8,7 +8,7 @@ library PlasmaDecoder {
   using RLPReader for bytes;
 
   struct Input {
-    address owner;
+    address payable owner;
     uint32 blockIndex;
     uint32 txIndex;
     uint8 outputIndex;
@@ -18,7 +18,7 @@ library PlasmaDecoder {
   }
 
   struct Output {
-    address owner;
+    address payable owner;
     address assetId;
     uint64 begin;
     uint64 end;
@@ -49,31 +49,31 @@ library PlasmaDecoder {
     Transaction[] transactions;
   }
 
-  function decodeProof(bytes memory rlpBytes) internal pure returns(SumMerkleProof.Proof) {
+  function decodeProof(bytes memory rlpBytes) internal pure returns(SumMerkleProof.Proof memory) {
     return _decodeProof(rlpBytes.toRlpItem().toList());
   }
 
-  function decodeInput(bytes memory rlpBytes) internal pure returns(Input) {
+  function decodeInput(bytes memory rlpBytes) internal pure returns(Input memory) {
     return _decodeInput(rlpBytes.toRlpItem().toList());
   }
 
-  function decodeOutput(bytes memory rlpBytes) internal pure returns(Output) {
+  function decodeOutput(bytes memory rlpBytes) internal pure returns(Output memory) {
     return _decodeOutput(rlpBytes.toRlpItem().toList());
   }
 
-  function decodeMetadata(bytes memory rlpBytes) internal pure returns(Metadata) {
+  function decodeMetadata(bytes memory rlpBytes) internal pure returns(Metadata memory) {
     return _decodeMetadata(rlpBytes.toRlpItem().toList());
   }
 
-  function decodeSignature(bytes memory rlpBytes) internal pure returns(Signature) {
+  function decodeSignature(bytes memory rlpBytes) internal pure returns(Signature memory) {
     return _decodeSignature(rlpBytes.toRlpItem().toList());
   }
 
-  function decodeTransaction(bytes memory rlpBytes) internal pure returns(Transaction) {
+  function decodeTransaction(bytes memory rlpBytes) internal pure returns(Transaction memory) {
     return _decodeTransaction(rlpBytes.toRlpItem().toList());
   }
 
-  function decodeBlock(bytes memory rlpBytes) internal pure returns(Block) {
+  function decodeBlock(bytes memory rlpBytes) internal pure returns(Block memory) {
     return _decodeBlock(rlpBytes.toRlpItem().toList());
   }
 
@@ -94,14 +94,14 @@ library PlasmaDecoder {
     bytes data;
   }
 
-  function _decodeSlice(RLPReader.RLPItem[] items) private pure returns(SumMerkleProof.Slice) {
+  function _decodeSlice(RLPReader.RLPItem[] memory items) private pure returns(SumMerkleProof.Slice memory) {
     return SumMerkleProof.Slice({
       begin: uint32(items[0].toUint()),
       end: uint32(items[1].toUint())
     });
   }
 
-  function _decodeProof(RLPReader.RLPItem[] items) private pure returns(SumMerkleProof.Proof) {
+  function _decodeProof(RLPReader.RLPItem[] memory items) private pure returns(SumMerkleProof.Proof memory) {
     return SumMerkleProof.Proof({
       index: uint32(items[0].toUint()),
       slice: _decodeSlice(items[1].toList()),
@@ -110,9 +110,9 @@ library PlasmaDecoder {
     });
   }
 
-  function _decodeInput(RLPReader.RLPItem[] items) private pure returns(Input) {
+  function _decodeInput(RLPReader.RLPItem[] memory items) private pure returns(Input memory) {
     return Input({
-      owner: items[0].toAddress(),
+      owner: address(uint160(items[0].toAddress())),
       blockIndex: uint32(items[1].toUint()),
       txIndex: uint32(items[2].toUint()),
       outputIndex: uint8(items[3].toUint()),
@@ -122,7 +122,7 @@ library PlasmaDecoder {
     });
   }
 
-  function _decodeInputs(RLPReader.RLPItem[] memory items) private pure returns(Input[]) {
+  function _decodeInputs(RLPReader.RLPItem[] memory items) private pure returns(Input[] memory) {
     Input[] memory inputs = new Input[](items.length);
     for (uint i = 0; i < items.length; i++) {
       inputs[i] = _decodeInput(items[i].toList());
@@ -130,16 +130,16 @@ library PlasmaDecoder {
     return inputs;
   }
 
-  function _decodeOutput(RLPReader.RLPItem[] memory items) private pure returns(Output) {
+  function _decodeOutput(RLPReader.RLPItem[] memory items) private pure returns(Output memory) {
     return Output({
-      owner: items[0].toAddress(),
+      owner: address(uint160(items[0].toAddress())),
       assetId: items[1].toAddress(),
       begin: uint64(items[2].toUint()),
       end: uint64(items[3].toUint())
     });
   }
 
-  function _decodeOutputs(RLPReader.RLPItem[] memory items) private pure returns(Output[]) {
+  function _decodeOutputs(RLPReader.RLPItem[] memory items) private pure returns(Output[] memory) {
     Output[] memory outputs = new Output[](items.length);
     for (uint i = 0; i < items.length; i++) {
       outputs[i] = _decodeOutput(items[i].toList());
@@ -147,13 +147,13 @@ library PlasmaDecoder {
     return outputs;
   }
 
-  function _decodeMetadata(RLPReader.RLPItem[] memory items) private pure returns(Metadata) {
+  function _decodeMetadata(RLPReader.RLPItem[] memory items) private pure returns(Metadata memory) {
     return Metadata({
       maxBlockId: uint32(items[0].toUint())
     });
   }
 
-  function _decodeSignature(RLPReader.RLPItem[] memory items) internal pure returns(Signature) {
+  function _decodeSignature(RLPReader.RLPItem[] memory items) internal pure returns(Signature memory) {
     return Signature({
       r: items[0].toUint(),
       s: items[0].toUint(),
@@ -161,7 +161,7 @@ library PlasmaDecoder {
     });
   }
 
-  function _decodeSignatures(RLPReader.RLPItem[] memory items) private pure returns(Signature[]) {
+  function _decodeSignatures(RLPReader.RLPItem[] memory items) private pure returns(Signature[] memory) {
     Signature[] memory signatures = new Signature[](items.length);
     for (uint i = 0; i < items.length; i++) {
       signatures[i] = _decodeSignature(items[i].toList());
@@ -169,7 +169,7 @@ library PlasmaDecoder {
     return signatures;
   }
 
-  function _decodeTransaction(RLPReader.RLPItem[] memory items) private pure returns(Transaction) {
+  function _decodeTransaction(RLPReader.RLPItem[] memory items) private pure returns(Transaction memory) {
     return Transaction({
       inputs: _decodeInputs(items[0].toList()),
       outputs: _decodeOutputs(items[1].toList()),
@@ -178,7 +178,7 @@ library PlasmaDecoder {
     });
   }
 
-  function _decodeTransactions(RLPReader.RLPItem[] memory items) private pure returns(Transaction[]) {
+  function _decodeTransactions(RLPReader.RLPItem[] memory items) private pure returns(Transaction[] memory) {
     Transaction[] memory transactions = new Transaction[](items.length);
     for (uint i = 0; i < items.length; i++) {
       transactions[i] = _decodeTransaction(items[i].toList());
@@ -186,7 +186,7 @@ library PlasmaDecoder {
     return transactions;
   }
 
-  function _decodeBlock(RLPReader.RLPItem[] memory items) private pure returns(Block) {
+  function _decodeBlock(RLPReader.RLPItem[] memory items) private pure returns(Block memory) {
     return Block({
       blockNumber: uint32(items[0].toUint()),
       previousBlockHash: items[1].toUint(),

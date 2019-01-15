@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -22,7 +22,7 @@ contract PlasmaBlocks is Ownable {
 
   function submitBlocks(
     uint256 fromIndex,
-    bytes newBlocks
+    bytes memory newBlocks
   )
     public
     onlyOwner
@@ -33,8 +33,8 @@ contract PlasmaBlocks is Ownable {
 
   function submitBlocksSigned(
     uint256 fromIndex,
-    bytes newBlocks,
-    bytes rsv
+    bytes memory newBlocks,
+    bytes memory rsv
   )
     public
     returns(uint256)
@@ -53,7 +53,7 @@ contract PlasmaBlocks is Ownable {
 
   function _submitBlocks(
     uint256 fromIndex,
-    bytes newBlocks
+    bytes memory newBlocks
   )
     internal
     returns(uint256)

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -97,29 +97,29 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
   }
 
   function depositERC20(IERC20 token, uint256 amountArg) public {
-    require(_assetLists[token].isInitialized(), "Operator should add this token first");
+    require(_assetLists[address(token)].isInitialized(), "Operator should add this token first");
 
     uint64 amount = uint64(amountArg / ASSET_DECIMALS_TRUNCATION);
-    (uint64 intervalId, uint64 begin, uint64 end) = _assetLists[token].append(amount);
+    (uint64 intervalId, uint64 begin, uint64 end) = _assetLists[address(token)].append(amount);
 
-    uint256 preBalance = token.balanceOf(this);
-    token.safeTransferFrom(msg.sender, this, amount);
-    uint256 deposited = token.balanceOf(this).sub(preBalance);
+    uint256 preBalance = token.balanceOf(address(this));
+    token.safeTransferFrom(msg.sender, address(this), amount);
+    uint256 deposited = token.balanceOf(address(this)).sub(preBalance);
 
-    emit ERC20Deposited(token, msg.sender, deposited);
-    emit AssetDeposited(token, msg.sender, intervalId, begin, end);
+    emit ERC20Deposited(address(token), msg.sender, deposited);
+    emit AssetDeposited(address(token), msg.sender, intervalId, begin, end);
     bytes32 hash = keccak256(abi.encodePacked(token, msg.sender, intervalId, begin, end));
     _allDepositHashes[msg.sender].push(hash);
   }
 
   function depositERC721(IERC721 token, uint256 tokenId) public {
     _expectedTokenAndTokenIdHash = keccak256(abi.encodePacked(token, tokenId));
-    token.safeTransferFrom(msg.sender, this, tokenId);
+    token.safeTransferFrom(msg.sender, address(this), tokenId);
     require(_expectedTokenAndTokenIdHash == bytes32(0), "ERC721 token not received");
 
     (uint64 intervalId, uint64 begin, uint64 end) = _assetLists[ERC721_ASSET_ID].append(1);
 
-    emit ERC721Deposited(token, msg.sender, tokenId, begin);
+    emit ERC721Deposited(address(token), msg.sender, tokenId, begin);
     emit AssetDeposited(ERC721_ASSET_ID, msg.sender, intervalId, begin, end);
 
     bytes32 hash = keccak256(abi.encodePacked(ERC721_ASSET_ID, msg.sender, intervalId, begin, end));
@@ -133,7 +133,7 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
     address operator,
     address /*from*/,
     uint256 tokenId,
-    bytes /*data*/
+    bytes memory /*data*/
   )
   public
   returns (bytes4)
@@ -186,7 +186,7 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
     bytes memory inputBytes, // PlasmaDecoder.Input
     bytes memory txProofBytes, // SumMerkleProof.Proof
     uint64 blockIndex,
-    uint8 spendIndex
+    uint8 /*spendIndex*/
   )
   public
   returns (bool)
@@ -229,7 +229,7 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
   function withdrawalEnd(
     bytes memory inputBytes, // PlasmaDecoder.Input
     uint64 intervalId,
-    IERC721 token,
+    address token,
     uint256 tokenId
   ) public {
     PlasmaDecoder.Input memory input = inputBytes.decodeInput();
@@ -260,7 +260,7 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
       bytes32 depositHash = keccak256(abi.encodePacked(token, tokenId, input.begin));
       require(_erc721Deposits[depositHash], "Invalid token or tokeId arguments");
       delete _erc721Deposits[depositHash];
-      token.approve(msg.sender, tokenId);
+      IERC721(token).approve(msg.sender, tokenId);
       return;
     }
 

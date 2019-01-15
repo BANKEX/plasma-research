@@ -1,24 +1,21 @@
-const EVMRevert = require('./helpers/EVMRevert');
+const { BN, shouldFail } = require('openzeppelin-test-helpers');
 
 const OrderedIntervalList = artifacts.require('OrderedIntervalListWrapper');
-const BigNumber = web3.BigNumber;
-
-require('chai')
-  .use(require('chai-bignumber')(BigNumber))
-  .use(require('chai-as-promised'))
-  .should();
 
 async function validateList (listContract, arr, ids) {
+  arr = arr.map(sub => sub.map(a => new BN(a)));
+  ids = ids.map(a => new BN(a));
+
   // Validate zero element
   const zeroInterval = await listContract.get.call(0);
-  zeroInterval[0].should.be.bignumber.equal(0);
-  zeroInterval[1].should.be.bignumber.equal(0);
-  (await listContract.getPrev.call(0)).should.be.bignumber.equal(0);
-  (await listContract.getNext.call(0)).should.be.bignumber.equal(0);
+  zeroInterval[0].should.be.bignumber.equal('0');
+  zeroInterval[1].should.be.bignumber.equal('0');
+  (await listContract.getPrev.call(0)).should.be.bignumber.equal('0');
+  (await listContract.getNext.call(0)).should.be.bignumber.equal('0');
 
   // Validate linked list with prev refs
   let i = 0;
-  let prevId = 0;
+  let prevId = new BN(0);
   let id = await listContract.firstIndex.call();
   while (i < arr.length && id !== 0) {
     const interval = await listContract.get.call(id);
@@ -36,32 +33,32 @@ async function validateList (listContract, arr, ids) {
   }
 
   i.should.be.equal(arr.length);
-  id.should.be.bignumber.equal(0);
+  id.should.be.bignumber.equal('0');
   (await listContract.lastIndex.call()).should.be.bignumber.equal(prevId);
 }
 
-async function printList (listContract) {
-  // Validate zero element
-  const zeroInterval = await listContract.get.call(0);
-  const zeroPrev = await listContract.getPrev.call(0);
-  const zeroNext = await listContract.getNext.call(0);
-  let s = 'zeroInterval=(' + zeroInterval[0] + ',' + zeroInterval[1] + ',' + zeroPrev + ',' + zeroNext + ') ';
+// async function printList (listContract) {
+//   // Validate zero element
+//   const zeroInterval = await listContract.get.call(0);
+//   const zeroPrev = await listContract.getPrev.call(0);
+//   const zeroNext = await listContract.getNext.call(0);
+//   let s = 'zeroInterval=(' + zeroInterval[0] + ',' + zeroInterval[1] + ',' + zeroPrev + ',' + zeroNext + ') ';
 
-  // Validate linked list with prev refs
-  let id = await listContract.firstIndex.call();
-  s += 'last=' + (await listContract.lastIndex.call()) + ' ';
-  s += 'list={ ';
-  while (id !== 0) {
-    const interval = await listContract.get.call(id);
-    const prevId = await listContract.getPrev.call(id);
-    s += id + ':[' + interval[0] + ',' + interval[1] + '):' + prevId + ' ';
+//   // Validate linked list with prev refs
+//   let id = await listContract.firstIndex.call();
+//   s += 'last=' + (await listContract.lastIndex.call()) + ' ';
+//   s += 'list={ ';
+//   while (id !== 0) {
+//     const interval = await listContract.get.call(id);
+//     const prevId = await listContract.getPrev.call(id);
+//     s += id + ':[' + interval[0] + ',' + interval[1] + '):' + prevId + ' ';
 
-    id = await listContract.getNext.call(id);
-  }
-  s += '}';
+//     id = await listContract.getNext.call(id);
+//   }
+//   s += '}';
 
-  return s;
-}
+//   return s;
+// }
 
 contract('OrderedIntervalList', function () {
   beforeEach(async function () {
@@ -70,10 +67,14 @@ contract('OrderedIntervalList', function () {
 
   describe('insert', function () {
     it('check init state', async function () {
-      await this.orderedList.get.call(0).should.be.fulfilled;
-      await this.orderedList.get.call(1).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.get.call(-1).should.be.rejectedWith(EVMRevert);
-      await validateList(this.orderedList, []);
+      await this.orderedList.get.call(0); // fulfilled
+      await shouldFail.reverting(
+        this.orderedList.get.call(1)
+      );
+      await shouldFail.reverting(
+        this.orderedList.get.call(-1)
+      );
+      await validateList(this.orderedList, [], []);
     });
 
     describe('single', function () {
@@ -93,7 +94,9 @@ contract('OrderedIntervalList', function () {
         //  = [0,0)
         //
 
-        await this.orderedList.insert(0, 0, 200, 100).should.be.rejectedWith(EVMRevert);
+        await shouldFail.reverting(
+          this.orderedList.insert(0, 0, 200, 100)
+        );
         await validateList(this.orderedList, [], []);
       });
 
@@ -103,7 +106,9 @@ contract('OrderedIntervalList', function () {
         //  = [0,0)
         //
 
-        await this.orderedList.insert(1, 0, 0, 100).should.be.rejectedWith(EVMRevert);
+        await shouldFail.reverting(
+          this.orderedList.insert(1, 0, 0, 100)
+        );
         await validateList(this.orderedList, [], []);
       });
 
@@ -113,7 +118,9 @@ contract('OrderedIntervalList', function () {
         //  = [0,0)
         //
 
-        await this.orderedList.insert(0, 1, 0, 100).should.be.rejectedWith(EVMRevert);
+        await shouldFail.reverting(
+          this.orderedList.insert(0, 1, 0, 100)
+        );
         await validateList(this.orderedList, [], []);
       });
     });
@@ -141,9 +148,15 @@ contract('OrderedIntervalList', function () {
       //
 
       await this.orderedList.insert(0, 0, 0, 100);
-      await this.orderedList.insert(1, 0, 101, 200).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(1, 0, 105, 200).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(1, 0, 200, 300).should.be.rejectedWith(EVMRevert);
+      await shouldFail.reverting(
+        this.orderedList.insert(1, 0, 101, 200)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(1, 0, 105, 200)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(1, 0, 200, 300)
+      );
       await validateList(this.orderedList, [[0, 100]], [1]);
     });
 
@@ -160,35 +173,83 @@ contract('OrderedIntervalList', function () {
       //
 
       await this.orderedList.insert(0, 0, 100, 200);
-      await this.orderedList.insert(0, 0, 50, 101).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(0, 1, 50, 101).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(1, 0, 50, 101).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(1, 1, 50, 101).should.be.rejectedWith(EVMRevert);
+      await shouldFail.reverting(
+        this.orderedList.insert(0, 0, 50, 101)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(0, 1, 50, 101)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(1, 0, 50, 101)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(1, 1, 50, 101)
+      );
 
-      await this.orderedList.insert(0, 0, 199, 250).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(0, 1, 199, 250).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(1, 0, 199, 250).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(1, 1, 199, 250).should.be.rejectedWith(EVMRevert);
+      await shouldFail.reverting(
+        this.orderedList.insert(0, 0, 199, 250)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(0, 1, 199, 250)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(1, 0, 199, 250)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(1, 1, 199, 250)
+      );
 
-      await this.orderedList.insert(0, 0, 100, 200).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(0, 1, 100, 200).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(1, 0, 100, 200).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(1, 1, 100, 200).should.be.rejectedWith(EVMRevert);
+      await shouldFail.reverting(
+        this.orderedList.insert(0, 0, 100, 200)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(0, 1, 100, 200)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(1, 0, 100, 200)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(1, 1, 100, 200)
+      );
 
-      await this.orderedList.insert(0, 0, 99, 200).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(0, 1, 99, 200).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(1, 0, 99, 200).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(1, 1, 99, 200).should.be.rejectedWith(EVMRevert);
+      await shouldFail.reverting(
+        this.orderedList.insert(0, 0, 99, 200)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(0, 1, 99, 200)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(1, 0, 99, 200)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(1, 1, 99, 200)
+      );
 
-      await this.orderedList.insert(0, 0, 100, 201).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(0, 1, 100, 201).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(1, 0, 100, 201).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(1, 1, 100, 201).should.be.rejectedWith(EVMRevert);
+      await shouldFail.reverting(
+        this.orderedList.insert(0, 0, 100, 201)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(0, 1, 100, 201)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(1, 0, 100, 201)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(1, 1, 100, 201)
+      );
 
-      await this.orderedList.insert(0, 0, 99, 201).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(0, 1, 99, 201).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(1, 0, 99, 201).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.insert(1, 1, 99, 201).should.be.rejectedWith(EVMRevert);
+      await shouldFail.reverting(
+        this.orderedList.insert(0, 0, 99, 201)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(0, 1, 99, 201)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(1, 0, 99, 201)
+      );
+      await shouldFail.reverting(
+        this.orderedList.insert(1, 1, 99, 201)
+      );
 
       await validateList(this.orderedList, [[100, 200]], [1]);
     });
@@ -222,9 +283,15 @@ contract('OrderedIntervalList', function () {
 
   describe('remove', function () {
     it('check init state', async function () {
-      await this.orderedList.remove(0, 0, 100).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.remove(1, 0, 100).should.be.rejectedWith(EVMRevert);
-      await this.orderedList.remove(-1, 0, 100).should.be.rejectedWith(EVMRevert);
+      await shouldFail.reverting(
+        this.orderedList.remove(0, 0, 100)
+      );
+      await shouldFail.reverting(
+        this.orderedList.remove(1, 0, 100)
+      );
+      await shouldFail.reverting(
+        this.orderedList.remove(-1, 0, 100)
+      );
     });
 
     it('full remove one element', async function () {
@@ -239,11 +306,11 @@ contract('OrderedIntervalList', function () {
       await validateList(this.orderedList, [], []);
 
       const firstInterval = await this.orderedList.get.call(1);
-      firstInterval[0].should.be.bignumber.equal(0);
-      firstInterval[1].should.be.bignumber.equal(0);
+      firstInterval[0].should.be.bignumber.equal('0');
+      firstInterval[1].should.be.bignumber.equal('0');
 
-      (await this.orderedList.firstIndex.call()).should.be.bignumber.equal(0);
-      (await this.orderedList.lastIndex.call()).should.be.bignumber.equal(0);
+      (await this.orderedList.firstIndex.call()).should.be.bignumber.equal('0');
+      (await this.orderedList.lastIndex.call()).should.be.bignumber.equal('0');
     });
 
     it('make hole inside interval', async function () {
@@ -368,10 +435,10 @@ contract('OrderedIntervalList', function () {
       await this.orderedList.remove(idLast, 401, 500);
       await validateList(this.orderedList, [[101, 200], [201, 300]], [3, 2]);
 
-      (await this.orderedList.getNext.call(idNewLast)).should.be.bignumber.equal(0);
-      (await this.orderedList.getPrev.call(idNewFirst)).should.be.bignumber.equal(0);
-      (await this.orderedList.firstIndex.call()).should.be.bignumber.equal(3);
-      (await this.orderedList.lastIndex.call()).should.be.bignumber.equal(2);
+      (await this.orderedList.getNext.call(idNewLast)).should.be.bignumber.equal('0');
+      (await this.orderedList.getPrev.call(idNewFirst)).should.be.bignumber.equal('0');
+      (await this.orderedList.firstIndex.call()).should.be.bignumber.equal('3');
+      (await this.orderedList.lastIndex.call()).should.be.bignumber.equal('2');
     });
 
     it('invalid range removing', async function () {
@@ -379,13 +446,21 @@ contract('OrderedIntervalList', function () {
       await this.orderedList.insert(0, 1, 0, 100);
 
       // empty range remove
-      await this.orderedList.remove(2, 99, 99).should.be.rejectedWith(EVMRevert);
+      await shouldFail.reverting(
+        this.orderedList.remove(2, 99, 99)
+      );
       // intersect only prefix
-      await this.orderedList.remove(2, 50, 150).should.be.rejectedWith(EVMRevert);
+      await shouldFail.reverting(
+        this.orderedList.remove(2, 50, 150)
+      );
       // intersect only suffix
-      await this.orderedList.remove(1, 50, 150).should.be.rejectedWith(EVMRevert);
+      await shouldFail.reverting(
+        this.orderedList.remove(1, 50, 150)
+      );
       // range greater than interval
-      await this.orderedList.remove(1, 0, 500).should.be.rejectedWith(EVMRevert);
+      await shouldFail.reverting(
+        this.orderedList.remove(1, 0, 500)
+      );
     });
   });
 

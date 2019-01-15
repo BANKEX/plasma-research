@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import {SafeMath32} from "./SafeMath32.sol";
 
@@ -57,7 +57,7 @@ library SumMerkleProof {
 
   // @dev compute hash of the node from two child nodes
   function hash(uint32 l1, uint32 l2, address a1, address a2) internal pure returns(address) {
-    return address(keccak256(abi.encodePacked(l1, l2, a1, a2)));
+    return address(uint256(keccak256(abi.encodePacked(l1, l2, a1, a2))));
   }
 
   function sumMerkleProof(Proof memory proof, address root, uint32 rootLength) internal pure returns(bool) {

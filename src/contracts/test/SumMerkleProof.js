@@ -1,14 +1,6 @@
-const BigNumber = require('bn.js');
-const { keccak256, bufferToHex } = require('ethereumjs-util');
-const EVMRevert = require('./helpers/EVMRevert');
-const EVMThrow = require('./helpers/EVMThrow');
+const { BN } = require('openzeppelin-test-helpers');
 var assert = require('assert');
 var fs = require('fs');
-
-require('chai')
-  .use(require('chai-as-promised'))
-  .use(require('chai-bignumber')(web3.BigNumber))
-  .should();
 
 var excpectedData = JSON.parse(fs.readFileSync('test/sample-merkle-proof.json'));
 
@@ -24,14 +16,14 @@ const be160 = function (x) {
 };
 
 const hash4 = function (l1, l2, a1, a2) {
-  return new BigNumber(keccak256(Buffer.concat([be32(l1), be32(l2), be160(a1), be160(a2)])).slice(12));
+  return new BN(web3.utils.keccak256(Buffer.concat([be32(l1), be32(l2), be160(a1), be160(a2)])).slice(12));
 };
 
 const randBits = function (bits) {
-  let value = new BigNumber();
+  let value = new BN();
   for (let i = 0; i < bits; i++) {
     if (Math.random() > 0.5) {
-      value = value.or((new BigNumber(2)).pow(new BigNumber(i)));
+      value = value.or((new BN(2)).pow(new BN(i)));
     }
   }
   return value;
@@ -53,16 +45,16 @@ const genRandProof = function (depth) {
     let ci = randBits(160);
     let cl = randBits(24);
     if (i === (depth - 2)) {
-      b = new BigNumber(1);
+      b = new BN(1);
       cl = curLeft;
     }
     if (i === (depth - 1)) {
-      b = new BigNumber(0);
-      cl = new BigNumber(2 ** 32 - 1).sub(curLength);
+      b = new BN(0);
+      cl = new BN(2 ** 32 - 1).sub(curLength);
     }
 
     proof = Buffer.concat([proof, be32(cl), be160(ci)]);
-    index = index.add(b.mul((new BigNumber(2)).pow(i)));
+    index = index.add(b.mul((new BN(2)).pow(i)));
     if (b === 1) {
       curItem = hash4(cl, curLength, ci, curItem);
       curLeft = curLeft.sub(cl);

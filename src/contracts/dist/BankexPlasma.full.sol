@@ -1,69 +1,69 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 // File: openzeppelin-solidity/contracts/math/SafeMath.sol
 
 /**
  * @title SafeMath
- * @dev Math operations with safety checks that revert on error
+ * @dev Unsigned math operations with safety checks that revert on error
  */
 library SafeMath {
+    /**
+    * @dev Multiplies two unsigned integers, reverts on overflow.
+    */
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
+        // benefit is lost if 'b' is also tested.
+        // See: https://github.com/OpenZeppelin/openzeppelin-solidity/pull/522
+        if (a == 0) {
+            return 0;
+        }
 
-  /**
-  * @dev Multiplies two numbers, reverts on overflow.
-  */
-  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-    // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
-    // benefit is lost if 'b' is also tested.
-    // See: https://github.com/OpenZeppelin/openzeppelin-solidity/pull/522
-    if (a == 0) {
-      return 0;
+        uint256 c = a * b;
+        require(c / a == b);
+
+        return c;
     }
 
-    uint256 c = a * b;
-    require(c / a == b);
+    /**
+    * @dev Integer division of two unsigned integers truncating the quotient, reverts on division by zero.
+    */
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        // Solidity only automatically asserts when dividing by 0
+        require(b > 0);
+        uint256 c = a / b;
+        // assert(a == b * c + a % b); // There is no case in which this doesn't hold
 
-    return c;
-  }
+        return c;
+    }
 
-  /**
-  * @dev Integer division of two numbers truncating the quotient, reverts on division by zero.
-  */
-  function div(uint256 a, uint256 b) internal pure returns (uint256) {
-    require(b > 0); // Solidity only automatically asserts when dividing by 0
-    uint256 c = a / b;
-    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+    /**
+    * @dev Subtracts two unsigned integers, reverts on overflow (i.e. if subtrahend is greater than minuend).
+    */
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        require(b <= a);
+        uint256 c = a - b;
 
-    return c;
-  }
+        return c;
+    }
 
-  /**
-  * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
-  */
-  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-    require(b <= a);
-    uint256 c = a - b;
+    /**
+    * @dev Adds two unsigned integers, reverts on overflow.
+    */
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        require(c >= a);
 
-    return c;
-  }
+        return c;
+    }
 
-  /**
-  * @dev Adds two numbers, reverts on overflow.
-  */
-  function add(uint256 a, uint256 b) internal pure returns (uint256) {
-    uint256 c = a + b;
-    require(c >= a);
-
-    return c;
-  }
-
-  /**
-  * @dev Divides two numbers and returns the remainder (unsigned integer modulo),
-  * reverts when dividing by zero.
-  */
-  function mod(uint256 a, uint256 b) internal pure returns (uint256) {
-    require(b != 0);
-    return a % b;
-  }
+    /**
+    * @dev Divides two unsigned integers and returns the remainder (unsigned integer modulo),
+    * reverts when dividing by zero.
+    */
+    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+        require(b != 0);
+        return a % b;
+    }
 }
 
 // File: openzeppelin-solidity/contracts/ownership/Ownable.sol
@@ -74,72 +74,69 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-  address private _owner;
+    address private _owner;
 
-  event OwnershipTransferred(
-    address indexed previousOwner,
-    address indexed newOwner
-  );
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
-  /**
-   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
-   * account.
-   */
-  constructor() internal {
-    _owner = msg.sender;
-    emit OwnershipTransferred(address(0), _owner);
-  }
+    /**
+     * @dev The Ownable constructor sets the original `owner` of the contract to the sender
+     * account.
+     */
+    constructor () internal {
+        _owner = msg.sender;
+        emit OwnershipTransferred(address(0), _owner);
+    }
 
-  /**
-   * @return the address of the owner.
-   */
-  function owner() public view returns(address) {
-    return _owner;
-  }
+    /**
+     * @return the address of the owner.
+     */
+    function owner() public view returns (address) {
+        return _owner;
+    }
 
-  /**
-   * @dev Throws if called by any account other than the owner.
-   */
-  modifier onlyOwner() {
-    require(isOwner());
-    _;
-  }
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(isOwner());
+        _;
+    }
 
-  /**
-   * @return true if `msg.sender` is the owner of the contract.
-   */
-  function isOwner() public view returns(bool) {
-    return msg.sender == _owner;
-  }
+    /**
+     * @return true if `msg.sender` is the owner of the contract.
+     */
+    function isOwner() public view returns (bool) {
+        return msg.sender == _owner;
+    }
 
-  /**
-   * @dev Allows the current owner to relinquish control of the contract.
-   * @notice Renouncing to ownership will leave the contract without an owner.
-   * It will not be possible to call the functions with the `onlyOwner`
-   * modifier anymore.
-   */
-  function renounceOwnership() public onlyOwner {
-    emit OwnershipTransferred(_owner, address(0));
-    _owner = address(0);
-  }
+    /**
+     * @dev Allows the current owner to relinquish control of the contract.
+     * @notice Renouncing to ownership will leave the contract without an owner.
+     * It will not be possible to call the functions with the `onlyOwner`
+     * modifier anymore.
+     */
+    function renounceOwnership() public onlyOwner {
+        emit OwnershipTransferred(_owner, address(0));
+        _owner = address(0);
+    }
 
-  /**
-   * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to.
-   */
-  function transferOwnership(address newOwner) public onlyOwner {
-    _transferOwnership(newOwner);
-  }
+    /**
+     * @dev Allows the current owner to transfer control of the contract to a newOwner.
+     * @param newOwner The address to transfer ownership to.
+     */
+    function transferOwnership(address newOwner) public onlyOwner {
+        _transferOwnership(newOwner);
+    }
 
-  /**
-   * @dev Transfers control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to.
-   */
-  function _transferOwnership(address newOwner) internal {
-    require(newOwner != address(0));
-    emit OwnershipTransferred(_owner, newOwner);
-    _owner = newOwner;
-  }
+    /**
+     * @dev Transfers control of the contract to a newOwner.
+     * @param newOwner The address to transfer ownership to.
+     */
+    function _transferOwnership(address newOwner) internal {
+        require(newOwner != address(0));
+        emit OwnershipTransferred(_owner, newOwner);
+        _owner = newOwner;
+    }
 }
 
 // File: openzeppelin-solidity/contracts/token/ERC20/IERC20.sol
@@ -149,32 +146,21 @@ contract Ownable {
  * @dev see https://github.com/ethereum/EIPs/issues/20
  */
 interface IERC20 {
-  function totalSupply() external view returns (uint256);
+    function transfer(address to, uint256 value) external returns (bool);
 
-  function balanceOf(address who) external view returns (uint256);
+    function approve(address spender, uint256 value) external returns (bool);
 
-  function allowance(address owner, address spender)
-    external view returns (uint256);
+    function transferFrom(address from, address to, uint256 value) external returns (bool);
 
-  function transfer(address to, uint256 value) external returns (bool);
+    function totalSupply() external view returns (uint256);
 
-  function approve(address spender, uint256 value)
-    external returns (bool);
+    function balanceOf(address who) external view returns (uint256);
 
-  function transferFrom(address from, address to, uint256 value)
-    external returns (bool);
+    function allowance(address owner, address spender) external view returns (uint256);
 
-  event Transfer(
-    address indexed from,
-    address indexed to,
-    uint256 value
-  );
+    event Transfer(address indexed from, address indexed to, uint256 value);
 
-  event Approval(
-    address indexed owner,
-    address indexed spender,
-    uint256 value
-  );
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
 // File: openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol
@@ -186,65 +172,33 @@ interface IERC20 {
  * which allows you to call the safe operations as `token.safeTransfer(...)`, etc.
  */
 library SafeERC20 {
+    using SafeMath for uint256;
 
-  using SafeMath for uint256;
+    function safeTransfer(IERC20 token, address to, uint256 value) internal {
+        require(token.transfer(to, value));
+    }
 
-  function safeTransfer(
-    IERC20 token,
-    address to,
-    uint256 value
-  )
-    internal
-  {
-    require(token.transfer(to, value));
-  }
+    function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {
+        require(token.transferFrom(from, to, value));
+    }
 
-  function safeTransferFrom(
-    IERC20 token,
-    address from,
-    address to,
-    uint256 value
-  )
-    internal
-  {
-    require(token.transferFrom(from, to, value));
-  }
+    function safeApprove(IERC20 token, address spender, uint256 value) internal {
+        // safeApprove should only be called when setting an initial allowance,
+        // or when resetting it to zero. To increase and decrease it, use
+        // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'
+        require((value == 0) || (token.allowance(msg.sender, spender) == 0));
+        require(token.approve(spender, value));
+    }
 
-  function safeApprove(
-    IERC20 token,
-    address spender,
-    uint256 value
-  )
-    internal
-  {
-    // safeApprove should only be called when setting an initial allowance, 
-    // or when resetting it to zero. To increase and decrease it, use 
-    // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'
-    require((value == 0) || (token.allowance(msg.sender, spender) == 0));
-    require(token.approve(spender, value));
-  }
+    function safeIncreaseAllowance(IERC20 token, address spender, uint256 value) internal {
+        uint256 newAllowance = token.allowance(address(this), spender).add(value);
+        require(token.approve(spender, newAllowance));
+    }
 
-  function safeIncreaseAllowance(
-    IERC20 token,
-    address spender,
-    uint256 value
-  )
-    internal
-  {
-    uint256 newAllowance = token.allowance(address(this), spender).add(value);
-    require(token.approve(spender, newAllowance));
-  }
-
-  function safeDecreaseAllowance(
-    IERC20 token,
-    address spender,
-    uint256 value
-  )
-    internal
-  {
-    uint256 newAllowance = token.allowance(address(this), spender).sub(value);
-    require(token.approve(spender, newAllowance));
-  }
+    function safeDecreaseAllowance(IERC20 token, address spender, uint256 value) internal {
+        uint256 newAllowance = token.allowance(address(this), spender).sub(value);
+        require(token.approve(spender, newAllowance));
+    }
 }
 
 // File: openzeppelin-solidity/contracts/introspection/IERC165.sol
@@ -254,17 +208,13 @@ library SafeERC20 {
  * @dev https://github.com/ethereum/EIPs/blob/master/EIPS/eip-165.md
  */
 interface IERC165 {
-
-  /**
-   * @notice Query if a contract implements an interface
-   * @param interfaceId The interface identifier, as specified in ERC-165
-   * @dev Interface identification is specified in ERC-165. This function
-   * uses less than 30,000 gas.
-   */
-  function supportsInterface(bytes4 interfaceId)
-    external
-    view
-    returns (bool);
+    /**
+     * @notice Query if a contract implements an interface
+     * @param interfaceId The interface identifier, as specified in ERC-165
+     * @dev Interface identification is specified in ERC-165. This function
+     * uses less than 30,000 gas.
+     */
+    function supportsInterface(bytes4 interfaceId) external view returns (bool);
 }
 
 // File: openzeppelin-solidity/contracts/token/ERC721/IERC721.sol
@@ -274,45 +224,23 @@ interface IERC165 {
  * @dev see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
  */
 contract IERC721 is IERC165 {
+    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
+    event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
+    event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
 
-  event Transfer(
-    address indexed from,
-    address indexed to,
-    uint256 indexed tokenId
-  );
-  event Approval(
-    address indexed owner,
-    address indexed approved,
-    uint256 indexed tokenId
-  );
-  event ApprovalForAll(
-    address indexed owner,
-    address indexed operator,
-    bool approved
-  );
+    function balanceOf(address owner) public view returns (uint256 balance);
+    function ownerOf(uint256 tokenId) public view returns (address owner);
 
-  function balanceOf(address owner) public view returns (uint256 balance);
-  function ownerOf(uint256 tokenId) public view returns (address owner);
+    function approve(address to, uint256 tokenId) public;
+    function getApproved(uint256 tokenId) public view returns (address operator);
 
-  function approve(address to, uint256 tokenId) public;
-  function getApproved(uint256 tokenId)
-    public view returns (address operator);
+    function setApprovalForAll(address operator, bool _approved) public;
+    function isApprovedForAll(address owner, address operator) public view returns (bool);
 
-  function setApprovalForAll(address operator, bool _approved) public;
-  function isApprovedForAll(address owner, address operator)
-    public view returns (bool);
+    function transferFrom(address from, address to, uint256 tokenId) public;
+    function safeTransferFrom(address from, address to, uint256 tokenId) public;
 
-  function transferFrom(address from, address to, uint256 tokenId) public;
-  function safeTransferFrom(address from, address to, uint256 tokenId)
-    public;
-
-  function safeTransferFrom(
-    address from,
-    address to,
-    uint256 tokenId,
-    bytes data
-  )
-    public;
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public;
 }
 
 // File: contracts/OrderedIntervalList.sol
@@ -673,7 +601,7 @@ library SumMerkleProof {
     uint32 end;
   }
 
-  // @dev data ordered from leaves to root. 
+  // @dev data ordered from leaves to root.
   // @dev index bits: right bit correspond leaves
   struct Proof {
     uint32 index;
@@ -683,16 +611,43 @@ library SumMerkleProof {
   }
 
   function item(bytes memory proof, uint i) internal pure returns(uint32 length, address result) {
+    // solium-disable-next-line security/no-inline-assembly
     assembly {
-      length := div(mload(add(proof, add(32, mul(i, 24)))), 0x100000000000000000000000000000000000000000000000000000000)
-      result := div(mload(add(proof, add(36, mul(i, 24)))), 0x1000000000000000000000000)
+
+      length := div(
+        mload(
+          add(
+            proof,
+            // 12 = index + begin + end
+            // 20 = item (address)
+            // 32 = 12 + 20
+            add(32, mul(i, 24))
+          )
+        ),
+        // Start from data offset, shift right to 28 bytes and return 4
+        0x100000000000000000000000000000000000000000000000000000000
+      )
+
+      result := div(
+        mload(
+          add(
+            proof,
+            // 12 = index + begin + end
+            // 20 = item (address)
+            // 36 = 12 + 20 + 4 (slice len offset)
+            add(36, mul(i, 24))
+          )
+        ),
+        // Start from data offset + 4, shift right to 12 bytes and return first 20
+        0x1000000000000000000000000
+      )
     }
   }
 
   // @dev compute hash of the node from two child nodes
   function hash(uint32 l1, uint32 l2, address a1, address a2) internal pure returns(address) {
-    return address(keccak256(abi.encodePacked(l1, l2, a1, a2)));
-  } 
+    return address(uint256(keccak256(abi.encodePacked(l1, l2, a1, a2))));
+  }
 
   function sumMerkleProof(Proof memory proof, address root, uint32 rootLength) internal pure returns(bool) {
     uint depth = proof.data.length / 24;
@@ -700,15 +655,16 @@ library SumMerkleProof {
     address curItem = proof.item;
     uint32 curLeft = proof.slice.begin;
     uint32 index = proof.index;
+
     for(uint8 i = 0; i < depth; i++) {
       (uint32 length, address result) = item(proof.data, i);
       if (index & 1 == 1) {
         curItem = hash(length, curLength, result, curItem);
         curLeft = curLeft.sub(length);
-        curLength = curLength.add(length); 
+        curLength = curLength.add(length);
       } else {
         curItem = hash(curLength, length, curItem, result);
-        curLength = curLength.add(length);  
+        curLength = curLength.add(length);
       }
       index >>= 1;
     }
@@ -722,7 +678,7 @@ library SumMerkleProof {
 * @author Hamdi Allam hamdi.allam97@gmail.com
 * Please reach out with any questions or concerns
 */
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 library RLPReader {
     uint8 constant STRING_SHORT_START = 0x80;
@@ -741,15 +697,19 @@ library RLPReader {
     * @param item RLP encoded bytes
     */
     function toRlpItem(bytes memory item) internal pure returns (RLPItem memory) {
-        if (item.length == 0) 
-            return RLPItem(0, 0);
-
         uint memPtr;
         assembly {
             memPtr := add(item, 0x20)
         }
 
         return RLPItem(item.length, memPtr);
+    }
+
+    /*
+    * @param item RLP encoded bytes
+    */
+    function size(RLPItem memory item) internal pure returns (uint) {
+        return item.len;
     }
 
     /*
@@ -770,12 +730,10 @@ library RLPReader {
         }
     }
 
-    /*
-    * Helpers
-    */
-
     // @return indicator whether encoded payload is a list. negate this function call for isData.
     function isList(RLPItem memory item) internal pure returns (bool) {
+        if (item.len == 0) return false;
+
         uint8 byte0;
         uint memPtr = item.memPtr;
         assembly {
@@ -787,8 +745,80 @@ library RLPReader {
         return true;
     }
 
+    /** RLPItem conversions into data types **/
+
+    // @returns raw rlp encoding in bytes
+    function toRlpBytes(RLPItem memory item) internal pure returns (bytes memory) {
+        bytes memory result = new bytes(item.len);
+        if (result.length == 0) return result;
+        
+        uint ptr;
+        assembly {
+            ptr := add(0x20, result)
+        }
+
+        copy(item.memPtr, ptr, item.len);
+        return result;
+    }
+
+    // any non-zero byte is considered true
+    function toBoolean(RLPItem memory item) internal pure returns (bool) {
+        require(item.len == 1);
+        uint result;
+        uint memPtr = item.memPtr;
+        assembly {
+            result := byte(0, mload(memPtr))
+        }
+
+        return result == 0 ? false : true;
+    }
+
+    function toAddress(RLPItem memory item) internal pure returns (address) {
+        // 1 byte for the length prefix according to RLP spec
+        require(item.len <= 21);
+
+        return address(toUint(item));
+    }
+
+    function toUint(RLPItem memory item) internal pure returns (uint) {
+        require(item.len > 0);
+
+        uint offset = _payloadOffset(item.memPtr);
+        uint len = item.len - offset;
+        uint memPtr = item.memPtr + offset;
+
+        uint result;
+        assembly {
+            result := div(mload(memPtr), exp(256, sub(32, len))) // shift to the correct location
+        }
+
+        return result;
+    }
+
+    function toBytes(RLPItem memory item) internal pure returns (bytes memory) {
+        require(item.len > 0);
+
+        uint offset = _payloadOffset(item.memPtr);
+        uint len = item.len - offset; // data length
+        bytes memory result = new bytes(len);
+
+        uint destPtr;
+        assembly {
+            destPtr := add(0x20, result)
+        }
+
+        copy(item.memPtr + offset, destPtr, len);
+        return result;
+    }
+
+    /*
+    * Private Helpers
+    */
+
     // @return number of payload items inside an encoded list.
-    function numItems(RLPItem memory item) internal pure returns (uint) {
+    function numItems(RLPItem memory item) private pure returns (uint) {
+        if (item.len == 0) return 0;
+
         uint count = 0;
         uint currPtr = item.memPtr + _payloadOffset(item.memPtr);
         uint endPtr = item.memPtr + item.len;
@@ -801,7 +831,7 @@ library RLPReader {
     }
 
     // @return entire rlp item byte length
-    function _itemLength(uint memPtr) internal pure returns (uint len) {
+    function _itemLength(uint memPtr) private pure returns (uint len) {
         uint byte0;
         assembly {
             byte0 := byte(0, mload(memPtr))
@@ -840,7 +870,7 @@ library RLPReader {
     }
 
     // @return number of bytes until the data
-    function _payloadOffset(uint memPtr) internal pure returns (uint) {
+    function _payloadOffset(uint memPtr) private pure returns (uint) {
         uint byte0;
         assembly {
             byte0 := byte(0, mload(memPtr))
@@ -856,73 +886,14 @@ library RLPReader {
             return byte0 - (LIST_LONG_START - 1) + 1;
     }
 
-    /** RLPItem conversions into data types **/
-
-    // @returns raw rlp encoding in bytes
-    function toRlpBytes(RLPItem memory item) internal pure returns (bytes) {
-        bytes memory result = new bytes(item.len);
-        
-        uint ptr;
-        assembly {
-            ptr := add(0x20, result)
-        }
-
-        copy(item.memPtr, ptr, item.len);
-        return result;
-    }
-
-    function toBoolean(RLPItem memory item) internal pure returns (bool) {
-        require(item.len == 1, "Invalid RLPItem. Booleans are encoded in 1 byte");
-        uint result;
-        uint memPtr = item.memPtr;
-        assembly {
-            result := byte(0, mload(memPtr))
-        }
-
-        return result == 0 ? false : true;
-    }
-
-    function toAddress(RLPItem memory item) internal pure returns (address) {
-        // 1 byte for the length prefix according to RLP spec
-        require(item.len <= 21, "Invalid RLPItem. Addresses are encoded in 20 bytes or less");
-
-        return address(toUint(item));
-    }
-
-    function toUint(RLPItem memory item) internal pure returns (uint) {
-        uint offset = _payloadOffset(item.memPtr);
-        uint len = item.len - offset;
-        uint memPtr = item.memPtr + offset;
-
-        uint result;
-        assembly {
-            result := div(mload(memPtr), exp(256, sub(32, len))) // shift to the correct location
-        }
-
-        return result;
-    }
-
-    function toBytes(RLPItem memory item) internal pure returns (bytes) {
-        uint offset = _payloadOffset(item.memPtr);
-        uint len = item.len - offset; // data length
-        bytes memory result = new bytes(len);
-
-        uint destPtr;
-        assembly {
-            destPtr := add(0x20, result)
-        }
-
-        copy(item.memPtr + offset, destPtr, len);
-        return result;
-    }
-
-
     /*
     * @param src Pointer to source
     * @param dest Pointer to destination
     * @param len Amount of memory to copy from the source
     */
-    function copy(uint src, uint dest, uint len) internal pure {
+    function copy(uint src, uint dest, uint len) private pure {
+        if (len == 0) return;
+
         // copy as many word sizes as possible
         for (; len >= WORD_SIZE; len -= WORD_SIZE) {
             assembly {
@@ -950,7 +921,7 @@ library PlasmaDecoder {
   using RLPReader for bytes;
 
   struct Input {
-    address owner;
+    address payable owner;
     uint32 blockIndex;
     uint32 txIndex;
     uint8 outputIndex;
@@ -960,7 +931,7 @@ library PlasmaDecoder {
   }
 
   struct Output {
-    address owner;
+    address payable owner;
     address assetId;
     uint64 begin;
     uint64 end;
@@ -991,31 +962,31 @@ library PlasmaDecoder {
     Transaction[] transactions;
   }
 
-  function decodeProof(bytes memory rlpBytes) internal pure returns(SumMerkleProof.Proof) {
+  function decodeProof(bytes memory rlpBytes) internal pure returns(SumMerkleProof.Proof memory) {
     return _decodeProof(rlpBytes.toRlpItem().toList());
   }
 
-  function decodeInput(bytes memory rlpBytes) internal pure returns(Input) {
+  function decodeInput(bytes memory rlpBytes) internal pure returns(Input memory) {
     return _decodeInput(rlpBytes.toRlpItem().toList());
   }
 
-  function decodeOutput(bytes memory rlpBytes) internal pure returns(Output) {
+  function decodeOutput(bytes memory rlpBytes) internal pure returns(Output memory) {
     return _decodeOutput(rlpBytes.toRlpItem().toList());
   }
 
-  function decodeMetadata(bytes memory rlpBytes) internal pure returns(Metadata) {
+  function decodeMetadata(bytes memory rlpBytes) internal pure returns(Metadata memory) {
     return _decodeMetadata(rlpBytes.toRlpItem().toList());
   }
 
-  function decodeSignature(bytes memory rlpBytes) internal pure returns(Signature) {
+  function decodeSignature(bytes memory rlpBytes) internal pure returns(Signature memory) {
     return _decodeSignature(rlpBytes.toRlpItem().toList());
   }
 
-  function decodeTransaction(bytes memory rlpBytes) internal pure returns(Transaction) {
+  function decodeTransaction(bytes memory rlpBytes) internal pure returns(Transaction memory) {
     return _decodeTransaction(rlpBytes.toRlpItem().toList());
   }
 
-  function decodeBlock(bytes memory rlpBytes) internal pure returns(Block) {
+  function decodeBlock(bytes memory rlpBytes) internal pure returns(Block memory) {
     return _decodeBlock(rlpBytes.toRlpItem().toList());
   }
 
@@ -1027,7 +998,7 @@ library PlasmaDecoder {
     uint32 end;
   }
 
-  // @dev data ordered from leaves to root. 
+  // @dev data ordered from leaves to root.
   // @dev index bits: right bit correspond leaves
   struct Proof {
     uint32 index;
@@ -1036,25 +1007,25 @@ library PlasmaDecoder {
     bytes data;
   }
 
-  function _decodeSlice(RLPReader.RLPItem[] items) private pure returns(SumMerkleProof.Slice) {
+  function _decodeSlice(RLPReader.RLPItem[] memory items) private pure returns(SumMerkleProof.Slice memory) {
     return SumMerkleProof.Slice({
       begin: uint32(items[0].toUint()),
       end: uint32(items[1].toUint())
     });
   }
 
-  function _decodeProof(RLPReader.RLPItem[] items) private pure returns(SumMerkleProof.Proof) {
+  function _decodeProof(RLPReader.RLPItem[] memory items) private pure returns(SumMerkleProof.Proof memory) {
     return SumMerkleProof.Proof({
       index: uint32(items[0].toUint()),
       slice: _decodeSlice(items[1].toList()),
       item: items[2].toAddress(),
-      data: items[2].toBytes()
+      data: items[3].toBytes()
     });
   }
 
-  function _decodeInput(RLPReader.RLPItem[] items) private pure returns(Input) {
+  function _decodeInput(RLPReader.RLPItem[] memory items) private pure returns(Input memory) {
     return Input({
-      owner: items[0].toAddress(),
+      owner: address(uint160(items[0].toAddress())),
       blockIndex: uint32(items[1].toUint()),
       txIndex: uint32(items[2].toUint()),
       outputIndex: uint8(items[3].toUint()),
@@ -1064,7 +1035,7 @@ library PlasmaDecoder {
     });
   }
 
-  function _decodeInputs(RLPReader.RLPItem[] memory items) private pure returns(Input[]) {
+  function _decodeInputs(RLPReader.RLPItem[] memory items) private pure returns(Input[] memory) {
     Input[] memory inputs = new Input[](items.length);
     for (uint i = 0; i < items.length; i++) {
       inputs[i] = _decodeInput(items[i].toList());
@@ -1072,16 +1043,16 @@ library PlasmaDecoder {
     return inputs;
   }
 
-  function _decodeOutput(RLPReader.RLPItem[] memory items) private pure returns(Output) {
+  function _decodeOutput(RLPReader.RLPItem[] memory items) private pure returns(Output memory) {
     return Output({
-      owner: items[0].toAddress(),
+      owner: address(uint160(items[0].toAddress())),
       assetId: items[1].toAddress(),
       begin: uint64(items[2].toUint()),
       end: uint64(items[3].toUint())
     });
   }
 
-  function _decodeOutputs(RLPReader.RLPItem[] memory items) private pure returns(Output[]) {
+  function _decodeOutputs(RLPReader.RLPItem[] memory items) private pure returns(Output[] memory) {
     Output[] memory outputs = new Output[](items.length);
     for (uint i = 0; i < items.length; i++) {
       outputs[i] = _decodeOutput(items[i].toList());
@@ -1089,13 +1060,13 @@ library PlasmaDecoder {
     return outputs;
   }
 
-  function _decodeMetadata(RLPReader.RLPItem[] memory items) private pure returns(Metadata) {
+  function _decodeMetadata(RLPReader.RLPItem[] memory items) private pure returns(Metadata memory) {
     return Metadata({
       maxBlockId: uint32(items[0].toUint())
     });
   }
 
-  function _decodeSignature(RLPReader.RLPItem[] memory items) internal pure returns(Signature) {
+  function _decodeSignature(RLPReader.RLPItem[] memory items) internal pure returns(Signature memory) {
     return Signature({
       r: items[0].toUint(),
       s: items[0].toUint(),
@@ -1103,7 +1074,7 @@ library PlasmaDecoder {
     });
   }
 
-  function _decodeSignatures(RLPReader.RLPItem[] memory items) private pure returns(Signature[]) {
+  function _decodeSignatures(RLPReader.RLPItem[] memory items) private pure returns(Signature[] memory) {
     Signature[] memory signatures = new Signature[](items.length);
     for (uint i = 0; i < items.length; i++) {
       signatures[i] = _decodeSignature(items[i].toList());
@@ -1111,7 +1082,7 @@ library PlasmaDecoder {
     return signatures;
   }
 
-  function _decodeTransaction(RLPReader.RLPItem[] memory items) private pure returns(Transaction) {
+  function _decodeTransaction(RLPReader.RLPItem[] memory items) private pure returns(Transaction memory) {
     return Transaction({
       inputs: _decodeInputs(items[0].toList()),
       outputs: _decodeOutputs(items[1].toList()),
@@ -1120,7 +1091,7 @@ library PlasmaDecoder {
     });
   }
 
-  function _decodeTransactions(RLPReader.RLPItem[] memory items) private pure returns(Transaction[]) {
+  function _decodeTransactions(RLPReader.RLPItem[] memory items) private pure returns(Transaction[] memory) {
     Transaction[] memory transactions = new Transaction[](items.length);
     for (uint i = 0; i < items.length; i++) {
       transactions[i] = _decodeTransaction(items[i].toList());
@@ -1128,7 +1099,7 @@ library PlasmaDecoder {
     return transactions;
   }
 
-  function _decodeBlock(RLPReader.RLPItem[] memory items) private pure returns(Block) {
+  function _decodeBlock(RLPReader.RLPItem[] memory items) private pure returns(Block memory) {
     return Block({
       blockNumber: uint32(items[0].toUint()),
       previousBlockHash: items[1].toUint(),
@@ -1149,66 +1120,54 @@ library PlasmaDecoder {
  */
 
 library ECDSA {
+    /**
+     * @dev Recover signer address from a message by using their signature
+     * @param hash bytes32 message, the hash is the signed message. What is recovered is the signer address.
+     * @param signature bytes signature, the signature is generated using web3.eth.sign()
+     */
+    function recover(bytes32 hash, bytes memory signature) internal pure returns (address) {
+        bytes32 r;
+        bytes32 s;
+        uint8 v;
 
-  /**
-   * @dev Recover signer address from a message by using their signature
-   * @param hash bytes32 message, the hash is the signed message. What is recovered is the signer address.
-   * @param signature bytes signature, the signature is generated using web3.eth.sign()
-   */
-  function recover(bytes32 hash, bytes signature)
-    internal
-    pure
-    returns (address)
-  {
-    bytes32 r;
-    bytes32 s;
-    uint8 v;
+        // Check the signature length
+        if (signature.length != 65) {
+            return (address(0));
+        }
 
-    // Check the signature length
-    if (signature.length != 65) {
-      return (address(0));
+        // Divide the signature in r, s and v variables
+        // ecrecover takes the signature parameters, and the only way to get them
+        // currently is to use assembly.
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            r := mload(add(signature, 0x20))
+            s := mload(add(signature, 0x40))
+            v := byte(0, mload(add(signature, 0x60)))
+        }
+
+        // Version of signature should be 27 or 28, but 0 and 1 are also possible versions
+        if (v < 27) {
+            v += 27;
+        }
+
+        // If the version is correct return the signer address
+        if (v != 27 && v != 28) {
+            return (address(0));
+        } else {
+            return ecrecover(hash, v, r, s);
+        }
     }
 
-    // Divide the signature in r, s and v variables
-    // ecrecover takes the signature parameters, and the only way to get them
-    // currently is to use assembly.
-    // solium-disable-next-line security/no-inline-assembly
-    assembly {
-      r := mload(add(signature, 0x20))
-      s := mload(add(signature, 0x40))
-      v := byte(0, mload(add(signature, 0x60)))
+    /**
+     * toEthSignedMessageHash
+     * @dev prefix a bytes32 value with "\x19Ethereum Signed Message:"
+     * and hash the result
+     */
+    function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32) {
+        // 32 is the length in bytes of hash,
+        // enforced by the type signature above
+        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
     }
-
-    // Version of signature should be 27 or 28, but 0 and 1 are also possible versions
-    if (v < 27) {
-      v += 27;
-    }
-
-    // If the version is correct return the signer address
-    if (v != 27 && v != 28) {
-      return (address(0));
-    } else {
-      // solium-disable-next-line arg-overflow
-      return ecrecover(hash, v, r, s);
-    }
-  }
-
-  /**
-   * toEthSignedMessageHash
-   * @dev prefix a bytes32 value with "\x19Ethereum Signed Message:"
-   * and hash the result
-   */
-  function toEthSignedMessageHash(bytes32 hash)
-    internal
-    pure
-    returns (bytes32)
-  {
-    // 32 is the length in bytes of hash,
-    // enforced by the type signature above
-    return keccak256(
-      abi.encodePacked("\x19Ethereum Signed Message:\n32", hash)
-    );
-  }
 }
 
 // File: contracts/PlasmaBlocks.sol
@@ -1230,7 +1189,7 @@ contract PlasmaBlocks is Ownable {
 
   function submitBlocks(
     uint256 fromIndex,
-    bytes newBlocks
+    bytes memory newBlocks
   )
     public
     onlyOwner
@@ -1241,8 +1200,8 @@ contract PlasmaBlocks is Ownable {
 
   function submitBlocksSigned(
     uint256 fromIndex,
-    bytes newBlocks,
-    bytes rsv
+    bytes memory newBlocks,
+    bytes memory rsv
   )
     public
     returns(uint256)
@@ -1261,7 +1220,7 @@ contract PlasmaBlocks is Ownable {
 
   function _submitBlocks(
     uint256 fromIndex,
-    bytes newBlocks
+    bytes memory newBlocks
   )
     internal
     returns(uint256)
@@ -1306,14 +1265,14 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
   address constant public MAIN_COIN_ASSET_ID = address(0);
   address constant public ERC721_ASSET_ID = address(1);
   uint256 constant public ASSET_DECIMALS_TRUNCATION = 10e13; //TODO: will be different for tokens
-  uint32 constant public PLASMA_ASSETS_TOTAL_SIZE = 2**24 - 1;
+  uint32 constant public PLASMA_ASSETS_TOTAL_SIZE = 2 ** 24 - 1;
 
   bytes32 private _expectedTokenAndTokenIdHash;
-  mapping (address => uint256) private _assetOffsets;
-  mapping (address => OrderedIntervalList.Data) private _assetLists;
-  mapping (address => bytes32[]) private _allDepositHashes;
-  mapping (bytes32 => bool) private _allWithdrawalHashes;
-  mapping (bytes32 => bool) private _erc721Deposits;
+  mapping(address => uint256) private _assetOffsets;
+  mapping(address => OrderedIntervalList.Data) private _assetLists;
+  mapping(address => bytes32[]) private _allDepositHashes;
+  mapping(bytes32 => bool) private _allWithdrawalHashes;
+  mapping(bytes32 => bool) private _erc721Deposits;
 
   event AssetDeposited(
     address indexed token,
@@ -1358,7 +1317,7 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
     _assetLists[ERC721_ASSET_ID].initialize();
   }
 
-  function assetOffsets(address asset) public view returns(uint256) {
+  function assetOffsets(address asset) public view returns (uint256) {
     return _assetOffsets[asset];
   }
 
@@ -1382,31 +1341,31 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
   }
 
   function depositERC20(IERC20 token, uint256 amountArg) public {
-    require(_assetLists[token].isInitialized(), "Operator should add this token first");
+    require(_assetLists[address(token)].isInitialized(), "Operator should add this token first");
 
     uint64 amount = uint64(amountArg / ASSET_DECIMALS_TRUNCATION);
-    (uint64 intervalId, uint64 begin, uint64 end) = _assetLists[token].append(amount);
+    (uint64 intervalId, uint64 begin, uint64 end) = _assetLists[address(token)].append(amount);
 
-    uint256 preBalance = token.balanceOf(this);
-    token.safeTransferFrom(msg.sender, this, amount);
-    uint256 deposited = token.balanceOf(this).sub(preBalance);
-    
-    emit ERC20Deposited(token, msg.sender, deposited);
-    emit AssetDeposited(token, msg.sender, intervalId, begin, end);
+    uint256 preBalance = token.balanceOf(address(this));
+    token.safeTransferFrom(msg.sender, address(this), amount);
+    uint256 deposited = token.balanceOf(address(this)).sub(preBalance);
+
+    emit ERC20Deposited(address(token), msg.sender, deposited);
+    emit AssetDeposited(address(token), msg.sender, intervalId, begin, end);
     bytes32 hash = keccak256(abi.encodePacked(token, msg.sender, intervalId, begin, end));
     _allDepositHashes[msg.sender].push(hash);
   }
 
   function depositERC721(IERC721 token, uint256 tokenId) public {
     _expectedTokenAndTokenIdHash = keccak256(abi.encodePacked(token, tokenId));
-    token.safeTransferFrom(msg.sender, this, tokenId);
+    token.safeTransferFrom(msg.sender, address(this), tokenId);
     require(_expectedTokenAndTokenIdHash == bytes32(0), "ERC721 token not received");
 
     (uint64 intervalId, uint64 begin, uint64 end) = _assetLists[ERC721_ASSET_ID].append(1);
 
-    emit ERC721Deposited(token, msg.sender, tokenId, begin);
+    emit ERC721Deposited(address(token), msg.sender, tokenId, begin);
     emit AssetDeposited(ERC721_ASSET_ID, msg.sender, intervalId, begin, end);
-    
+
     bytes32 hash = keccak256(abi.encodePacked(ERC721_ASSET_ID, msg.sender, intervalId, begin, end));
     _allDepositHashes[msg.sender].push(hash);
 
@@ -1418,10 +1377,10 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
     address operator,
     address /*from*/,
     uint256 tokenId,
-    bytes /*data*/
+    bytes memory /*data*/
   )
-    public
-    returns(bytes4)
+  public
+  returns (bytes4)
   {
     bytes32 receivedTokenAndTokenId = keccak256(abi.encodePacked(msg.sender, tokenId));
 
@@ -1436,9 +1395,9 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
   function withdrawalBegin(
     bytes memory inputBytes // PlasmaDecoder.Input
   )
-    public
-    payable //TODO: Bonds
-    returns(bool)
+  public
+  payable //TODO: Bonds
+  returns (bool)
   {
     PlasmaDecoder.Input memory input = inputBytes.decodeInput();
 
@@ -1452,14 +1411,16 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
       input.end
     );
 
-    bytes32 inputHash = keccak256(abi.encodePacked(input.owner,
-      input.blockIndex,
-      input.txIndex,
-      input.outputIndex,
-      input.assetId,
-      input.begin,
-      input.end
-    ));
+    bytes32 inputHash = keccak256(
+      abi.encodePacked(
+        input.owner,
+        input.blockIndex,
+        input.txIndex,
+        input.outputIndex,
+        input.assetId,
+        input.begin,
+        input.end
+      ));
     _allWithdrawalHashes[inputHash] = true;
 
     return true;
@@ -1469,22 +1430,24 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
     bytes memory inputBytes, // PlasmaDecoder.Input
     bytes memory txProofBytes, // SumMerkleProof.Proof
     uint64 blockIndex,
-    uint8 spendIndex
+    uint8 /*spendIndex*/
   )
-    public
-    returns(bool)
+  public
+  returns (bool)
   {
     PlasmaDecoder.Input memory input = inputBytes.decodeInput();
     SumMerkleProof.Proof memory txProof = txProofBytes.decodeProof();
 
-    bytes32 inputHash = keccak256(abi.encodePacked(input.owner,
-      input.blockIndex,
-      input.txIndex,
-      input.outputIndex,
-      input.assetId,
-      input.begin,
-      input.end
-    ));
+    bytes32 inputHash = keccak256(
+      abi.encodePacked(
+        input.owner,
+        input.blockIndex,
+        input.txIndex,
+        input.outputIndex,
+        input.assetId,
+        input.begin,
+        input.end
+      ));
     require(_allWithdrawalHashes[inputHash], "You should start withdrawal first");
 
     require(txProof.sumMerkleProof(blocks(blockIndex), PLASMA_ASSETS_TOTAL_SIZE));
@@ -1498,7 +1461,7 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
   // function withdrawalChallangeExistance(
   //   ExitState state,
   //   SumMerkleProof txProof,
-  //   MerkleProof inputProof, 
+  //   MerkleProof inputProof,
   //   uint64 maxBlockIndex,
   //   MerkleProof maxBlockIndexProof
   // )
@@ -1506,23 +1469,25 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
   //   returns(bool)
   // {
   // }
-    
+
   function withdrawalEnd(
     bytes memory inputBytes, // PlasmaDecoder.Input
     uint64 intervalId,
-    IERC721 token,
+    address token,
     uint256 tokenId
   ) public {
     PlasmaDecoder.Input memory input = inputBytes.decodeInput();
 
-    bytes32 inputHash = keccak256(abi.encodePacked(input.owner,
-      input.blockIndex,
-      input.txIndex,
-      input.outputIndex,
-      input.assetId,
-      input.begin,
-      input.end
-    ));
+    bytes32 inputHash = keccak256(
+      abi.encodePacked(
+        input.owner,
+        input.blockIndex,
+        input.txIndex,
+        input.outputIndex,
+        input.assetId,
+        input.begin,
+        input.end
+      ));
     require(_allWithdrawalHashes[inputHash], "You should start withdrawal first");
     delete _allWithdrawalHashes[inputHash];
 
@@ -1539,10 +1504,10 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
       bytes32 depositHash = keccak256(abi.encodePacked(token, tokenId, input.begin));
       require(_erc721Deposits[depositHash], "Invalid token or tokeId arguments");
       delete _erc721Deposits[depositHash];
-      token.approve(msg.sender, tokenId);
+      IERC721(token).approve(msg.sender, tokenId);
       return;
     }
-    
+
     IERC20(token).transfer(msg.sender, uint256(input.end).sub(input.begin));
   }
 }
