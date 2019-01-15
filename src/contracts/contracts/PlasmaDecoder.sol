@@ -3,7 +3,6 @@ pragma solidity ^0.4.24;
 import { RLPReader } from "solidity-rlp/contracts/RLPReader.sol";
 import { SumMerkleProof } from "./SumMerkleProof.sol";
 
-
 library PlasmaDecoder {
   using RLPReader for RLPReader.RLPItem;
   using RLPReader for bytes;
@@ -86,7 +85,7 @@ library PlasmaDecoder {
     uint32 end;
   }
 
-  // @dev data ordered from leaves to root. 
+  // @dev data ordered from leaves to root.
   // @dev index bits: right bit correspond leaves
   struct Proof {
     uint32 index;
@@ -107,7 +106,7 @@ library PlasmaDecoder {
       index: uint32(items[0].toUint()),
       slice: _decodeSlice(items[1].toList()),
       item: items[2].toAddress(),
-      data: items[2].toBytes()
+      data: items[3].toBytes()
     });
   }
 

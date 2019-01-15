@@ -2,137 +2,275 @@ package blockchain
 
 import (
 	"fmt"
-	"sort"
-
 	. "github.com/BANKEX/plasma-research/src/node/alias"
 	. "github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
-	"github.com/ethereum/go-ethereum/crypto/sha3"
+	. "github.com/BANKEX/plasma-research/src/node/utils"
+	"sort"
 )
 
-type SumMerkleNode struct {
+type SumTreeRoot struct {
 	// We use 24 bit
 	Length uint32
 	Hash   Uint160
 }
 
-type SumMerkleTree struct {
-	NodeList []SumMerkleNode
+type SumTreeNode struct {
+	Begin uint32
+	End   uint32
+
+	// We use 24 bit of length field
+	Length uint32
+	Hash   Uint160
+
+	Left   *SumTreeNode
+	Right  *SumTreeNode
+	Parent *SumTreeNode
 }
 
-type SumMerkleProof struct {
-	Index    uint32
-	Slice    Slice
-	Hash     Uint160
-	NodeList []SumMerkleNode
+// Index: Bit index of the element in the tree
+// Slice: Slice that stored inside a leaf with corresponding index
+// Item: Hash ot the transaction associated with a slice
+// Data: List of proof steps
+type SumMerkleTreeProof struct {
+	Index uint32
+	Slice Slice
+	Item  Uint160
+	Data  []ProofStep
 }
 
-// func uint160ToUint256(Uint160 n) Uint256 {
-// 	res := make(byte, 256)
-// 	res[96:256] = n[:]
-// 	return res
-// }
-
-func (t SumMerkleTree) GetRoot() SumMerkleNode {
-	return t.NodeList[0]
+type ProofStep struct {
+	Length []byte  // 4 bytes
+	Hash   Uint160 // 20 bytes
 }
 
-func (t SumMerkleTree) GetLeaves() []SumMerkleNode {
-	return t.NodeList[1<<16-1 : 1<<17-1]
-}
-
-func (t SumMerkleTree) MerkleProof(Index uint32) SumMerkleProof {
-	res := *new(SumMerkleProof)
-	res.Index = Index
-	left := uint32(0)
-
-	curCell := 1<<16 - 1 + Index
-	length := t.NodeList[curCell].Length
-	res.Hash = t.NodeList[curCell].Hash
-
-	for curCell > 0 {
-		if (curCell & 1) == 0 {
-			res.NodeList = append(res.NodeList, t.NodeList[curCell-1])
-			left += t.NodeList[curCell-1].Length
-		} else {
-			res.NodeList = append(res.NodeList, t.NodeList[curCell+1])
+func HasIntersection(slices []Slice) error {
+	for i := 0; i < len(slices)-1; i++ {
+		if slices[i].End > slices[i+1].Begin {
+			return fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
+				slices[i].Begin, slices[i].End, slices[i+1].Begin, slices[i+1].End)
 		}
-		curCell = (curCell - 1) >> 1
 	}
-	res.Slice.Begin = left
-	res.Slice.End = left + length
-	return res
+	return nil
+}
+
+// Use this first when assemble blocks
+func PrepareLeaves(transactions []Transaction) ([]*SumTreeNode, error) {
+
+	zeroHash := Keccak160([]byte{})
+	slice2transactions := map[Slice]*Transaction{}
+
+	var slices []Slice
+	for _, t := range transactions {
+		for _, input := range t.Inputs {
+			slices = append(slices, input.Slice)
+			slice2transactions[input.Slice] = &t
+		}
+	}
+
+	sort.Slice(slices, func(i, j int) bool {
+		return slices[i].Begin < slices[j].Begin
+	})
+
+	err := HasIntersection(slices)
+	if err != nil {
+		return nil, err
+	}
+
+	slices = FillGaps(slices)
+
+	var leaves []*SumTreeNode
+	for _, slice := range slices {
+
+		// Slices that filling the gaps haven't got a reference to transaction
+		tx, hasTx := slice2transactions[slice]
+		var txHash = zeroHash
+		if hasTx {
+			txHash = tx.GetHash()
+		}
+
+		leaf := SumTreeNode{
+			Begin:  slice.Begin,
+			End:    slice.End,
+			Hash:   txHash,
+			Length: slice.End - slice.Begin,
+		}
+
+		leaves = append(leaves, &leaf)
+	}
+	return leaves, nil
+}
+
+type SumMerkleTree struct {
+	Root  *SumTreeNode
+	Leafs []*SumTreeNode
 }
 
 func uint32BE(n uint32) []byte {
 	return []byte{byte(n >> 24), byte(n >> 16), byte(n >> 8), byte(n)}
 }
 
-type OwnedSlice struct {
-	Slice
-	TxHash Uint160
+func concatAndHash(left *SumTreeNode, right *SumTreeNode, hashFunc HashFunction) Uint160 {
+	l1, l2 := left.Length, right.Length
+	h1, h2 := left.Hash, right.Hash
+
+	d1 := append(uint32BE(l1), uint32BE(l2)...)
+	d2 := append(h1, h2...)
+
+	result := append(d1, d2...)
+	return hashFunc(result)
 }
 
-func Hash(a, b Uint160) Uint160 {
-	hash := sha3.NewKeccak256()
-	var buf []byte
-	hash.Write(append(a, b...))
-	buf = hash.Sum(buf)
-	return buf
+func NewSumMerkleTree(leafs []*SumTreeNode, hashFunc HashFunction) *SumMerkleTree {
+	var tree SumMerkleTree
+	tree.Leafs = leafs
+
+	var buckets = tree.Leafs
+
+	// At the end we assign new layer to buckets, so stop when ever we can't merge anymore
+	for len(buckets) != 1 {
+		// next layer
+		var newBuckets []*SumTreeNode
+
+		for len(buckets) > 0 {
+			if len(buckets) >= 2 {
+
+				// deque pair from the head
+				left, right := buckets[0], buckets[1]
+				buckets = buckets[2:]
+
+				length := left.Length + right.Length
+				hash := concatAndHash(left, right, hashFunc)
+
+				node := SumTreeNode{
+					Hash:   hash,
+					Length: length,
+				}
+
+				left.Parent = &node
+				right.Parent = &node
+
+				left.Right = right
+				right.Left = left
+
+				newBuckets = append(newBuckets, &node)
+
+			} else {
+				// Pop the last one - goes to next layer as it is
+				newBuckets = append(newBuckets, buckets[0])
+				buckets = []*SumTreeNode{}
+			}
+		}
+		buckets = newBuckets
+	}
+
+	tree.Root = buckets[0]
+	return &tree
 }
 
-func Hash4(x1, x2, x3, x4 []byte) Uint160 {
-	hash := sha3.NewKeccak256()
-	var buf []byte
-	hash.Write(append(append(append(x1, x2...), x3...), x4...))
-	buf = hash.Sum(buf)
-	return buf
+func (tree *SumMerkleTree) GetProof(leafIndex uint32) SumMerkleTreeProof {
+
+	var curr = tree.Leafs[leafIndex]
+	var result SumMerkleTreeProof
+	result.Slice = Slice{curr.Begin, curr.End}
+	result.Item = curr.Hash
+
+	index := uint32(0)
+	var proofSteps []ProofStep
+
+	for i := uint(0); curr.Parent != nil; i++ {
+
+		var node *SumTreeNode
+		if curr.Right != nil {
+			// We are on the left
+			node = curr.Right
+		} else {
+			// We have left node - it means we are at the right
+			node = curr.Left
+			// set bit in index, if we are at the right
+			index |= 1 << i
+		}
+
+		// 4 + 20 byte
+		// step := append(uint32BE(node.Length), node.Hash...)
+		// proofSteps = append(proofSteps, step...)
+
+		step := ProofStep{uint32BE(node.Length), node.Hash}
+		proofSteps = append(proofSteps, step)
+		curr = curr.Parent
+	}
+
+	result.Index = index
+	result.Data = proofSteps
+	return result
 }
 
-// TODO: check, that slices are conflicting together.
-// TODO: join slices for same transactions
-func NewSumMerkleTree(txs []Transaction) (*SumMerkleTree, error) {
-	nleaves := 1 << 16
-	nnodes := nleaves*2 - 1
-	t := new(SumMerkleTree)
-	nullhash := make([]byte, 160)
-	t.NodeList = make([]SumMerkleNode, nnodes)
-	leaves := make([]OwnedSlice, 0)
+func (tree *SumMerkleTree) GetRlpEncodedProof(leafIndex uint32) []byte {
+	proof := tree.GetProof(leafIndex)
 
-	for _, tx := range txs {
-		for _, in := range tx.Inputs {
-			leaves = append(leaves, OwnedSlice{in.Slice, tx.GetHash()})
+	var data []byte
+	for _, proofItem := range proof.Data {
+		data = append(data, proofItem.Length...)
+		data = append(data, proofItem.Hash...)
+	}
+
+	tmp := struct {
+		Index uint32
+		Slice Slice
+		Item  []byte
+		Data  []byte
+	}{
+		proof.Index,
+		proof.Slice,
+		proof.Item,
+		data,
+	}
+
+	rlp, _ := EncodeToRLP(tmp)
+	return rlp
+}
+
+func (tree *SumMerkleTree) GetRoot() SumTreeRoot {
+	r := tree.Root
+	return SumTreeRoot{
+		r.Length,
+		r.Hash,
+	}
+}
+
+// We use 24 bits to define plasma slices space
+// 2^24 - 1 = 0x00FFFFFF
+const plasmaLength = 16777215
+
+// Fill plasma range space with Slices, src slices should be sorted first
+func FillGaps(src []Slice) []Slice {
+
+	// TODO(artall64): Slice Merge, it doesn't merge a slices even if they are neighbors as I remember such improvement can be useful
+	var result []Slice
+
+	pos := uint32(0)
+	for i := 0; i <= len(src)-1; i++ {
+
+		item := src[i]
+
+		if pos < item.Begin {
+			emptySlice := Slice{
+				Begin: pos,
+				End:   item.Begin,
+			}
+			result = append(result, emptySlice)
 		}
-	}
-	sort.Slice(leaves, func(i, j int) bool { return leaves[i].Begin < leaves[j].Begin })
 
-	for i := 0; i < len(leaves)-1; i++ {
-		if leaves[i].End >= leaves[i+1].Begin {
-			return nil, fmt.Errorf("slices (%d, %d) and (%d, %d) intersect", leaves[i].Begin, leaves[i].End, leaves[i+1].Begin, leaves[i+1].End)
+		result = append(result, item)
+		pos = item.End
+	}
+
+	if pos != plasmaLength {
+		emptySlice := Slice{
+			Begin: pos,
+			End:   plasmaLength,
 		}
+		result = append(result, emptySlice)
 	}
 
-	cursorCell := nleaves - 1
-	cursorLeft := uint32(0)
-	for _, leaf := range leaves {
-		if leaf.Begin > cursorLeft {
-			t.NodeList[cursorCell] = SumMerkleNode{leaf.Begin - cursorLeft, nullhash[:]}
-			cursorCell++
-		}
-		t.NodeList[cursorCell] = SumMerkleNode{leaf.End - leaf.Begin, leaf.TxHash}
-		cursorCell++
-		cursorLeft = leaf.End
-	}
-
-	t.NodeList[cursorCell] = SumMerkleNode{1<<24 - cursorLeft, nullhash[:]}
-	cursorCell++
-	for cursorCell < nnodes {
-		t.NodeList[cursorCell] = SumMerkleNode{0, nullhash[:]}
-		cursorCell++
-	}
-
-	for i := nleaves - 2; i >= 0; i-- {
-		t.NodeList[i].Length = t.NodeList[2*i+1].Length + t.NodeList[2*i+2].Length
-		t.NodeList[i].Hash = Hash4(uint32BE(t.NodeList[2*i+1].Length), uint32BE(t.NodeList[2*i+2].Length), t.NodeList[2*i+1].Hash, t.NodeList[2*i+1].Hash)
-	}
-	return t, nil
+	return result
 }

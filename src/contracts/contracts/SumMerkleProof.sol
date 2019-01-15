@@ -24,8 +24,34 @@ library SumMerkleProof {
   function item(bytes memory proof, uint i) internal pure returns(uint32 length, address result) {
     // solium-disable-next-line security/no-inline-assembly
     assembly {
-      length := div(mload(add(proof, add(32, mul(i, 24)))), 0x100000000000000000000000000000000000000000000000000000000)
-      result := div(mload(add(proof, add(36, mul(i, 24)))), 0x1000000000000000000000000)
+
+      length := div(
+        mload(
+          add(
+            proof,
+            // 12 = index + begin + end
+            // 20 = item (address)
+            // 32 = 12 + 20
+            add(32, mul(i, 24))
+          )
+        ),
+        // Start from data offset, shift right to 28 bytes and return 4
+        0x100000000000000000000000000000000000000000000000000000000
+      )
+
+      result := div(
+        mload(
+          add(
+            proof,
+            // 12 = index + begin + end
+            // 20 = item (address)
+            // 36 = 12 + 20 + 4 (slice len offset)
+            add(36, mul(i, 24))
+          )
+        ),
+        // Start from data offset + 4, shift right to 12 bytes and return first 20
+        0x1000000000000000000000000
+      )
     }
   }
 
@@ -40,6 +66,7 @@ library SumMerkleProof {
     address curItem = proof.item;
     uint32 curLeft = proof.slice.begin;
     uint32 index = proof.index;
+
     for(uint8 i = 0; i < depth; i++) {
       (uint32 length, address result) = item(proof.data, i);
       if (index & 1 == 1) {

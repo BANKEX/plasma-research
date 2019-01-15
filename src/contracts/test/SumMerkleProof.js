@@ -1,23 +1,19 @@
 const BigNumber = require('bn.js');
 const { keccak256, bufferToHex } = require('ethereumjs-util');
-
 const EVMRevert = require('./helpers/EVMRevert');
 const EVMThrow = require('./helpers/EVMThrow');
+var assert = require('assert');
+var fs = require('fs');
 
 require('chai')
   .use(require('chai-as-promised'))
   .use(require('chai-bignumber')(web3.BigNumber))
   .should();
 
+var excpectedData = JSON.parse(fs.readFileSync('test/sample-merkle-proof.json'));
+
 const SumMerkleProofWrapper = artifacts.require('SumMerkleProofWrapper');
-
-const to256bits = function (blocks) {
-  return blocks.map(b => (new BigNumber(b)).toString(16, 64)).concat(['']).reduce((a, b) => a + b);
-};
-
-const to160bits = function (blocks) {
-  return blocks.map(b => (new BigNumber(b)).toString(16, 40)).concat(['']).reduce((a, b) => a + b);
-};
+const SumMerkleProof = artifacts.require('SumMerkleProof');
 
 const be32 = function (x) {
   return x.toBuffer('be', 32).slice(-4);
@@ -88,11 +84,54 @@ const genRandProof = function (depth) {
   };
 };
 
-contract('SumMerkleTree', function ([_, wallet1, wallet2, wallet3, wallet4, wallet5]) {
-  it('should return true', async function () {
-    // const { index, begin, end, item, proof, curItem, curLength } = genRandProof(10);
-    // (await sumMerkleProof.functions.sumMerkleProofTest(
-    //   index, begin, end, item, proof, curItem, curLength
-    // ).call()).should.be.true;
+contract('SumMerkleProofWrapper', function ([_, wallet1, wallet2, wallet3, wallet4, wallet5]) {
+  let wrapper;
+
+  beforeEach(async function () {
+    wrapper = await SumMerkleProofWrapper.new();
+  });
+
+  it('should verify valid proof', async function () {
+    // That proof was generated in Go code
+    const root = '0x' + excpectedData.rootHash;
+    const rootLength = '0x' + excpectedData.rootLength;
+    const index = 1;
+    const begin = excpectedData.begin;
+    const end = excpectedData.end;
+    const item = '0x' + excpectedData.item;
+    const proofSteps = '0x' +
+      excpectedData.itemsLenAndHash[0] +
+      excpectedData.itemsLenAndHash[1] +
+      excpectedData.itemsLenAndHash[2];
+
+    const result = await wrapper.sumMerkleProofTest(index, begin, end, item, proofSteps, root, rootLength);
+    assert.strictEqual(result, true);
+  });
+
+  it('shouldn\'t verify invalid proof', async function () {
+    // That proof was generated in Go code
+    const root = '0x' + excpectedData.rootHash;
+    const rootLength = '0x' + excpectedData.rootLength;
+    const index = 1;
+    const begin = excpectedData.begin;
+    const end = excpectedData.end;
+    const item = '0x' + excpectedData.item;
+
+    // Make proof wrong by replacing 4 bytes with 0xDEADBEEF
+    let stepOne = excpectedData.itemsLenAndHash[0].slice(0, 40) + 'DEADBEEF';
+    let stepTwo = excpectedData.itemsLenAndHash[1].slice(0, 40) + 'DEADBEEF';
+    let stepThree = excpectedData.itemsLenAndHash[2].slice(0, 40) + 'DEADBEEF';
+    const proofSteps = '0x' + stepOne + stepTwo + stepThree;
+
+    const result = await wrapper.sumMerkleProofTest(index, begin, end, item, proofSteps, root, rootLength);
+    assert.strictEqual(result, false);
+  });
+
+  it('should verify valid proof represented as rlp bytes', async function () {
+    const sumMerkleRoot = '0x' + excpectedData.rootHash;
+    const rlpEncodedProof = '0x' + excpectedData.rlpEncoded;
+
+    const result = await wrapper.sumMerkleProofFromBytesTest(sumMerkleRoot, rlpEncodedProof);
+    assert.strictEqual(result, true);
   });
 });
