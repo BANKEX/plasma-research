@@ -158,7 +158,7 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 				fmt.Println(options.Eth["balance"])
 				return
 			}
-			balanceFloat, err := GetETHAccountBalance(arguments[2])
+			balanceFloat, err := v.GetETHAccountBalance(arguments[2])
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -170,7 +170,7 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 				fmt.Println(options.Eth["ownerBalance"])
 				return
 			}
-			balanceFloat, err := GetETHAccountBalance(v.cfg.VerifierEthereumAddress)
+			balanceFloat, err := v.GetETHAccountBalance(v.cfg.VerifierEthereumAddress)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -581,8 +581,8 @@ func findTransaction(slice []blockchain.Input, block, tx uint32, out byte) *bloc
 	return nil
 }
 
-func GetETHAccountBalance(address string) (float64, error) {
-	client, err := ethclient.Dial("https://mainnet.infura.io")
+func (v *Verifier) GetETHAccountBalance(address string) (float64, error) {
+	client, err := ethclient.Dial(v.cfg.GethHost)
 	if err != nil {
 		return 0, err
 	}
