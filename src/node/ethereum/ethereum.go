@@ -3,142 +3,148 @@ package ethereum
 import (
 	"context"
 	"crypto/ecdsa"
-	"log"
 	"math/big"
-	"strconv"
 
-	"github.com/BANKEX/plasma-research/src/node/config"
 	"github.com/BANKEX/plasma-research/src/node/ethereum/plasmacontract"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/BANKEX/plasma-research/src/node/utils"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-func GetBalance(address string) string {
-	client, err := ethclient.Dial(config.GetVerifier().GethHost)
-	if err != nil {
-		log.Println(err)
-	}
+const (
+	defaultGasLimitForTransfer = uint64(21000)
+	defaultGasLimit            = uint64(300000)
+)
 
-	account := common.HexToAddress(address)
-	pendingBalance, err := client.PendingBalanceAt(context.Background(), account)
-	if err != nil {
-		log.Println(err)
-	}
-	return pendingBalance.String()
+type Ethereum struct {
+	client                *ethclient.Client
+	plasmaContractAddress common.Address
+	plasmaContract        *store.Store
 }
 
-func PushHashBlock(blockNumber uint32, hash []byte) {
-	client, err := ethclient.Dial(config.GetVerifier().GethHost)
+func NewEthereum(endpoint string, plasmaContractAddress common.Address) (*Ethereum, error) {
+	client, err := ethclient.Dial(endpoint)
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
 
-	privateKey, err := crypto.HexToECDSA(config.GetVerifier().VerifierPrivateKey)
+	contract, err := store.NewStore(plasmaContractAddress, client)
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
 
-	publicKey := privateKey.Public()
-	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
-	if !ok {
-		log.Println("error casting public key to ECDSA")
-	}
+	return &Ethereum{
+		client:                client,
+		plasmaContractAddress: plasmaContractAddress,
+		plasmaContract:        contract,
+	}, nil
+}
 
-	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
-	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+func (e *Ethereum) GetBalance(ctx context.Context, address common.Address) (*big.Int, error) {
+	return e.client.PendingBalanceAt(ctx, address)
+}
+
+func (e *Ethereum) PushHashBlock(ctx context.Context, key *ecdsa.PrivateKey, blockNumber uint32, hash []byte) (*types.Transaction, error) {
+	fromAddress := crypto.PubkeyToAddress(key.PublicKey)
+
+	nonce, err := e.client.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
 
-	gasPrice, err := client.SuggestGasPrice(context.Background())
+	gasPrice, err := e.client.SuggestGasPrice(context.Background())
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
 
-	auth := bind.NewKeyedTransactor(privateKey)
-	auth.Nonce = big.NewInt(int64(nonce))
-	auth.Value = big.NewInt(0)
-	auth.GasLimit = uint64(300000)
-	auth.GasPrice = gasPrice
-
-	address := common.HexToAddress(config.GetVerifier().PlasmaContractAddress)
-	instance, err := store.NewStore(address, client)
-	if err != nil {
-		log.Println(err)
-	}
+	opts := utils.GetTxOpts(ctx, key, defaultGasLimit, gasPrice)
+	opts.Value = big.NewInt(0)
+	opts.Nonce = big.NewInt(0).SetUint64(nonce)
 
 	// _, err = instance.SubmitBlocks(blockNumber, hash) // TODO: uncomment after regenerating abi
-	_, err = instance.SubmitBlocks(auth, nil, nil) // TODO: normal params
+	tx, err := e.plasmaContract.SubmitBlocks(opts, nil, nil) // TODO: normal params
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
+	return tx, nil
 }
 
-func GetLastBlockNumber() string {
-	client, err := ethclient.Dial(config.GetVerifier().GethHost)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	address := common.HexToAddress(config.GetVerifier().PlasmaContractAddress)
-	instance, err := store.NewStore(address, client)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	blockLength, err := instance.BlocksLength(nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return strconv.Itoa((int)(blockLength.Uint64() - 1))
+func (e *Ethereum) GetLastBlockNumber() (*big.Int, error) {
+	return e.plasmaContract.BlocksLength(nil)
 }
 
-func Exit() {
-	client, err := ethclient.Dial(config.GetVerifier().GethHost)
+func (e *Ethereum) Exit(ctx context.Context, key *ecdsa.PrivateKey) (*types.Transaction, error) {
+	fromAddress := crypto.PubkeyToAddress(key.PublicKey)
+
+	nonce, err := e.client.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
 
-	privateKey, err := crypto.HexToECDSA(config.GetVerifier().VerifierPrivateKey)
+	gasPrice, err := e.client.SuggestGasPrice(context.Background())
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
 
-	publicKey := privateKey.Public()
-	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
-	if !ok {
-		log.Println("error casting public key to ECDSA")
-	}
+	opts := utils.GetTxOpts(ctx, key, defaultGasLimit, gasPrice)
+	opts.Value = big.NewInt(0)
+	opts.Nonce = big.NewInt(0).SetUint64(nonce)
 
-	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
-	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	tx, err := e.plasmaContract.WithdrawalBegin(opts, nil)
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
+	return tx, nil
+}
 
-	gasPrice, err := client.SuggestGasPrice(context.Background())
+func (e *Ethereum) Deposit(ctx context.Context, contractAddress common.Address, key *ecdsa.PrivateKey, value *big.Int) (*types.Transaction, error) {
+	gasPrice, err := e.client.SuggestGasPrice(context.Background())
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
 
-	auth := bind.NewKeyedTransactor(privateKey)
-	auth.Nonce = big.NewInt(int64(nonce))
-	auth.Value = big.NewInt(0)
-	auth.GasLimit = uint64(300000)
-	auth.GasPrice = gasPrice
+	opts := utils.GetTxOpts(ctx, key, defaultGasLimit, gasPrice)
+	opts.Value = value
 
-	address := common.HexToAddress(config.GetVerifier().PlasmaContractAddress)
-	instance, err := store.NewStore(address, client)
+	tx, err := e.plasmaContract.Deposit(opts)
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
+	return tx, nil
+}
 
-	_, err = instance.WithdrawalBegin(auth, nil)
+func (e *Ethereum) SendTransactionInWei(ctx context.Context, key *ecdsa.PrivateKey, value *big.Int, to common.Address) (*types.Transaction, error) {
+	fromAddress := crypto.PubkeyToAddress(key.PublicKey)
+
+	nonce, err := e.client.PendingNonceAt(ctx, fromAddress)
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
 
+	gasPrice, err := e.client.SuggestGasPrice(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var data []byte
+	tx := types.NewTransaction(nonce, to, value, defaultGasLimitForTransfer, gasPrice, data)
+
+	chainID, err := e.client.NetworkID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chainID), key)
+	if err != nil {
+		return nil, err
+	}
+
+	err = e.client.SendTransaction(ctx, signedTx)
+	if err != nil {
+		return nil, err
+	}
+
+	return signedTx, err
 }
