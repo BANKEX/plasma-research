@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
-	"github.com/BANKEX/plasma-research/src/node/ethereum/plasmacontract"
-	"github.com/BANKEX/plasma-research/src/node/types"
-	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/BANKEX/plasma-research/src/node/ethereum/plasmacontract"
+	"github.com/BANKEX/plasma-research/src/node/types"
 
 	"github.com/BANKEX/plasma-research/src/node/blockchain"
 	"github.com/BANKEX/plasma-research/src/node/ethereum/events"
@@ -30,12 +30,12 @@ func NewOperator(cfg *Config) (*Operator, error) {
 	manager := transactionManager.NewTransactionManager()
 	publisher, err := transactionManager.NewBlockPublisher(manager)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	eventMonitor, err := transactionManager.NewEventMonitor(manager, publisher)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	// TODO: refactor this place
