@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.2;
 
 import { RLPReader } from "solidity-rlp/contracts/RLPReader.sol";
 import { SumMerkleProof } from "./SumMerkleProof.sol";

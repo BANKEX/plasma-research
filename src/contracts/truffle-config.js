@@ -58,10 +58,15 @@ module.exports = {
       gasPrice: 20000000000,
     },
   },
-  solc: {
-    optimizer: {
-      enabled: true,
-      runs: 200,
+  compilers: {
+    solc: {
+      version: '0.5.2',
+      settings: {
+        optimizer: {
+          enabled: true,
+          runs: 200,
+        }
+      }
     },
   },
   migrations_directory: './migrations',
