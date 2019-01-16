@@ -77,53 +77,53 @@ const SumMerkleProofWrapper = artifacts.require('SumMerkleProofWrapper');
 // };
 
 contract('SumMerkleProofWrapper', function () {
-  let wrapper;
+    let wrapper;
 
-  beforeEach(async function () {
-    wrapper = await SumMerkleProofWrapper.new();
-  });
+    beforeEach(async function () {
+        wrapper = await SumMerkleProofWrapper.new();
+    });
 
-  it('should verify valid proof', async function () {
-    // That proof was generated in Go code
-    const root = '0x' + excpectedData.rootHash;
-    const rootLength = '0x' + excpectedData.rootLength;
-    const index = 1;
-    const begin = excpectedData.begin;
-    const end = excpectedData.end;
-    const item = '0x' + excpectedData.item;
-    const proofSteps = '0x' +
-      excpectedData.itemsLenAndHash[0] +
-      excpectedData.itemsLenAndHash[1] +
-      excpectedData.itemsLenAndHash[2];
+    it('should verify valid proof', async function () {
+        // That proof was generated in Go code
+        const root = '0x' + excpectedData.rootHash;
+        const rootLength = '0x' + excpectedData.rootLength;
+        const index = 1;
+        const begin = excpectedData.begin;
+        const end = excpectedData.end;
+        const item = '0x' + excpectedData.item;
+        const proofSteps = '0x' +
+            excpectedData.itemsLenAndHash[0] +
+            excpectedData.itemsLenAndHash[1] +
+            excpectedData.itemsLenAndHash[2];
 
-    const result = await wrapper.sumMerkleProofTest(index, begin, end, item, proofSteps, root, rootLength);
-    assert.strictEqual(result, true);
-  });
+        const result = await wrapper.sumMerkleProofTest(index, begin, end, item, proofSteps, root, rootLength);
+        assert.strictEqual(result, true);
+    });
 
-  it('shouldn\'t verify invalid proof', async function () {
-    // That proof was generated in Go code
-    const root = '0x' + excpectedData.rootHash;
-    const rootLength = '0x' + excpectedData.rootLength;
-    const index = 1;
-    const begin = excpectedData.begin;
-    const end = excpectedData.end;
-    const item = '0x' + excpectedData.item;
+    it('shouldn\'t verify invalid proof', async function () {
+        // That proof was generated in Go code
+        const root = '0x' + excpectedData.rootHash;
+        const rootLength = '0x' + excpectedData.rootLength;
+        const index = 1;
+        const begin = excpectedData.begin;
+        const end = excpectedData.end;
+        const item = '0x' + excpectedData.item;
 
-    // Make proof wrong by replacing 4 bytes with 0xDEADBEEF
-    let stepOne = excpectedData.itemsLenAndHash[0].slice(0, 40) + 'DEADBEEF';
-    let stepTwo = excpectedData.itemsLenAndHash[1].slice(0, 40) + 'DEADBEEF';
-    let stepThree = excpectedData.itemsLenAndHash[2].slice(0, 40) + 'DEADBEEF';
-    const proofSteps = '0x' + stepOne + stepTwo + stepThree;
+        // Make proof wrong by replacing 4 bytes with 0xDEADBEEF
+        let stepOne = excpectedData.itemsLenAndHash[0].slice(0, 40) + 'DEADBEEF';
+        let stepTwo = excpectedData.itemsLenAndHash[1].slice(0, 40) + 'DEADBEEF';
+        let stepThree = excpectedData.itemsLenAndHash[2].slice(0, 40) + 'DEADBEEF';
+        const proofSteps = '0x' + stepOne + stepTwo + stepThree;
 
-    const result = await wrapper.sumMerkleProofTest(index, begin, end, item, proofSteps, root, rootLength);
-    assert.strictEqual(result, false);
-  });
+        const result = await wrapper.sumMerkleProofTest(index, begin, end, item, proofSteps, root, rootLength);
+        assert.strictEqual(result, false);
+    });
 
-  it('should verify valid proof represented as rlp bytes', async function () {
-    const sumMerkleRoot = '0x' + excpectedData.rootHash;
-    const rlpEncodedProof = '0x' + excpectedData.rlpEncoded;
+    it('should verify valid proof represented as rlp bytes', async function () {
+        const sumMerkleRoot = '0x' + excpectedData.rootHash;
+        const rlpEncodedProof = '0x' + excpectedData.rlpEncoded;
 
-    const result = await wrapper.sumMerkleProofFromBytesTest(sumMerkleRoot, rlpEncodedProof);
-    assert.strictEqual(result, true);
-  });
+        const result = await wrapper.sumMerkleProofFromBytesTest(sumMerkleRoot, rlpEncodedProof);
+        assert.strictEqual(result, true);
+    });
 });

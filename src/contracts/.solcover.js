@@ -1,4 +1,4 @@
 module.exports = {
-  copyPackages: ['openzeppelin-solidity'],
-  norpc: true
+    copyPackages: ['openzeppelin-solidity'],
+    norpc: true
 }

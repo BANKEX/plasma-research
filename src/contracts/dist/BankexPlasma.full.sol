@@ -248,280 +248,280 @@ contract IERC721 is IERC165 {
 /**
  * @title OrderedIntervalList
  * @dev List of ordered by intervals with non intersections checks.
-*/
+ */
 library OrderedIntervalList {
-  struct Interval {
-    uint64 begin; // inclusive
-    uint64 end;   // exclusive
+    struct Interval {
+        uint64 begin; // inclusive
+        uint64 end;   // exclusive
 
-    uint64 next;
-    uint64 prev;
-  }
+        uint64 next;
+        uint64 prev;
+    }
 
-  struct Data {
-    Interval[] intervals; // sparsed array
-    uint64 firstIndex;
-    uint64 lastIndex;
-  }
+    struct Data {
+        Interval[] intervals; // sparsed array
+        uint64 firstIndex;
+        uint64 lastIndex;
+    }
 
-  function isInitialized(Data storage self) internal view returns(bool) {
-    return self.intervals.length > 0;
-  }
+    function isInitialized(Data storage self) internal view returns(bool) {
+        return self.intervals.length > 0;
+    }
 
-  function getFirstIndex(Data storage self) internal view returns(uint64) {
-    return self.firstIndex;
-  }
+    function getFirstIndex(Data storage self) internal view returns(uint64) {
+        return self.firstIndex;
+    }
 
-  function getLastIndex(Data storage self) internal view returns(uint64) {
-    return self.lastIndex;
-  }
+    function getLastIndex(Data storage self) internal view returns(uint64) {
+        return self.lastIndex;
+    }
 
-  /**
-   * @notice Check if OrderedIntervalList initialized
-   * @return was initialized or not
-   */
-  function initialize(Data storage self) internal {
-    require(self.intervals.length == 0, "OrderedIntervalList was already initialized");
-    self.intervals.push(Interval(0,0,0,0));
-  }
+    /**
+     * @notice Check if OrderedIntervalList initialized
+     * @return was initialized or not
+     */
+    function initialize(Data storage self) internal {
+        require(self.intervals.length == 0, "OrderedIntervalList was already initialized");
+        self.intervals.push(Interval(0,0,0,0));
+    }
 
-  /**
-   * @notice Get interval by the index
-   * @param id interval index in the list
-   * @return interval tuple
-   */
-  function get(Data storage self, uint64 id) internal view returns(Interval storage interval) {
-    require(id < self.intervals.length, "interval id doesn't exists in interval set");
-    interval = self.intervals[id];
-    //require(interval.end != 0, "interval id doesn't exsits in interval set");
-  }
+    /**
+     * @notice Get interval by the index
+     * @param id interval index in the list
+     * @return interval tuple
+     */
+    function get(Data storage self, uint64 id) internal view returns(Interval storage interval) {
+        require(id < self.intervals.length, "interval id doesn't exists in interval set");
+        interval = self.intervals[id];
+        //require(interval.end != 0, "interval id doesn't exsits in interval set");
+    }
 
-  /**
-   * @notice Check interval existance by the index
-   * @param id interval index in the list
-   * @return is existing or not
-   */
-  function exist(Data storage self, uint64 id) internal view returns (bool) {
-    return self.intervals[id].end != 0;
-  }
+    /**
+     * @notice Check interval existance by the index
+     * @param id interval index in the list
+     * @return is existing or not
+     */
+    function exist(Data storage self, uint64 id) internal view returns (bool) {
+        return self.intervals[id].end != 0;
+    }
 
-  /**
-   * @notice Add interval after the lates interval
-   * @param size length of the new interval
-   * @return id of the latest interval
-   */
-  function append(
-    Data storage self,
-    uint64 size
-  )
-    internal
-    returns(
-      uint64 id,
-      uint64 begin,
-      uint64 end
+    /**
+     * @notice Add interval after the lates interval
+     * @param size length of the new interval
+     * @return id of the latest interval
+     */
+    function append(
+        Data storage self,
+        uint64 size
     )
-  {
-    Interval storage lastInterval = self.intervals[self.lastIndex];
-    begin = lastInterval.end;
-    end = lastInterval.end + size - 1;
-    id = insert(self, self.lastIndex, 0, begin, end);
-  }
-
-  /**
-   * @notice Insert interval in the specific place in a list
-   * @dev Method also check that new interval doesn't intersect with existed intervals in list
-   * @param prev id of the prev interval in the list. Zero if it's a first interval.
-   * @param next id of the next interval in the list. Zero if it's a last interval.
-   * @param begin left bound of the new interval (inclusive)
-   * @param end right bound of the new interval (exclusive)
-   * @return id of the interval that contain new interval. Could be a new interval or an existed with
-   * extended bounds in case of adjacent bounds of the inserted interval with his neighbors.
-   */
-  function insert(
-    Data storage self,
-    uint64 prev,
-    uint64 next,
-    uint64 begin,
-    uint64 end
-  )
-    internal
-    returns(uint64 id)
-  {
-    return _insert(
-      self,
-      prev,
-      next,
-      begin,
-      end,
-      false
-    );
-  }
-
-  /**
-   * @notice Remove range in interval by index
-   * @param index interval index in list
-   * @param begin left range bound
-   * @param end right range bound
-   * @return index of the new interval if new one was created (was made a hole insided existed interval) or zero.
-   */
-  function remove(
-    Data storage self,
-    uint64 index,
-    uint64 begin,
-    uint64 end
-  )
-    internal
-    returns(uint64 newInterval)
-  {
-    require(begin < end, "right bound less than left bound");
-    require(index < self.intervals.length, "valid index bounds");
-
-    Interval storage modifiedInterval = self.intervals[index];
-    Interval storage prevInterval = self.intervals[modifiedInterval.prev];
-    Interval storage nextInterval = self.intervals[modifiedInterval.next];
-    require(modifiedInterval.end != 0, "removed interval doesn't exists");
-    require(modifiedInterval.begin <= begin && end <= modifiedInterval.end, "incorrect removed range bounds");
-
-    bool shrinkBegin = (begin == modifiedInterval.begin);
-    bool shrinkEnd = (end == modifiedInterval.end);
-
-    if (shrinkBegin && shrinkEnd) {
-      // Remove whole interval
-
-      if (modifiedInterval.prev > 0) {
-        prevInterval.next = modifiedInterval.next;
-      } else {
-        self.firstIndex = modifiedInterval.next;
-      }
-
-      if (modifiedInterval.next > 0) {
-        nextInterval.prev = modifiedInterval.prev;
-      } else {
-        self.lastIndex = modifiedInterval.prev;
-      }
-
-      delete self.intervals[index];
-    } else
-    if (shrinkBegin) {
-      // Shrink from left side
-      modifiedInterval.begin = end;
-    } else
-    if (shrinkEnd) {
-      // Shrink from right side
-      modifiedInterval.end = begin;
-    } else {
-      // Make a hole
-      uint64 oldEnd = modifiedInterval.end;
-      modifiedInterval.end = begin;
-      modifiedInterval.next = _insert(
-        self,
-        index,
-        modifiedInterval.next,
-        end,
-        oldEnd,
-        true
-      );
-      newInterval = modifiedInterval.next;
-    }
-  }
-
-  function _insert(
-    Data storage self,
-    uint64 prev,
-    uint64 next,
-    uint64 begin,
-    uint64 end,
-    bool allowGapAfterLast
-  )
-    private
-    returns(uint64 id)
-  {
-    require(begin < end, "right bound less or equal to left bound");
-    require((prev != 0 || next != 0) == (self.firstIndex > 0), "prev and next could be zero iff no intervals");
-
-    if (!isInitialized(self)) {
-      initialize(self);
+        internal
+        returns(
+            uint64 id,
+            uint64 begin,
+            uint64 end
+        )
+    {
+        Interval storage lastInterval = self.intervals[self.lastIndex];
+        begin = lastInterval.end;
+        end = lastInterval.end + size - 1;
+        id = insert(self, self.lastIndex, 0, begin, end);
     }
 
-    Interval storage prevInterval = self.intervals[prev];
-    Interval storage nextInterval = self.intervals[next];
-
-    require(prev == 0 || begin >= prevInterval.end, "begin could not intersect prev interval");
-    require(next == 0 || end <= nextInterval.begin, "end could not intersect next interval");
-
-    if ((prev > 0) == (next > 0)) {
-      // Adding between existing intervals or very first interval
-      require(
-        prevInterval.next == next && nextInterval.prev == prev,
-        "prev and next should refer to the neighboring intervals"
-      );
-    } else
-    if (next > 0) {
-      // Adding before first interval
-      require(
-        self.firstIndex == next && nextInterval.prev == 0,
-        "next should refer to the first interval"
-      );
-    } else
-    if (prev > 0) {
-      // Adding after last interval
-      require(
-        self.lastIndex == prev && prevInterval.next == 0,
-        "prev should refer to the last interval"
-      );
-      require(
-        allowGapAfterLast || prev != self.lastIndex || prevInterval.end == begin, 
-        "should begin from the end of latest interval when adding to the end"
-      );
+    /**
+     * @notice Insert interval in the specific place in a list
+     * @dev Method also check that new interval doesn't intersect with existed intervals in list
+     * @param prev id of the prev interval in the list. Zero if it's a first interval.
+     * @param next id of the next interval in the list. Zero if it's a last interval.
+     * @param begin left bound of the new interval (inclusive)
+     * @param end right bound of the new interval (exclusive)
+     * @return id of the interval that contain new interval. Could be a new interval or an existed with
+     * extended bounds in case of adjacent bounds of the inserted interval with his neighbors.
+     */
+    function insert(
+        Data storage self,
+        uint64 prev,
+        uint64 next,
+        uint64 begin,
+        uint64 end
+    )
+        internal
+        returns(uint64 id)
+    {
+        return _insert(
+            self,
+            prev,
+            next,
+            begin,
+            end,
+            false
+        );
     }
 
-    bool concatPrev = (prev > 0 && begin == prevInterval.end);
-    bool concatNext = (next > 0 && end == nextInterval.begin);
+    /**
+     * @notice Remove range in interval by index
+     * @param index interval index in list
+     * @param begin left range bound
+     * @param end right range bound
+     * @return index of the new interval if new one was created (was made a hole insided existed interval) or zero.
+     */
+    function remove(
+        Data storage self,
+        uint64 index,
+        uint64 begin,
+        uint64 end
+    )
+        internal
+        returns(uint64 newInterval)
+    {
+        require(begin < end, "right bound less than left bound");
+        require(index < self.intervals.length, "valid index bounds");
 
-    if (!concatPrev && !concatNext) {
-      id = uint64(self.intervals.length);
-      self.intervals.push(Interval({
-        begin: begin,
-        end: end,
+        Interval storage modifiedInterval = self.intervals[index];
+        Interval storage prevInterval = self.intervals[modifiedInterval.prev];
+        Interval storage nextInterval = self.intervals[modifiedInterval.next];
+        require(modifiedInterval.end != 0, "removed interval doesn't exists");
+        require(modifiedInterval.begin <= begin && end <= modifiedInterval.end, "incorrect removed range bounds");
+
+        bool shrinkBegin = (begin == modifiedInterval.begin);
+        bool shrinkEnd = (end == modifiedInterval.end);
+
+        if (shrinkBegin && shrinkEnd) {
+            // Remove whole interval
+
+            if (modifiedInterval.prev > 0) {
+                prevInterval.next = modifiedInterval.next;
+            } else {
+                self.firstIndex = modifiedInterval.next;
+            }
+
+            if (modifiedInterval.next > 0) {
+                nextInterval.prev = modifiedInterval.prev;
+            } else {
+                self.lastIndex = modifiedInterval.prev;
+            }
+
+            delete self.intervals[index];
+        } else
+        if (shrinkBegin) {
+            // Shrink from left side
+            modifiedInterval.begin = end;
+        } else
+        if (shrinkEnd) {
+            // Shrink from right side
+            modifiedInterval.end = begin;
+        } else {
+            // Make a hole
+            uint64 oldEnd = modifiedInterval.end;
+            modifiedInterval.end = begin;
+            modifiedInterval.next = _insert(
+                self,
+                index,
+                modifiedInterval.next,
+                end,
+                oldEnd,
+                true
+            );
+            newInterval = modifiedInterval.next;
+        }
+    }
+
+    function _insert(
+        Data storage self,
+        uint64 prev,
+        uint64 next,
+        uint64 begin,
+        uint64 end,
+        bool allowGapAfterLast
+    )
+        private
+        returns(uint64 id)
+    {
+        require(begin < end, "right bound less or equal to left bound");
+        require((prev != 0 || next != 0) == (self.firstIndex > 0), "prev and next could be zero iff no intervals");
+
+        if (!isInitialized(self)) {
+            initialize(self);
+        }
+
+        Interval storage prevInterval = self.intervals[prev];
+        Interval storage nextInterval = self.intervals[next];
+
+        require(prev == 0 || begin >= prevInterval.end, "begin could not intersect prev interval");
+        require(next == 0 || end <= nextInterval.begin, "end could not intersect next interval");
+
+        if ((prev > 0) == (next > 0)) {
+            // Adding between existing intervals or very first interval
+            require(
+                prevInterval.next == next && nextInterval.prev == prev,
+                "prev and next should refer to the neighboring intervals"
+            );
+        } else
+        if (next > 0) {
+            // Adding before first interval
+            require(
+                self.firstIndex == next && nextInterval.prev == 0,
+                "next should refer to the first interval"
+            );
+        } else
+        if (prev > 0) {
+            // Adding after last interval
+            require(
+                self.lastIndex == prev && prevInterval.next == 0,
+                "prev should refer to the last interval"
+            );
+            require(
+                allowGapAfterLast || prev != self.lastIndex || prevInterval.end == begin, 
+                "should begin from the end of latest interval when adding to the end"
+            );
+        }
+
+        bool concatPrev = (prev > 0 && begin == prevInterval.end);
+        bool concatNext = (next > 0 && end == nextInterval.begin);
+
+        if (!concatPrev && !concatNext) {
+            id = uint64(self.intervals.length);
+            self.intervals.push(Interval({
+                begin: begin,
+                end: end,
         prev: prev,
-        next: next
-      }));
+                next: next
+            }));
 
-      if (next > 0) {
-        nextInterval.prev = id;
-      } else {
-        self.lastIndex = id;
-      }
+            if (next > 0) {
+                nextInterval.prev = id;
+            } else {
+                self.lastIndex = id;
+            }
 
-      if (prev > 0) {
-        prevInterval.next = id;
-      } else {
-        self.firstIndex = id;
-      }
-    } else
-    if (concatPrev && concatNext) {
-      prevInterval.end = nextInterval.end;
-      prevInterval.next = nextInterval.next;
-      id = prev;
+            if (prev > 0) {
+                prevInterval.next = id;
+            } else {
+                self.firstIndex = id;
+            }
+        } else
+        if (concatPrev && concatNext) {
+            prevInterval.end = nextInterval.end;
+            prevInterval.next = nextInterval.next;
+            id = prev;
 
-      // When attaching pre last to last
-      if (next == self.lastIndex) {
-        self.lastIndex = id;
-      } else {
-        self.intervals[nextInterval.next].prev = id;
-      }
+            // When attaching pre last to last
+            if (next == self.lastIndex) {
+                self.lastIndex = id;
+            } else {
+                self.intervals[nextInterval.next].prev = id;
+            }
 
-      delete self.intervals[next];
-    } else
-    if (concatPrev) {
-      prevInterval.end = end;
-      id = prev;
-    } else
-    if (concatNext) {
-      nextInterval.begin = begin;
-      id = next;
+            delete self.intervals[next];
+        } else
+        if (concatPrev) {
+            prevInterval.end = end;
+            id = prev;
+        } else
+        if (concatNext) {
+            nextInterval.begin = begin;
+            id = next;
+        }
     }
-  }
 }
 
 // File: contracts/SafeMath32.sol
@@ -532,144 +532,144 @@ library OrderedIntervalList {
  */
 library SafeMath32 {
 
-  /**
-  * @dev Multiplies two numbers, reverts on overflow.
-  */
-  function mul(uint32 a, uint32 b) internal pure returns (uint32) {
-    // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
-    // benefit is lost if 'b' is also tested.
-    // See: https://github.com/OpenZeppelin/openzeppelin-solidity/pull/522
-    if (a == 0) {
-      return 0;
+    /**
+   * @dev Multiplies two numbers, reverts on overflow.
+   */
+    function mul(uint32 a, uint32 b) internal pure returns (uint32) {
+        // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
+        // benefit is lost if 'b' is also tested.
+        // See: https://github.com/OpenZeppelin/openzeppelin-solidity/pull/522
+        if (a == 0) {
+            return 0;
+        }
+
+        uint32 c = a * b;
+        require(c / a == b);
+
+        return c;
     }
 
-    uint32 c = a * b;
-    require(c / a == b);
+    /**
+   * @dev Integer division of two numbers truncating the quotient, reverts on division by zero.
+   */
+    function div(uint32 a, uint32 b) internal pure returns (uint32) {
+        require(b > 0); // Solidity only automatically asserts when dividing by 0
+        uint32 c = a / b;
+        // assert(a == b * c + a % b); // There is no case in which this doesn't hold
 
-    return c;
-  }
+        return c;
+    }
 
-  /**
-  * @dev Integer division of two numbers truncating the quotient, reverts on division by zero.
-  */
-  function div(uint32 a, uint32 b) internal pure returns (uint32) {
-    require(b > 0); // Solidity only automatically asserts when dividing by 0
-    uint32 c = a / b;
-    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+    /**
+   * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
+   */
+    function sub(uint32 a, uint32 b) internal pure returns (uint32) {
+        require(b <= a);
+        uint32 c = a - b;
 
-    return c;
-  }
+        return c;
+    }
 
-  /**
-  * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
-  */
-  function sub(uint32 a, uint32 b) internal pure returns (uint32) {
-    require(b <= a);
-    uint32 c = a - b;
+    /**
+   * @dev Adds two numbers, reverts on overflow.
+   */
+    function add(uint32 a, uint32 b) internal pure returns (uint32) {
+        uint32 c = a + b;
+        require(c >= a);
 
-    return c;
-  }
+        return c;
+    }
 
-  /**
-  * @dev Adds two numbers, reverts on overflow.
-  */
-  function add(uint32 a, uint32 b) internal pure returns (uint32) {
-    uint32 c = a + b;
-    require(c >= a);
-
-    return c;
-  }
-
-  /**
-  * @dev Divides two numbers and returns the remainder (unsigned integer modulo),
-  * reverts when dividing by zero.
-  */
-  function mod(uint32 a, uint32 b) internal pure returns (uint32) {
-    require(b != 0);
-    return a % b;
-  }
+    /**
+   * @dev Divides two numbers and returns the remainder (unsigned integer modulo),
+   * reverts when dividing by zero.
+   */
+    function mod(uint32 a, uint32 b) internal pure returns (uint32) {
+        require(b != 0);
+        return a % b;
+    }
 }
 
 // File: contracts/SumMerkleProof.sol
 
 library SumMerkleProof {
-  using SafeMath32 for uint32;
+    using SafeMath32 for uint32;
 
-  // here is 32-bit plasma
-  struct Slice {
-    uint32 begin;
-    uint32 end;
-  }
-
-  // @dev data ordered from leaves to root.
-  // @dev index bits: right bit correspond leaves
-  struct Proof {
-    uint32 index;
-    Slice slice;
-    address item;
-    bytes data;
-  }
-
-  function item(bytes memory proof, uint i) internal pure returns(uint32 length, address result) {
-    // solium-disable-next-line security/no-inline-assembly
-    assembly {
-
-      length := div(
-        mload(
-          add(
-            proof,
-            // 12 = index + begin + end
-            // 20 = item (address)
-            // 32 = 12 + 20
-            add(32, mul(i, 24))
-          )
-        ),
-        // Start from data offset, shift right to 28 bytes and return 4
-        0x100000000000000000000000000000000000000000000000000000000
-      )
-
-      result := div(
-        mload(
-          add(
-            proof,
-            // 12 = index + begin + end
-            // 20 = item (address)
-            // 36 = 12 + 20 + 4 (slice len offset)
-            add(36, mul(i, 24))
-          )
-        ),
-        // Start from data offset + 4, shift right to 12 bytes and return first 20
-        0x1000000000000000000000000
-      )
+    // here is 32-bit plasma
+    struct Slice {
+        uint32 begin;
+        uint32 end;
     }
-  }
 
-  // @dev compute hash of the node from two child nodes
-  function hash(uint32 l1, uint32 l2, address a1, address a2) internal pure returns(address) {
-    return address(uint256(keccak256(abi.encodePacked(l1, l2, a1, a2))));
-  }
-
-  function sumMerkleProof(Proof memory proof, address root, uint32 rootLength) internal pure returns(bool) {
-    uint depth = proof.data.length / 24;
-    uint32 curLength = proof.slice.end.sub(proof.slice.begin);
-    address curItem = proof.item;
-    uint32 curLeft = proof.slice.begin;
-    uint32 index = proof.index;
-
-    for(uint8 i = 0; i < depth; i++) {
-      (uint32 length, address result) = item(proof.data, i);
-      if (index & 1 == 1) {
-        curItem = hash(length, curLength, result, curItem);
-        curLeft = curLeft.sub(length);
-        curLength = curLength.add(length);
-      } else {
-        curItem = hash(curLength, length, curItem, result);
-        curLength = curLength.add(length);
-      }
-      index >>= 1;
+    // @dev data ordered from leaves to root.
+    // @dev index bits: right bit correspond leaves
+    struct Proof {
+        uint32 index;
+        Slice slice;
+        address item;
+        bytes data;
     }
-    return curLeft == 0 && curLength == rootLength && curItem == root;
-  }
+
+    function item(bytes memory proof, uint i) internal pure returns(uint32 length, address result) {
+        // solium-disable-next-line security/no-inline-assembly
+        assembly {
+
+            length := div(
+                mload(
+                    add(
+                        proof,
+                        // 12 = index + begin + end
+                        // 20 = item (address)
+                        // 32 = 12 + 20
+                        add(32, mul(i, 24))
+                    )
+                ),
+                // Start from data offset, shift right to 28 bytes and return 4
+                0x100000000000000000000000000000000000000000000000000000000
+            )
+
+            result := div(
+                mload(
+                    add(
+                        proof,
+                        // 12 = index + begin + end
+                        // 20 = item (address)
+                        // 36 = 12 + 20 + 4 (slice len offset)
+                        add(36, mul(i, 24))
+                    )
+                ),
+                // Start from data offset + 4, shift right to 12 bytes and return first 20
+                0x1000000000000000000000000
+            )
+        }
+    }
+
+    // @dev compute hash of the node from two child nodes
+    function hash(uint32 l1, uint32 l2, address a1, address a2) internal pure returns(address) {
+        return address(uint256(keccak256(abi.encodePacked(l1, l2, a1, a2))));
+    }
+
+    function sumMerkleProof(Proof memory proof, address root, uint32 rootLength) internal pure returns(bool) {
+        uint depth = proof.data.length / 24;
+        uint32 curLength = proof.slice.end.sub(proof.slice.begin);
+        address curItem = proof.item;
+        uint32 curLeft = proof.slice.begin;
+        uint32 index = proof.index;
+
+        for(uint8 i = 0; i < depth; i++) {
+            (uint32 length, address result) = item(proof.data, i);
+            if (index & 1 == 1) {
+                curItem = hash(length, curLength, result, curItem);
+                curLeft = curLeft.sub(length);
+                curLength = curLength.add(length);
+            } else {
+                curItem = hash(curLength, length, curItem, result);
+                curLength = curLength.add(length);
+            }
+            index >>= 1;
+        }
+        return curLeft == 0 && curLength == rootLength && curItem == root;
+    }
 }
 
 // File: solidity-rlp/contracts/RLPReader.sol
@@ -917,197 +917,197 @@ library RLPReader {
 // File: contracts/PlasmaDecoder.sol
 
 library PlasmaDecoder {
-  using RLPReader for RLPReader.RLPItem;
-  using RLPReader for bytes;
+    using RLPReader for RLPReader.RLPItem;
+    using RLPReader for bytes;
 
-  struct Input {
-    address payable owner;
-    uint32 blockIndex;
-    uint32 txIndex;
-    uint8 outputIndex;
-    address assetId;
-    uint64 begin;
-    uint64 end;
-  }
-
-  struct Output {
-    address payable owner;
-    address assetId;
-    uint64 begin;
-    uint64 end;
-  }
-
-  struct Metadata {
-    uint32 maxBlockId;
-  }
-
-  struct Signature {
-    uint256 r;
-    uint256 s;
-    uint8 v;
-  }
-
-  struct Transaction {
-    Input[] inputs;
-    Output[] outputs;
-    Metadata metadata;
-    Signature[] signatures;
-  }
-
-  struct Block {
-    uint32 blockNumber;
-    uint256 previousBlockHash;
-    uint256 merkleRoot;
-    Signature signature;
-    Transaction[] transactions;
-  }
-
-  function decodeProof(bytes memory rlpBytes) internal pure returns(SumMerkleProof.Proof memory) {
-    return _decodeProof(rlpBytes.toRlpItem().toList());
-  }
-
-  function decodeInput(bytes memory rlpBytes) internal pure returns(Input memory) {
-    return _decodeInput(rlpBytes.toRlpItem().toList());
-  }
-
-  function decodeOutput(bytes memory rlpBytes) internal pure returns(Output memory) {
-    return _decodeOutput(rlpBytes.toRlpItem().toList());
-  }
-
-  function decodeMetadata(bytes memory rlpBytes) internal pure returns(Metadata memory) {
-    return _decodeMetadata(rlpBytes.toRlpItem().toList());
-  }
-
-  function decodeSignature(bytes memory rlpBytes) internal pure returns(Signature memory) {
-    return _decodeSignature(rlpBytes.toRlpItem().toList());
-  }
-
-  function decodeTransaction(bytes memory rlpBytes) internal pure returns(Transaction memory) {
-    return _decodeTransaction(rlpBytes.toRlpItem().toList());
-  }
-
-  function decodeBlock(bytes memory rlpBytes) internal pure returns(Block memory) {
-    return _decodeBlock(rlpBytes.toRlpItem().toList());
-  }
-
-  // Private methods
-
-  // here is 32-bit plasma
-  struct Slice {
-    uint32 begin;
-    uint32 end;
-  }
-
-  // @dev data ordered from leaves to root.
-  // @dev index bits: right bit correspond leaves
-  struct Proof {
-    uint32 index;
-    Slice slice;
-    address item;
-    bytes data;
-  }
-
-  function _decodeSlice(RLPReader.RLPItem[] memory items) private pure returns(SumMerkleProof.Slice memory) {
-    return SumMerkleProof.Slice({
-      begin: uint32(items[0].toUint()),
-      end: uint32(items[1].toUint())
-    });
-  }
-
-  function _decodeProof(RLPReader.RLPItem[] memory items) private pure returns(SumMerkleProof.Proof memory) {
-    return SumMerkleProof.Proof({
-      index: uint32(items[0].toUint()),
-      slice: _decodeSlice(items[1].toList()),
-      item: items[2].toAddress(),
-      data: items[3].toBytes()
-    });
-  }
-
-  function _decodeInput(RLPReader.RLPItem[] memory items) private pure returns(Input memory) {
-    return Input({
-      owner: address(uint160(items[0].toAddress())),
-      blockIndex: uint32(items[1].toUint()),
-      txIndex: uint32(items[2].toUint()),
-      outputIndex: uint8(items[3].toUint()),
-      assetId: items[4].toAddress(),
-      begin: uint64(items[5].toUint()),
-      end: uint64(items[6].toUint())
-    });
-  }
-
-  function _decodeInputs(RLPReader.RLPItem[] memory items) private pure returns(Input[] memory) {
-    Input[] memory inputs = new Input[](items.length);
-    for (uint i = 0; i < items.length; i++) {
-      inputs[i] = _decodeInput(items[i].toList());
+    struct Input {
+        address payable owner;
+        uint32 blockIndex;
+        uint32 txIndex;
+        uint8 outputIndex;
+        address assetId;
+        uint64 begin;
+        uint64 end;
     }
-    return inputs;
-  }
 
-  function _decodeOutput(RLPReader.RLPItem[] memory items) private pure returns(Output memory) {
-    return Output({
-      owner: address(uint160(items[0].toAddress())),
-      assetId: items[1].toAddress(),
-      begin: uint64(items[2].toUint()),
-      end: uint64(items[3].toUint())
-    });
-  }
-
-  function _decodeOutputs(RLPReader.RLPItem[] memory items) private pure returns(Output[] memory) {
-    Output[] memory outputs = new Output[](items.length);
-    for (uint i = 0; i < items.length; i++) {
-      outputs[i] = _decodeOutput(items[i].toList());
+    struct Output {
+        address payable owner;
+        address assetId;
+        uint64 begin;
+        uint64 end;
     }
-    return outputs;
-  }
 
-  function _decodeMetadata(RLPReader.RLPItem[] memory items) private pure returns(Metadata memory) {
-    return Metadata({
-      maxBlockId: uint32(items[0].toUint())
-    });
-  }
-
-  function _decodeSignature(RLPReader.RLPItem[] memory items) internal pure returns(Signature memory) {
-    return Signature({
-      r: items[0].toUint(),
-      s: items[0].toUint(),
-      v: uint8(items[0].toUint())
-    });
-  }
-
-  function _decodeSignatures(RLPReader.RLPItem[] memory items) private pure returns(Signature[] memory) {
-    Signature[] memory signatures = new Signature[](items.length);
-    for (uint i = 0; i < items.length; i++) {
-      signatures[i] = _decodeSignature(items[i].toList());
+    struct Metadata {
+        uint32 maxBlockId;
     }
-    return signatures;
-  }
 
-  function _decodeTransaction(RLPReader.RLPItem[] memory items) private pure returns(Transaction memory) {
-    return Transaction({
-      inputs: _decodeInputs(items[0].toList()),
-      outputs: _decodeOutputs(items[1].toList()),
-      metadata: _decodeMetadata(items[2].toList()),
-      signatures: _decodeSignatures(items[3].toList())
-    });
-  }
-
-  function _decodeTransactions(RLPReader.RLPItem[] memory items) private pure returns(Transaction[] memory) {
-    Transaction[] memory transactions = new Transaction[](items.length);
-    for (uint i = 0; i < items.length; i++) {
-      transactions[i] = _decodeTransaction(items[i].toList());
+    struct Signature {
+        uint256 r;
+        uint256 s;
+        uint8 v;
     }
-    return transactions;
-  }
 
-  function _decodeBlock(RLPReader.RLPItem[] memory items) private pure returns(Block memory) {
-    return Block({
-      blockNumber: uint32(items[0].toUint()),
-      previousBlockHash: items[1].toUint(),
-      merkleRoot: items[2].toUint(),
-      signature: _decodeSignature(items[3].toList()),
-      transactions: _decodeTransactions(items[4].toList())
-    });
-  }
+    struct Transaction {
+        Input[] inputs;
+        Output[] outputs;
+        Metadata metadata;
+        Signature[] signatures;
+    }
+
+    struct Block {
+        uint32 blockNumber;
+        uint256 previousBlockHash;
+        uint256 merkleRoot;
+        Signature signature;
+        Transaction[] transactions;
+    }
+
+    function decodeProof(bytes memory rlpBytes) internal pure returns(SumMerkleProof.Proof memory) {
+        return _decodeProof(rlpBytes.toRlpItem().toList());
+    }
+
+    function decodeInput(bytes memory rlpBytes) internal pure returns(Input memory) {
+        return _decodeInput(rlpBytes.toRlpItem().toList());
+    }
+
+    function decodeOutput(bytes memory rlpBytes) internal pure returns(Output memory) {
+        return _decodeOutput(rlpBytes.toRlpItem().toList());
+    }
+
+    function decodeMetadata(bytes memory rlpBytes) internal pure returns(Metadata memory) {
+        return _decodeMetadata(rlpBytes.toRlpItem().toList());
+    }
+
+    function decodeSignature(bytes memory rlpBytes) internal pure returns(Signature memory) {
+        return _decodeSignature(rlpBytes.toRlpItem().toList());
+    }
+
+    function decodeTransaction(bytes memory rlpBytes) internal pure returns(Transaction memory) {
+        return _decodeTransaction(rlpBytes.toRlpItem().toList());
+    }
+
+    function decodeBlock(bytes memory rlpBytes) internal pure returns(Block memory) {
+        return _decodeBlock(rlpBytes.toRlpItem().toList());
+    }
+
+    // Private methods
+
+    // here is 32-bit plasma
+    struct Slice {
+        uint32 begin;
+        uint32 end;
+    }
+
+    // @dev data ordered from leaves to root.
+    // @dev index bits: right bit correspond leaves
+    struct Proof {
+        uint32 index;
+        Slice slice;
+        address item;
+        bytes data;
+    }
+
+    function _decodeSlice(RLPReader.RLPItem[] memory items) private pure returns(SumMerkleProof.Slice memory) {
+        return SumMerkleProof.Slice({
+            begin: uint32(items[0].toUint()),
+            end: uint32(items[1].toUint())
+        });
+    }
+
+    function _decodeProof(RLPReader.RLPItem[] memory items) private pure returns(SumMerkleProof.Proof memory) {
+        return SumMerkleProof.Proof({
+            index: uint32(items[0].toUint()),
+            slice: _decodeSlice(items[1].toList()),
+            item: items[2].toAddress(),
+            data: items[3].toBytes()
+        });
+    }
+
+    function _decodeInput(RLPReader.RLPItem[] memory items) private pure returns(Input memory) {
+        return Input({
+            owner: address(uint160(items[0].toAddress())),
+            blockIndex: uint32(items[1].toUint()),
+            txIndex: uint32(items[2].toUint()),
+            outputIndex: uint8(items[3].toUint()),
+            assetId: items[4].toAddress(),
+            begin: uint64(items[5].toUint()),
+            end: uint64(items[6].toUint())
+        });
+    }
+
+    function _decodeInputs(RLPReader.RLPItem[] memory items) private pure returns(Input[] memory) {
+        Input[] memory inputs = new Input[](items.length);
+        for (uint i = 0; i < items.length; i++) {
+            inputs[i] = _decodeInput(items[i].toList());
+        }
+        return inputs;
+    }
+
+    function _decodeOutput(RLPReader.RLPItem[] memory items) private pure returns(Output memory) {
+        return Output({
+            owner: address(uint160(items[0].toAddress())),
+            assetId: items[1].toAddress(),
+            begin: uint64(items[2].toUint()),
+            end: uint64(items[3].toUint())
+        });
+    }
+
+    function _decodeOutputs(RLPReader.RLPItem[] memory items) private pure returns(Output[] memory) {
+        Output[] memory outputs = new Output[](items.length);
+        for (uint i = 0; i < items.length; i++) {
+            outputs[i] = _decodeOutput(items[i].toList());
+        }
+        return outputs;
+    }
+
+    function _decodeMetadata(RLPReader.RLPItem[] memory items) private pure returns(Metadata memory) {
+        return Metadata({
+            maxBlockId: uint32(items[0].toUint())
+        });
+    }
+
+    function _decodeSignature(RLPReader.RLPItem[] memory items) internal pure returns(Signature memory) {
+        return Signature({
+            r: items[0].toUint(),
+            s: items[0].toUint(),
+            v: uint8(items[0].toUint())
+        });
+    }
+
+    function _decodeSignatures(RLPReader.RLPItem[] memory items) private pure returns(Signature[] memory) {
+        Signature[] memory signatures = new Signature[](items.length);
+        for (uint i = 0; i < items.length; i++) {
+            signatures[i] = _decodeSignature(items[i].toList());
+        }
+        return signatures;
+    }
+
+    function _decodeTransaction(RLPReader.RLPItem[] memory items) private pure returns(Transaction memory) {
+        return Transaction({
+            inputs: _decodeInputs(items[0].toList()),
+            outputs: _decodeOutputs(items[1].toList()),
+            metadata: _decodeMetadata(items[2].toList()),
+            signatures: _decodeSignatures(items[3].toList())
+        });
+    }
+
+    function _decodeTransactions(RLPReader.RLPItem[] memory items) private pure returns(Transaction[] memory) {
+        Transaction[] memory transactions = new Transaction[](items.length);
+        for (uint i = 0; i < items.length; i++) {
+            transactions[i] = _decodeTransaction(items[i].toList());
+        }
+        return transactions;
+    }
+
+    function _decodeBlock(RLPReader.RLPItem[] memory items) private pure returns(Block memory) {
+        return Block({
+            blockNumber: uint32(items[0].toUint()),
+            previousBlockHash: items[1].toUint(),
+            merkleRoot: items[2].toUint(),
+            signature: _decodeSignature(items[3].toList()),
+            transactions: _decodeTransactions(items[4].toList())
+        });
+    }
 }
 
 // File: openzeppelin-solidity/contracts/cryptography/ECDSA.sol
@@ -1173,343 +1173,343 @@ library ECDSA {
 // File: contracts/PlasmaBlocks.sol
 
 contract PlasmaBlocks is Ownable {
-  using SafeMath for uint256;
+    using SafeMath for uint256;
 
-  address[] private _blocks;
+    address[] private _blocks;
 
-  event BlocksSubmitted(uint256 indexed length, uint256 time);
+    event BlocksSubmitted(uint256 indexed length, uint256 time);
 
-  function blocksLength() public view returns(uint) {
-    return _blocks.length;
-  }
-
-  function blocks(uint i) public view returns(address) {
-    return _blocks[i];
-  }
-
-  function submitBlocks(
-    uint256 fromIndex,
-    bytes memory newBlocks
-  )
-    public
-    onlyOwner
-    returns(uint256)
-  {
-    _submitBlocks(fromIndex, newBlocks);
-  }
-
-  function submitBlocksSigned(
-    uint256 fromIndex,
-    bytes memory newBlocks,
-    bytes memory rsv
-  )
-    public
-    returns(uint256)
-  {
-    bytes32 messageHash = keccak256(
-      abi.encodePacked(
-        fromIndex,
-        newBlocks
-      )
-    );
-
-    bytes32 signedHash = ECDSA.toEthSignedMessageHash(messageHash);
-    require(owner() == ECDSA.recover(signedHash, rsv), "Invalid signature");
-    return _submitBlocks(fromIndex, newBlocks);
-  }
-
-  function _submitBlocks(
-    uint256 fromIndex,
-    bytes memory newBlocks
-  )
-    internal
-    returns(uint256)
-  {
-    uint256 newBlocksLength = newBlocks.length / 20;
-
-    require(fromIndex == _blocks.length, "Invalid fromIndex");
-
-    uint256 begin = _blocks.length.sub(fromIndex);
-    _blocks.length = fromIndex.add(newBlocksLength);
-    for (uint i = begin; i < newBlocksLength; i++) {
-      address newBlock;
-      uint256 offset = 32 + i * 20;
-
-      // solium-disable-next-line security/no-inline-assembly
-      assembly {
-        // Load the current element of the proof
-        newBlock := div(mload(add(newBlocks, offset)), 0x1000000000000000000000000)
-      }
-
-      _blocks[fromIndex + i] = newBlock;
+    function blocksLength() public view returns(uint) {
+        return _blocks.length;
     }
 
-    if (begin < newBlocksLength) {
-      // solium-disable-next-line security/no-block-members
-      emit BlocksSubmitted(_blocks.length, block.timestamp);
+    function blocks(uint i) public view returns(address) {
+        return _blocks[i];
     }
 
-    return newBlocksLength - begin;
-  }
+    function submitBlocks(
+        uint256 fromIndex,
+        bytes memory newBlocks
+    )
+        public
+        onlyOwner
+        returns(uint256)
+    {
+        _submitBlocks(fromIndex, newBlocks);
+    }
+
+    function submitBlocksSigned(
+        uint256 fromIndex,
+        bytes memory newBlocks,
+        bytes memory rsv
+    )
+        public
+        returns(uint256)
+    {
+        bytes32 messageHash = keccak256(
+            abi.encodePacked(
+                fromIndex,
+                newBlocks
+            )
+        );
+
+        bytes32 signedHash = ECDSA.toEthSignedMessageHash(messageHash);
+        require(owner() == ECDSA.recover(signedHash, rsv), "Invalid signature");
+        return _submitBlocks(fromIndex, newBlocks);
+    }
+
+    function _submitBlocks(
+        uint256 fromIndex,
+        bytes memory newBlocks
+    )
+        internal
+        returns(uint256)
+    {
+        uint256 newBlocksLength = newBlocks.length / 20;
+
+        require(fromIndex == _blocks.length, "Invalid fromIndex");
+
+        uint256 begin = _blocks.length.sub(fromIndex);
+        _blocks.length = fromIndex.add(newBlocksLength);
+        for (uint i = begin; i < newBlocksLength; i++) {
+            address newBlock;
+            uint256 offset = 32 + i * 20;
+
+            // solium-disable-next-line security/no-inline-assembly
+            assembly {
+                // Load the current element of the proof
+                newBlock := div(mload(add(newBlocks, offset)), 0x1000000000000000000000000)
+            }
+
+            _blocks[fromIndex + i] = newBlock;
+        }
+
+        if (begin < newBlocksLength) {
+            // solium-disable-next-line security/no-block-members
+            emit BlocksSubmitted(_blocks.length, block.timestamp);
+        }
+
+        return newBlocksLength - begin;
+    }
 }
 
 // File: contracts/PlasmaAssets.sol
 
 contract PlasmaAssets is Ownable, PlasmaBlocks {
-  using SafeMath for uint256;
-  using SafeERC20 for IERC20;
-  using PlasmaDecoder for bytes;
-  using OrderedIntervalList for OrderedIntervalList.Data;
-  using SumMerkleProof for SumMerkleProof.Proof;
+    using SafeMath for uint256;
+    using SafeERC20 for IERC20;
+    using PlasmaDecoder for bytes;
+    using OrderedIntervalList for OrderedIntervalList.Data;
+    using SumMerkleProof for SumMerkleProof.Proof;
 
-  address constant public MAIN_COIN_ASSET_ID = address(0);
-  address constant public ERC721_ASSET_ID = address(1);
-  uint256 constant public ASSET_DECIMALS_TRUNCATION = 10e13; //TODO: will be different for tokens
-  uint32 constant public PLASMA_ASSETS_TOTAL_SIZE = 2 ** 24 - 1;
+    address constant public MAIN_COIN_ASSET_ID = address(0);
+    address constant public ERC721_ASSET_ID = address(1);
+    uint256 constant public ASSET_DECIMALS_TRUNCATION = 10e13; //TODO: will be different for tokens
+    uint32 constant public PLASMA_ASSETS_TOTAL_SIZE = 2 ** 24 - 1;
 
-  bytes32 private _expectedTokenAndTokenIdHash;
-  mapping(address => uint256) private _assetOffsets;
-  mapping(address => OrderedIntervalList.Data) private _assetLists;
-  mapping(address => bytes32[]) private _allDepositHashes;
-  mapping(bytes32 => bool) private _allWithdrawalHashes;
-  mapping(bytes32 => bool) private _erc721Deposits;
+    bytes32 private _expectedTokenAndTokenIdHash;
+    mapping(address => uint256) private _assetOffsets;
+    mapping(address => OrderedIntervalList.Data) private _assetLists;
+    mapping(address => bytes32[]) private _allDepositHashes;
+    mapping(bytes32 => bool) private _allWithdrawalHashes;
+    mapping(bytes32 => bool) private _erc721Deposits;
 
-  event AssetDeposited(
-    address indexed token,
-    address indexed who,
-    uint64 intervalId,
-    uint64 begin,
-    uint64 end
-  );
-
-  event CoinDeposited(
-    address indexed who,
-    uint256 amount
-  );
-
-  event ERC20Deposited(
-    address indexed token,
-    address indexed who,
-    uint256 amount
-  );
-
-  event ERC721Deposited(
-    address indexed token,
-    address indexed who,
-    uint256 tokenId,
-    uint64 indexed begin
-  );
-
-  event WithdrawalBegin(
-    address owner,
-    uint32 blockIndex,
-    uint32 txIndex,
-    uint8 outputIndex,
-    address assetId,
-    uint64 begin,
-    uint64 end
-  );
-
-  //
-
-  constructor() public {
-    _assetLists[MAIN_COIN_ASSET_ID].initialize();
-    _assetLists[ERC721_ASSET_ID].initialize();
-  }
-
-  function assetOffsets(address asset) public view returns (uint256) {
-    return _assetOffsets[asset];
-  }
-
-  function setAssetOffset(address asset, uint256 assetOffset) public onlyOwner {
-    require(assetOffset > uint(ERC721_ASSET_ID) && assetOffset < 256, "assetOffset should be in range [2, 255]");
-    require(_assetOffsets[asset] == 0, "assetOffset was already set");
-    _assetOffsets[asset] = assetOffset;
-    _assetLists[asset].initialize();
-  }
-
-  // Deposits
-
-  function deposit() public payable {
-    uint64 amount = uint64(msg.value / ASSET_DECIMALS_TRUNCATION);
-    (uint64 intervalId, uint64 begin, uint64 end) = _assetLists[MAIN_COIN_ASSET_ID].append(amount);
-
-    emit CoinDeposited(msg.sender, amount);
-    emit AssetDeposited(MAIN_COIN_ASSET_ID, msg.sender, intervalId, begin, end);
-    bytes32 hash = keccak256(abi.encodePacked(msg.sender, amount));
-    _allDepositHashes[msg.sender].push(hash);
-  }
-
-  function depositERC20(IERC20 token, uint256 amountArg) public {
-    require(_assetLists[address(token)].isInitialized(), "Operator should add this token first");
-
-    uint64 amount = uint64(amountArg / ASSET_DECIMALS_TRUNCATION);
-    (uint64 intervalId, uint64 begin, uint64 end) = _assetLists[address(token)].append(amount);
-
-    uint256 preBalance = token.balanceOf(address(this));
-    token.safeTransferFrom(msg.sender, address(this), amount);
-    uint256 deposited = token.balanceOf(address(this)).sub(preBalance);
-
-    emit ERC20Deposited(address(token), msg.sender, deposited);
-    emit AssetDeposited(address(token), msg.sender, intervalId, begin, end);
-    bytes32 hash = keccak256(abi.encodePacked(token, msg.sender, intervalId, begin, end));
-    _allDepositHashes[msg.sender].push(hash);
-  }
-
-  function depositERC721(IERC721 token, uint256 tokenId) public {
-    _expectedTokenAndTokenIdHash = keccak256(abi.encodePacked(token, tokenId));
-    token.safeTransferFrom(msg.sender, address(this), tokenId);
-    require(_expectedTokenAndTokenIdHash == bytes32(0), "ERC721 token not received");
-
-    (uint64 intervalId, uint64 begin, uint64 end) = _assetLists[ERC721_ASSET_ID].append(1);
-
-    emit ERC721Deposited(address(token), msg.sender, tokenId, begin);
-    emit AssetDeposited(ERC721_ASSET_ID, msg.sender, intervalId, begin, end);
-
-    bytes32 hash = keccak256(abi.encodePacked(ERC721_ASSET_ID, msg.sender, intervalId, begin, end));
-    _allDepositHashes[msg.sender].push(hash);
-
-    bytes32 erc721Hash = keccak256(abi.encodePacked(token, tokenId, begin));
-    _erc721Deposits[erc721Hash] = true;
-  }
-
-  function onERC721Received(
-    address operator,
-    address /*from*/,
-    uint256 tokenId,
-    bytes memory /*data*/
-  )
-  public
-  returns (bytes4)
-  {
-    bytes32 receivedTokenAndTokenId = keccak256(abi.encodePacked(msg.sender, tokenId));
-
-    require(operator == address(this), "Only this contract should deposit ERC721 tokens");
-    require(receivedTokenAndTokenId == _expectedTokenAndTokenIdHash, "ERC721 token was not expected");
-    delete _expectedTokenAndTokenIdHash;
-    return this.onERC721Received.selector;
-  }
-
-  // Withdrawals
-
-  function withdrawalBegin(
-    bytes memory inputBytes // PlasmaDecoder.Input
-  )
-  public
-  payable //TODO: Bonds
-  returns (bool)
-  {
-    PlasmaDecoder.Input memory input = inputBytes.decodeInput();
-
-    emit WithdrawalBegin(
-      input.owner,
-      input.blockIndex,
-      input.txIndex,
-      input.outputIndex,
-      input.assetId,
-      input.begin,
-      input.end
+    event AssetDeposited(
+        address indexed token,
+        address indexed who,
+        uint64 intervalId,
+        uint64 begin,
+        uint64 end
     );
 
-    bytes32 inputHash = keccak256(
-      abi.encodePacked(
-        input.owner,
-        input.blockIndex,
-        input.txIndex,
-        input.outputIndex,
-        input.assetId,
-        input.begin,
-        input.end
-      ));
-    _allWithdrawalHashes[inputHash] = true;
+    event CoinDeposited(
+        address indexed who,
+        uint256 amount
+    );
 
-    return true;
-  }
+    event ERC20Deposited(
+        address indexed token,
+        address indexed who,
+        uint256 amount
+    );
 
-  function withdrawalChallangeSpend(
-    bytes memory inputBytes, // PlasmaDecoder.Input
-    bytes memory txProofBytes, // SumMerkleProof.Proof
-    uint64 blockIndex,
-    uint8 /*spendIndex*/
-  )
-  public
-  returns (bool)
-  {
-    PlasmaDecoder.Input memory input = inputBytes.decodeInput();
-    SumMerkleProof.Proof memory txProof = txProofBytes.decodeProof();
+    event ERC721Deposited(
+        address indexed token,
+        address indexed who,
+        uint256 tokenId,
+        uint64 indexed begin
+    );
 
-    bytes32 inputHash = keccak256(
-      abi.encodePacked(
-        input.owner,
-        input.blockIndex,
-        input.txIndex,
-        input.outputIndex,
-        input.assetId,
-        input.begin,
-        input.end
-      ));
-    require(_allWithdrawalHashes[inputHash], "You should start withdrawal first");
+    event WithdrawalBegin(
+        address owner,
+        uint32 blockIndex,
+        uint32 txIndex,
+        uint8 outputIndex,
+        address assetId,
+        uint64 begin,
+        uint64 end
+    );
 
-    require(txProof.sumMerkleProof(blocks(blockIndex), PLASMA_ASSETS_TOTAL_SIZE));
+    //
 
-    // Cancel widthraw
-    delete _allWithdrawalHashes[inputHash];
-
-    return true;
-  }
-
-  // function withdrawalChallangeExistance(
-  //   ExitState state,
-  //   SumMerkleProof txProof,
-  //   MerkleProof inputProof,
-  //   uint64 maxBlockIndex,
-  //   MerkleProof maxBlockIndexProof
-  // )
-  //   public
-  //   returns(bool)
-  // {
-  // }
-
-  function withdrawalEnd(
-    bytes memory inputBytes, // PlasmaDecoder.Input
-    uint64 intervalId,
-    address token,
-    uint256 tokenId
-  ) public {
-    PlasmaDecoder.Input memory input = inputBytes.decodeInput();
-
-    bytes32 inputHash = keccak256(
-      abi.encodePacked(
-        input.owner,
-        input.blockIndex,
-        input.txIndex,
-        input.outputIndex,
-        input.assetId,
-        input.begin,
-        input.end
-      ));
-    require(_allWithdrawalHashes[inputHash], "You should start withdrawal first");
-    delete _allWithdrawalHashes[inputHash];
-
-    // Update interval and check it exist
-    _assetLists[input.assetId].remove(intervalId, input.begin, input.end);
-
-    if (input.assetId == MAIN_COIN_ASSET_ID) {
-      input.owner.transfer(uint256(input.end).sub(input.begin).mul(ASSET_DECIMALS_TRUNCATION));
-      return;
+    constructor() public {
+        _assetLists[MAIN_COIN_ASSET_ID].initialize();
+        _assetLists[ERC721_ASSET_ID].initialize();
     }
 
-    if (input.assetId == ERC721_ASSET_ID) {
-      require(input.end == input.begin + 1, "It is allowed to withdraw only 1 ERC721 per transaction");
-      bytes32 depositHash = keccak256(abi.encodePacked(token, tokenId, input.begin));
-      require(_erc721Deposits[depositHash], "Invalid token or tokeId arguments");
-      delete _erc721Deposits[depositHash];
-      IERC721(token).approve(msg.sender, tokenId);
-      return;
+    function assetOffsets(address asset) public view returns (uint256) {
+        return _assetOffsets[asset];
     }
 
-    IERC20(token).transfer(msg.sender, uint256(input.end).sub(input.begin));
-  }
+    function setAssetOffset(address asset, uint256 assetOffset) public onlyOwner {
+        require(assetOffset > uint(ERC721_ASSET_ID) && assetOffset < 256, "assetOffset should be in range [2, 255]");
+        require(_assetOffsets[asset] == 0, "assetOffset was already set");
+        _assetOffsets[asset] = assetOffset;
+        _assetLists[asset].initialize();
+    }
+
+    // Deposits
+
+    function deposit() public payable {
+        uint64 amount = uint64(msg.value / ASSET_DECIMALS_TRUNCATION);
+        (uint64 intervalId, uint64 begin, uint64 end) = _assetLists[MAIN_COIN_ASSET_ID].append(amount);
+
+        emit CoinDeposited(msg.sender, amount);
+        emit AssetDeposited(MAIN_COIN_ASSET_ID, msg.sender, intervalId, begin, end);
+        bytes32 hash = keccak256(abi.encodePacked(msg.sender, amount));
+        _allDepositHashes[msg.sender].push(hash);
+    }
+
+    function depositERC20(IERC20 token, uint256 amountArg) public {
+        require(_assetLists[address(token)].isInitialized(), "Operator should add this token first");
+
+        uint64 amount = uint64(amountArg / ASSET_DECIMALS_TRUNCATION);
+        (uint64 intervalId, uint64 begin, uint64 end) = _assetLists[address(token)].append(amount);
+
+        uint256 preBalance = token.balanceOf(address(this));
+        token.safeTransferFrom(msg.sender, address(this), amount);
+        uint256 deposited = token.balanceOf(address(this)).sub(preBalance);
+
+        emit ERC20Deposited(address(token), msg.sender, deposited);
+        emit AssetDeposited(address(token), msg.sender, intervalId, begin, end);
+        bytes32 hash = keccak256(abi.encodePacked(token, msg.sender, intervalId, begin, end));
+        _allDepositHashes[msg.sender].push(hash);
+    }
+
+    function depositERC721(IERC721 token, uint256 tokenId) public {
+        _expectedTokenAndTokenIdHash = keccak256(abi.encodePacked(token, tokenId));
+        token.safeTransferFrom(msg.sender, address(this), tokenId);
+        require(_expectedTokenAndTokenIdHash == bytes32(0), "ERC721 token not received");
+
+        (uint64 intervalId, uint64 begin, uint64 end) = _assetLists[ERC721_ASSET_ID].append(1);
+
+        emit ERC721Deposited(address(token), msg.sender, tokenId, begin);
+        emit AssetDeposited(ERC721_ASSET_ID, msg.sender, intervalId, begin, end);
+
+        bytes32 hash = keccak256(abi.encodePacked(ERC721_ASSET_ID, msg.sender, intervalId, begin, end));
+        _allDepositHashes[msg.sender].push(hash);
+
+        bytes32 erc721Hash = keccak256(abi.encodePacked(token, tokenId, begin));
+        _erc721Deposits[erc721Hash] = true;
+    }
+
+    function onERC721Received(
+        address operator,
+        address /*from*/,
+        uint256 tokenId,
+        bytes memory /*data*/
+    )
+    public
+    returns (bytes4)
+    {
+        bytes32 receivedTokenAndTokenId = keccak256(abi.encodePacked(msg.sender, tokenId));
+
+        require(operator == address(this), "Only this contract should deposit ERC721 tokens");
+        require(receivedTokenAndTokenId == _expectedTokenAndTokenIdHash, "ERC721 token was not expected");
+        delete _expectedTokenAndTokenIdHash;
+        return this.onERC721Received.selector;
+    }
+
+    // Withdrawals
+
+    function withdrawalBegin(
+        bytes memory inputBytes // PlasmaDecoder.Input
+    )
+    public
+    payable //TODO: Bonds
+    returns (bool)
+    {
+        PlasmaDecoder.Input memory input = inputBytes.decodeInput();
+
+        emit WithdrawalBegin(
+            input.owner,
+            input.blockIndex,
+            input.txIndex,
+            input.outputIndex,
+            input.assetId,
+            input.begin,
+            input.end
+        );
+
+        bytes32 inputHash = keccak256(
+            abi.encodePacked(
+                input.owner,
+                input.blockIndex,
+                input.txIndex,
+                input.outputIndex,
+                input.assetId,
+                input.begin,
+                input.end
+            ));
+        _allWithdrawalHashes[inputHash] = true;
+
+        return true;
+    }
+
+    function withdrawalChallangeSpend(
+        bytes memory inputBytes, // PlasmaDecoder.Input
+        bytes memory txProofBytes, // SumMerkleProof.Proof
+        uint64 blockIndex,
+        uint8 /*spendIndex*/
+    )
+    public
+    returns (bool)
+    {
+        PlasmaDecoder.Input memory input = inputBytes.decodeInput();
+        SumMerkleProof.Proof memory txProof = txProofBytes.decodeProof();
+
+        bytes32 inputHash = keccak256(
+            abi.encodePacked(
+                input.owner,
+                input.blockIndex,
+                input.txIndex,
+                input.outputIndex,
+                input.assetId,
+                input.begin,
+                input.end
+            ));
+        require(_allWithdrawalHashes[inputHash], "You should start withdrawal first");
+
+        require(txProof.sumMerkleProof(blocks(blockIndex), PLASMA_ASSETS_TOTAL_SIZE));
+
+        // Cancel widthraw
+        delete _allWithdrawalHashes[inputHash];
+
+        return true;
+    }
+
+    // function withdrawalChallangeExistance(
+    //   ExitState state,
+    //   SumMerkleProof txProof,
+    //   MerkleProof inputProof,
+    //   uint64 maxBlockIndex,
+    //   MerkleProof maxBlockIndexProof
+    // )
+    //   public
+    //   returns(bool)
+    // {
+    // }
+
+    function withdrawalEnd(
+        bytes memory inputBytes, // PlasmaDecoder.Input
+        uint64 intervalId,
+        address token,
+        uint256 tokenId
+    ) public {
+        PlasmaDecoder.Input memory input = inputBytes.decodeInput();
+
+        bytes32 inputHash = keccak256(
+            abi.encodePacked(
+                input.owner,
+                input.blockIndex,
+                input.txIndex,
+                input.outputIndex,
+                input.assetId,
+                input.begin,
+                input.end
+            ));
+        require(_allWithdrawalHashes[inputHash], "You should start withdrawal first");
+        delete _allWithdrawalHashes[inputHash];
+
+        // Update interval and check it exist
+        _assetLists[input.assetId].remove(intervalId, input.begin, input.end);
+
+        if (input.assetId == MAIN_COIN_ASSET_ID) {
+            input.owner.transfer(uint256(input.end).sub(input.begin).mul(ASSET_DECIMALS_TRUNCATION));
+            return;
+        }
+
+        if (input.assetId == ERC721_ASSET_ID) {
+            require(input.end == input.begin + 1, "It is allowed to withdraw only 1 ERC721 per transaction");
+            bytes32 depositHash = keccak256(abi.encodePacked(token, tokenId, input.begin));
+            require(_erc721Deposits[depositHash], "Invalid token or tokeId arguments");
+            delete _erc721Deposits[depositHash];
+            IERC721(token).approve(msg.sender, tokenId);
+            return;
+        }
+
+        IERC20(token).transfer(msg.sender, uint256(input.end).sub(input.begin));
+    }
 }
 
 // File: contracts/BankexPlasma.sol
