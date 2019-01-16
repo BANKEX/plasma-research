@@ -22,6 +22,7 @@
     "solidity-coverage": "^0.5.11",
     "solidity-rlp": "^1.2.1",
     "solium": "^1.2.2",
+    "solc": "^0.5.2",
     "truffle": "^5.0.1",
     "truffle-flattener": "1.2.9",
     "web3": "^1.0.0-beta.37",

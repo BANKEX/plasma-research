@@ -678,7 +678,7 @@ library SumMerkleProof {
 * @author Hamdi Allam hamdi.allam97@gmail.com
 * Please reach out with any questions or concerns
 */
-pragma solidity ^0.5.2;
+pragma solidity ^0.5.0;
 
 library RLPReader {
     uint8 constant STRING_SHORT_START = 0x80;
@@ -1514,6 +1514,6 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
 
 // File: contracts/BankexPlasma.sol
 
+// solium-disable-next-line no-empty-blocks
 contract BankexPlasma is PlasmaAssets {
-
 }
