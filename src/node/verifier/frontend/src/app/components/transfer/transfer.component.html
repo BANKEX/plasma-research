@@ -1,0 +1,13 @@
+<h1>{{tx.sum}}</h1>
+<h1>{{tx.who}}</h1>
+<div>
+  <label>
+    Sum
+    <input [(ngModel)]="tx.sum">
+  </label>
+  <label>
+    Address
+    <input [(ngModel)]="tx.who">
+  </label>
+  <button (click)="transfer()">Transfer</button>
+</div>
