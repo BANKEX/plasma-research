@@ -49,7 +49,7 @@ library OrderedIntervalList {
     function get(Data storage self, uint64 id) internal view returns(Interval storage interval) {
         require(id < self.intervals.length, "interval id doesn't exists in interval set");
         interval = self.intervals[id];
-        //require(interval.end != 0, "interval id doesn't exsits in interval set");
+        //require(interval.end != 0, "interval id doesn't exsits in interval set"); // TODO: why its commented?
     }
 
     /**
@@ -226,7 +226,7 @@ library OrderedIntervalList {
                 "prev should refer to the last interval"
             );
             require(
-                allowGapAfterLast || prev != self.lastIndex || prevInterval.end == begin, 
+                allowGapAfterLast || prev != self.lastIndex || prevInterval.end == begin,
                 "should begin from the end of latest interval when adding to the end"
             );
         }
