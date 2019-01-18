@@ -99,7 +99,7 @@ func (e *Ethereum) Exit(ctx context.Context, key *ecdsa.PrivateKey) (*types.Tran
 	return tx, nil
 }
 
-func (e *Ethereum) Deposit(ctx context.Context, contractAddress common.Address, key *ecdsa.PrivateKey, value *big.Int) (*types.Transaction, error) {
+func (e *Ethereum) Deposit(ctx context.Context, key *ecdsa.PrivateKey, value *big.Int) (*types.Transaction, error) {
 	gasPrice, err := e.client.SuggestGasPrice(context.Background())
 	if err != nil {
 		return nil, err
@@ -108,11 +108,17 @@ func (e *Ethereum) Deposit(ctx context.Context, contractAddress common.Address, 
 	opts := utils.GetTxOpts(ctx, key, defaultGasLimit, gasPrice)
 	opts.Value = value
 
-	tx, err := e.plasmaContract.Deposit(opts)
+	return e.plasmaContract.Deposit(opts)
+}
+
+func (e *Ethereum) DepositERC20(ctx context.Context, key *ecdsa.PrivateKey, tokenAddress common.Address, value *big.Int) (*types.Transaction, error) {
+	gasPrice, err := e.client.SuggestGasPrice(context.Background())
 	if err != nil {
 		return nil, err
 	}
-	return tx, nil
+
+	opts := utils.GetTxOpts(ctx, key, defaultGasLimit, gasPrice)
+	return e.plasmaContract.DepositERC20(opts, tokenAddress, value)
 }
 
 func (e *Ethereum) SendTransactionInWei(ctx context.Context, key *ecdsa.PrivateKey, value *big.Int, to common.Address) (*types.Transaction, error) {

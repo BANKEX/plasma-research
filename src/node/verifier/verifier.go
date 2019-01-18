@@ -195,8 +195,7 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 			value, ok := big.NewInt(0).SetString(arguments[2], 10)
 			switch ok {
 			case true:
-				rawContractAddress := common.HexToAddress(v.cfg.PlasmaContractAddress)
-				res, err := v.eth.Deposit(context.TODO(), rawContractAddress, v.key, value)
+				res, err := v.eth.Deposit(context.TODO(), v.key, value)
 				if err != nil {
 					fmt.Println(err)
 					return
@@ -377,8 +376,7 @@ func (v *Verifier) DepositHandler(c *gin.Context) {
 		return
 	}
 
-	rawContractAddress := common.HexToAddress(v.cfg.PlasmaContractAddress)
-	result, err := v.eth.Deposit(context.TODO(), rawContractAddress, v.key, value)
+	result, err := v.eth.Deposit(context.TODO(), v.key, value)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
