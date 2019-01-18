@@ -1,4 +1,4 @@
-package transactionManager
+package blockPublicher
 
 import (
 	"context"
@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/BANKEX/plasma-research/src/contracts/api"
-	"github.com/BANKEX/plasma-research/src/node/config"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -22,10 +21,11 @@ type EventMonitor struct {
 	blockPublisher     *BlockPublisher
 	client             *ethclient.Client
 	currentBlock       uint64
+	contractAddress    common.Address
 }
 
-func NewEventMonitor(m *TransactionManager, p *BlockPublisher) (*EventMonitor, error) {
-	c, err := ethclient.Dial(config.GetOperator().GethHost)
+func NewEventMonitor(m *TransactionManager, p *BlockPublisher, contractAddress common.Address, startingBlock uint64, endpointAddress string) (*EventMonitor, error) {
+	c, err := ethclient.Dial(endpointAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,8 @@ func NewEventMonitor(m *TransactionManager, p *BlockPublisher) (*EventMonitor, e
 	result := EventMonitor{
 		transactionManager: m,
 		client:             c,
-		currentBlock:       config.GetOperator().StartingBlock,
+		currentBlock:       startingBlock,
+		contractAddress:    contractAddress,
 	}
 
 	manager = m
@@ -44,9 +45,9 @@ func NewEventMonitor(m *TransactionManager, p *BlockPublisher) (*EventMonitor, e
 	return &result, nil
 }
 
-//// todo monitor deposit events, forward to transaction manager
-//// todo monitor withdraw events, forward to transaction manager
-//// todo if we need to send some challenges from the operator, this is the place to do it
+// // todo monitor deposit events, forward to transaction manager
+// // todo monitor withdraw events, forward to transaction manager
+// // todo if we need to send some challenges from the operator, this is the place to do it
 
 func (m *EventMonitor) loop() {
 	for {
@@ -73,12 +74,11 @@ func (m *EventMonitor) loop() {
 }
 
 func (m *EventMonitor) processBlock(blockNumber uint64) error {
-	contractAddress := common.HexToAddress(config.GetOperator().PlasmaContractAddress[2:])
 	query := ethereum.FilterQuery{
 		FromBlock: big.NewInt(int64(blockNumber)),
 		ToBlock:   big.NewInt(int64(blockNumber)),
 		Addresses: []common.Address{
-			contractAddress,
+			m.contractAddress,
 		},
 	}
 	logs, err := m.client.FilterLogs(context.Background(), query)

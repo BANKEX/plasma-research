@@ -1,12 +1,10 @@
-package transactionManager
+package blockPublicher
 
 import (
 	"log"
 	"time"
 
 	"github.com/BANKEX/plasma-research/src/node/blockchain"
-	"github.com/BANKEX/plasma-research/src/node/config"
-
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -21,8 +19,8 @@ type BlockPublisher struct {
 	client             *ethclient.Client
 }
 
-func NewBlockPublisher(m *TransactionManager) (*BlockPublisher, error) {
-	c, err := ethclient.Dial(config.GetOperator().GethHost)
+func NewBlockPublisher(m *TransactionManager, endpointAddress string) (*BlockPublisher, error) {
+	c, err := ethclient.Dial(endpointAddress)
 	if err != nil {
 		return nil, err
 	}

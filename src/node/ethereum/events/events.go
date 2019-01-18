@@ -11,9 +11,8 @@ import (
 
 	"github.com/BANKEX/plasma-research/src/contracts/api"
 	"github.com/BANKEX/plasma-research/src/node/blockchain"
-	"github.com/BANKEX/plasma-research/src/node/config"
+	"github.com/BANKEX/plasma-research/src/node/operator/blockPublicher"
 	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
-	"github.com/BANKEX/plasma-research/src/node/transactionManager"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -32,15 +31,14 @@ type EventAssetDeposited struct {
 var eventGroup = make([]EventAssetDeposited, 0)
 var currentBlock uint64 = 0
 var client *ethclient.Client
-var manager *transactionManager.TransactionManager
+var manager *blockPublicher.TransactionManager
 
-func GetEvent() bool {
+func GetEvent(contractAddress common.Address) bool {
 	maxBlock, err := client.HeaderByNumber(context.Background(), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	contractAddress := common.HexToAddress(config.GetOperator().PlasmaContractAddress)
 	query := ethereum.FilterQuery{
 		FromBlock: big.NewInt(int64(currentBlock)),
 		ToBlock:   big.NewInt(int64(checker(currentBlock, maxBlock.Number.Uint64()))),
@@ -123,8 +121,8 @@ func ShowGroup() {
 		fmt.Printf("Who: %s\n", eventGroup[i].Who.String())
 	}
 }
-func EventListener(m *transactionManager.TransactionManager) {
-	c, err := ethclient.Dial(config.GetOperator().GethHost)
+func EventListener(m *blockPublicher.TransactionManager, contractAddress common.Address, endpointAddress string) {
+	c, err := ethclient.Dial(endpointAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -132,7 +130,7 @@ func EventListener(m *transactionManager.TransactionManager) {
 	manager = m
 
 	for {
-		if !GetEvent() {
+		if !GetEvent(contractAddress) {
 			break
 		}
 	}

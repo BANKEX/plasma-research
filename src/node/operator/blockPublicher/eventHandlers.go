@@ -1,4 +1,4 @@
-package transactionManager
+package blockPublicher
 
 import (
 	"log"

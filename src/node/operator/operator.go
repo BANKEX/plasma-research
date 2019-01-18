@@ -2,50 +2,65 @@ package operator
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"encoding/hex"
 	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/BANKEX/plasma-research/src/contracts/api"
+	"github.com/BANKEX/plasma-research/src/node/operator/blockPublicher"
 	"github.com/BANKEX/plasma-research/src/node/types"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 
 	"github.com/BANKEX/plasma-research/src/node/blockchain"
 	"github.com/BANKEX/plasma-research/src/node/ethereum/events"
 	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
-	"github.com/BANKEX/plasma-research/src/node/transactionManager"
 	"github.com/gin-gonic/contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 type Operator struct {
-	cfg *Config
+	cfg           *Config
+	key           *ecdsa.PrivateKey
+	plasmaAddress common.Address
 
-	txManager *transactionManager.TransactionManager
-	publisher *transactionManager.BlockPublisher
-	monitor   *transactionManager.EventMonitor
+	txManager *blockPublicher.TransactionManager
+	publisher *blockPublicher.BlockPublisher
+	monitor   *blockPublicher.EventMonitor
 }
 
 func NewOperator(cfg *Config) (*Operator, error) {
-	manager := transactionManager.NewTransactionManager()
-	publisher, err := transactionManager.NewBlockPublisher(manager)
+	key, err := crypto.HexToECDSA(cfg.MainAccountPrivateKey[2:])
 	if err != nil {
 		return nil, err
 	}
 
-	eventMonitor, err := transactionManager.NewEventMonitor(manager, publisher)
+	plasmaContractAddress := common.HexToAddress(cfg.PlasmaContractAddress)
+
+	manager := blockPublicher.NewTransactionManager(key)
+
+	publisher, err := blockPublicher.NewBlockPublisher(manager, cfg.GethHost)
+	if err != nil {
+		return nil, err
+	}
+
+	eventMonitor, err := blockPublicher.NewEventMonitor(manager, publisher, plasmaContractAddress, cfg.StartingBlock, cfg.GethHost)
 	if err != nil {
 		return nil, err
 	}
 
 	// TODO: refactor this place
-	go events.EventListener(manager)
+	go events.EventListener(manager, plasmaContractAddress, cfg.GethHost)
 
 	return &Operator{
-		cfg:       cfg,
-		txManager: manager,
-		publisher: publisher,
-		monitor:   eventMonitor,
+		cfg:           cfg,
+		key:           key,
+		txManager:     manager,
+		publisher:     publisher,
+		monitor:       eventMonitor,
+		plasmaAddress: plasmaContractAddress,
 	}, nil
 }
 
