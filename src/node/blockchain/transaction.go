@@ -1,13 +1,13 @@
 package blockchain
 
 import (
-	"github.com/BANKEX/plasma-research/src/node/alias"
-	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
-	"github.com/BANKEX/plasma-research/src/node/utils"
-
 	"bytes"
 	"errors"
 	"fmt"
+
+	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
+	"github.com/BANKEX/plasma-research/src/node/types"
+	"github.com/BANKEX/plasma-research/src/node/utils"
 
 	"github.com/ethereum/go-ethereum/crypto"
 )
@@ -29,7 +29,7 @@ type Transaction struct {
 	UnsignedTransaction
 	// Signatures 65 bytes long ECDSA signature encoded in RSV format
 	// R(32) bytes S(32) bytes  V(1) byte
-	Signatures []alias.Signature `json:"signatures"`
+	Signatures []types.Signature `json:"signatures"`
 }
 
 type Metadata struct {
@@ -54,8 +54,8 @@ type Input struct {
 // Output represents transaction output in terms of UTXO model
 type Output struct {
 	// Ethereum address of the owner
-	Owner alias.Uint160     `json:"owner"`
-	Slice slice.Slice `json:"slice"`
+	Owner types.Uint160 `json:"owner"`
+	Slice slice.Slice   `json:"slice"`
 }
 
 // GetKey gets unique input hash consisting of block number, transaction number, and output number.
@@ -76,7 +76,7 @@ func (t *UnsignedTransaction) GetInputOwners() [][]byte {
 }
 
 // GetMerkleRoot gets the root of merklized transaction inputs, outputs, and metadata.
-func (t *UnsignedTransaction) GetMerkleRoot() alias.Uint160 {
+func (t *UnsignedTransaction) GetMerkleRoot() types.Uint160 {
 	var leaves []Item
 
 	for _, data := range t.Inputs {
@@ -98,26 +98,26 @@ func (t *UnsignedTransaction) GetMerkleRoot() alias.Uint160 {
 }
 
 // Pads 20 byte hash to 32 bytes with zeros
-func PadHash(in alias.Uint160) alias.Uint256 {
+func PadHash(in types.Uint160) types.Uint256 {
 	return append(make([]byte, 12), in...)
 }
 
 // GetSignaturesHash returns a hash of concatenated signatures.
-func (t *Transaction) GetSignaturesHash() alias.Uint160 {
+func (t *Transaction) GetSignaturesHash() types.Uint160 {
 	result := make([]byte, 0, 65*len(t.Signatures))
 	for _, s := range t.Signatures {
 		result = append(result, s...)
 	}
-	return alias.Uint160(utils.Keccak160(result))
+	return types.Uint160(utils.Keccak160(result))
 }
 
 // GetHash returns a full hash of signed transaction.
-func (t *Transaction) GetHash() alias.Uint160 {
+func (t *Transaction) GetHash() types.Uint160 {
 	// TODO: We call GetHash many times - think refactor of transaction to kind of freezed object with hash that calculated once
 	var result []byte
 	result = append(result, t.GetMerkleRoot()...)
 	result = append(result, t.GetSignaturesHash()...)
-	return alias.Uint160(utils.Keccak160(result))
+	return types.Uint160(utils.Keccak160(result))
 }
 
 // Signs a transaction with a specified private key.

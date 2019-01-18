@@ -1,4 +1,4 @@
-package alias
+package types
 
 type Uint160 []byte //20
 type Uint256 []byte //32

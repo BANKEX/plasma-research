@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/BANKEX/plasma-research/src/node/alias"
 	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
+	"github.com/BANKEX/plasma-research/src/node/types"
 	"github.com/BANKEX/plasma-research/src/node/utils"
 )
 
 type SumTreeRoot struct {
 	// We use 24 bit
 	Length uint32
-	Hash   alias.Uint160
+	Hash   types.Uint160
 }
 
 type SumTreeNode struct {
@@ -21,7 +21,7 @@ type SumTreeNode struct {
 
 	// We use 24 bit of length field
 	Length uint32
-	Hash   alias.Uint160
+	Hash   types.Uint160
 
 	Left   *SumTreeNode
 	Right  *SumTreeNode
@@ -35,13 +35,13 @@ type SumTreeNode struct {
 type SumMerkleTreeProof struct {
 	Index uint32
 	Slice slice.Slice
-	Item  alias.Uint160
+	Item  types.Uint160
 	Data  []ProofStep
 }
 
 type ProofStep struct {
-	Length []byte  // 4 bytes
-	Hash   alias.Uint160 // 20 bytes
+	Length []byte        // 4 bytes
+	Hash   types.Uint160 // 20 bytes
 }
 
 func HasIntersection(slices []slice.Slice) error {
@@ -110,7 +110,7 @@ func uint32BE(n uint32) []byte {
 	return []byte{byte(n >> 24), byte(n >> 16), byte(n >> 8), byte(n)}
 }
 
-func concatAndHash(left *SumTreeNode, right *SumTreeNode, hashFunc HashFunction) alias.Uint160 {
+func concatAndHash(left *SumTreeNode, right *SumTreeNode, hashFunc HashFunction) types.Uint160 {
 	l1, l2 := left.Length, right.Length
 	h1, h2 := left.Hash, right.Hash
 
