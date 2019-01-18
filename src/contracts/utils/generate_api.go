@@ -1,7 +1,7 @@
 // +build ignore
 // This program generates wrappers for contracts.
 
-package utils
+package main
 
 import (
 	"encoding/json"

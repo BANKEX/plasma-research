@@ -39,6 +39,6 @@ clean:
 	@rm -rf build
 
 generate_api: clean compile
-	${GO} build utils/generate_api.go
+	${GO} build -o generate_api utils/generate_api.go
 	./generate_api
 	rm generate_api
