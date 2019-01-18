@@ -2,16 +2,17 @@ package blockchain
 
 import (
 	"fmt"
-	. "github.com/BANKEX/plasma-research/src/node/alias"
-	. "github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
-	. "github.com/BANKEX/plasma-research/src/node/utils"
 	"sort"
+
+	"github.com/BANKEX/plasma-research/src/node/types"
+	"github.com/BANKEX/plasma-research/src/node/types/slice"
+	"github.com/BANKEX/plasma-research/src/node/utils"
 )
 
 type SumTreeRoot struct {
 	// We use 24 bit
 	Length uint32
-	Hash   Uint160
+	Hash   types.Uint160
 }
 
 type SumTreeNode struct {
@@ -20,7 +21,7 @@ type SumTreeNode struct {
 
 	// We use 24 bit of length field
 	Length uint32
-	Hash   Uint160
+	Hash   types.Uint160
 
 	Left   *SumTreeNode
 	Right  *SumTreeNode
@@ -33,17 +34,17 @@ type SumTreeNode struct {
 // Data: List of proof steps
 type SumMerkleTreeProof struct {
 	Index uint32
-	Slice Slice
-	Item  Uint160
+	Slice slice.Slice
+	Item  types.Uint160
 	Data  []ProofStep
 }
 
 type ProofStep struct {
-	Length []byte  // 4 bytes
-	Hash   Uint160 // 20 bytes
+	Length []byte        // 4 bytes
+	Hash   types.Uint160 // 20 bytes
 }
 
-func HasIntersection(slices []Slice) error {
+func HasIntersection(slices []slice.Slice) error {
 	for i := 0; i < len(slices)-1; i++ {
 		if slices[i].End > slices[i+1].Begin {
 			return fmt.Errorf("slices (%d, %d) and (%d, %d) intersect",
@@ -56,10 +57,10 @@ func HasIntersection(slices []Slice) error {
 // Use this first when assemble blocks
 func PrepareLeaves(transactions []Transaction) ([]*SumTreeNode, error) {
 
-	zeroHash := Keccak160([]byte{})
-	slice2transactions := map[Slice]*Transaction{}
+	zeroHash := utils.Keccak160([]byte{})
+	slice2transactions := map[slice.Slice]*Transaction{}
 
-	var slices []Slice
+	var slices []slice.Slice
 	for _, t := range transactions {
 		for _, input := range t.Inputs {
 			slices = append(slices, input.Slice)
@@ -79,20 +80,20 @@ func PrepareLeaves(transactions []Transaction) ([]*SumTreeNode, error) {
 	slices = FillGaps(slices)
 
 	var leaves []*SumTreeNode
-	for _, slice := range slices {
+	for _, s := range slices {
 
 		// Slices that filling the gaps haven't got a reference to transaction
-		tx, hasTx := slice2transactions[slice]
+		tx, hasTx := slice2transactions[s]
 		var txHash = zeroHash
 		if hasTx {
 			txHash = tx.GetHash()
 		}
 
 		leaf := SumTreeNode{
-			Begin:  slice.Begin,
-			End:    slice.End,
+			Begin:  s.Begin,
+			End:    s.End,
 			Hash:   txHash,
-			Length: slice.End - slice.Begin,
+			Length: s.End - s.Begin,
 		}
 
 		leaves = append(leaves, &leaf)
@@ -109,7 +110,7 @@ func uint32BE(n uint32) []byte {
 	return []byte{byte(n >> 24), byte(n >> 16), byte(n >> 8), byte(n)}
 }
 
-func concatAndHash(left *SumTreeNode, right *SumTreeNode, hashFunc HashFunction) Uint160 {
+func concatAndHash(left *SumTreeNode, right *SumTreeNode, hashFunc HashFunction) types.Uint160 {
 	l1, l2 := left.Length, right.Length
 	h1, h2 := left.Hash, right.Hash
 
@@ -171,7 +172,7 @@ func (tree *SumMerkleTree) GetProof(leafIndex uint32) SumMerkleTreeProof {
 
 	var curr = tree.Leafs[leafIndex]
 	var result SumMerkleTreeProof
-	result.Slice = Slice{curr.Begin, curr.End}
+	result.Slice = slice.Slice{curr.Begin, curr.End}
 	result.Item = curr.Hash
 
 	index := uint32(0)
@@ -215,7 +216,7 @@ func (tree *SumMerkleTree) GetRlpEncodedProof(leafIndex uint32) []byte {
 
 	tmp := struct {
 		Index uint32
-		Slice Slice
+		Slice slice.Slice
 		Item  []byte
 		Data  []byte
 	}{
@@ -225,7 +226,7 @@ func (tree *SumMerkleTree) GetRlpEncodedProof(leafIndex uint32) []byte {
 		data,
 	}
 
-	rlp, _ := EncodeToRLP(tmp)
+	rlp, _ := utils.EncodeToRLP(tmp)
 	return rlp
 }
 
@@ -242,10 +243,10 @@ func (tree *SumMerkleTree) GetRoot() SumTreeRoot {
 const plasmaLength = 16777215
 
 // Fill plasma range space with Slices, src slices should be sorted first
-func FillGaps(src []Slice) []Slice {
+func FillGaps(src []slice.Slice) []slice.Slice {
 
 	// TODO(artall64): Slice Merge, it doesn't merge a slices even if they are neighbors as I remember such improvement can be useful
-	var result []Slice
+	var result []slice.Slice
 
 	pos := uint32(0)
 	for i := 0; i <= len(src)-1; i++ {
@@ -253,7 +254,7 @@ func FillGaps(src []Slice) []Slice {
 		item := src[i]
 
 		if pos < item.Begin {
-			emptySlice := Slice{
+			emptySlice := slice.Slice{
 				Begin: pos,
 				End:   item.Begin,
 			}
@@ -265,7 +266,7 @@ func FillGaps(src []Slice) []Slice {
 	}
 
 	if pos != plasmaLength {
-		emptySlice := Slice{
+		emptySlice := slice.Slice{
 			Begin: pos,
 			End:   plasmaLength,
 		}

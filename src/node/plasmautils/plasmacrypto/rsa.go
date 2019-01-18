@@ -12,6 +12,31 @@ type Accumulator struct {
 	value *gmp.Int
 }
 
+func (a *Accumulator) Value() *big.Int {
+	return a.value.BigInt()
+}
+
+func (a *Accumulator) Clone() *Accumulator {
+	return &Accumulator{new(gmp.Int).Set(a.value)}
+}
+
+func (a *Accumulator) SetInt(value *big.Int) *Accumulator {
+	a.value = new(gmp.Int).SetBigInt(value)
+	return a
+}
+
+func (a *Accumulator) Accumulate(m uint32) *Accumulator {
+	a.value.Exp(a.value, new(gmp.Int).SetUint64(uint64(m)), RsaN)
+	return a
+}
+
+func (a *Accumulator) BatchAccumulate(m []uint32) *Accumulator {
+	for _, item := range m {
+		a.value.Exp(a.value, new(gmp.Int).SetUint64(uint64(item)), RsaN)
+	}
+	return a
+}
+
 type Proof struct {
 	B    *big.Int
 	R    *big.Int
@@ -91,31 +116,6 @@ func GenProof(g, A *Accumulator, _x *big.Int, _alpha *big.Int) *Proof {
 	r := new(gmp.Int).Mod(y, B)
 	b := new(gmp.Int).Exp(h, new(gmp.Int).Div(y, B), RsaN)
 	return &Proof{b.BigInt(), r.BigInt(), beta.BigInt()}
-}
-
-func (s *Accumulator) Value() *big.Int {
-	return s.value.BigInt()
-}
-
-func (s *Accumulator) Clone() *Accumulator {
-	return &Accumulator{new(gmp.Int).Set(s.value)}
-}
-
-func (s *Accumulator) SetInt(value *big.Int) *Accumulator {
-	s.value = new(gmp.Int).SetBigInt(value)
-	return s
-}
-
-func (A *Accumulator) Accumulate(m uint32) *Accumulator {
-	A.value.Exp(A.value, new(gmp.Int).SetUint64(uint64(m)), RsaN)
-	return A
-}
-
-func (A *Accumulator) BatchAccumulate(m []uint32) *Accumulator {
-	for _, item := range m {
-		A.value.Exp(A.value, new(gmp.Int).SetUint64(uint64(item)), RsaN)
-	}
-	return A
 }
 
 func init() {

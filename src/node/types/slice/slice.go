@@ -10,7 +10,7 @@ const TreeHeight = 24
 // GetAlignedSlices returns an array of aligned slice indexes given
 // an arbitrary source slice with begin and end leaf indexes.
 func (s *Slice) GetAlignedSlices() []uint32 {
-	res := []uint32{}
+	var res []uint32
 	a := s.Begin
 	b := s.End
 	q := uint32(1)

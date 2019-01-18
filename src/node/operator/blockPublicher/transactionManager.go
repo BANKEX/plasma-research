@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"sync"
 
-	. "github.com/BANKEX/plasma-research/src/node/alias"
 	"github.com/BANKEX/plasma-research/src/node/blockchain"
+	"github.com/BANKEX/plasma-research/src/node/types"
 	"github.com/BANKEX/plasma-research/src/node/utils"
 )
 
@@ -16,8 +16,8 @@ type TransactionManager struct {
 	utxoIndex        map[string]*blockchain.Input // map key is "BlockNumber:TransactionNumber:OutputNumber"
 	transactionQueue []*blockchain.Transaction
 	lastBlock        uint32
-	lastHash         Uint256
-	lastAccumulator  Uint2048
+	lastHash         types.Uint256
+	lastAccumulator  types.Uint2048
 	mutex            sync.Mutex
 	key              *ecdsa.PrivateKey
 }

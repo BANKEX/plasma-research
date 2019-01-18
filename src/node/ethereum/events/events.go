@@ -12,7 +12,7 @@ import (
 	"github.com/BANKEX/plasma-research/src/contracts/api"
 	"github.com/BANKEX/plasma-research/src/node/blockchain"
 	"github.com/BANKEX/plasma-research/src/node/operator/blockPublicher"
-	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
+	"github.com/BANKEX/plasma-research/src/node/types/slice"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"

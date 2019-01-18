@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/BANKEX/plasma-research/src/node/blockchain"
-	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
+	"github.com/BANKEX/plasma-research/src/node/types/slice"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/core/types"
 )

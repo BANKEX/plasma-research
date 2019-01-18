@@ -29,7 +29,7 @@ import (
 
 	"github.com/BANKEX/plasma-research/src/node/blockchain"
 	"github.com/BANKEX/plasma-research/src/node/ethereum"
-	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
+	"github.com/BANKEX/plasma-research/src/node/types/slice"
 	"github.com/BANKEX/plasma-research/src/node/verifier/cli/options"
 	"github.com/gin-gonic/gin"
 	"github.com/imroc/req"

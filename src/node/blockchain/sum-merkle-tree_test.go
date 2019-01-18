@@ -3,12 +3,13 @@ package blockchain
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/BANKEX/plasma-research/src/node/utils"
 	"io/ioutil"
 	"os"
 	"testing"
 
-	. "github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
+	"github.com/BANKEX/plasma-research/src/node/utils"
+
+	"github.com/BANKEX/plasma-research/src/node/types/slice"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -107,7 +108,7 @@ func TestSMT(t *testing.T) {
 }
 
 func TestPrepareLeavesIntersectedSlices(t *testing.T) {
-	slices := []Slice{{1, 10}, {5, 20}}
+	slices := []slice.Slice{{1, 10}, {5, 20}}
 
 	err := HasIntersection(slices)
 
@@ -118,7 +119,7 @@ func TestPrepareLeavesIntersectedSlices(t *testing.T) {
 }
 
 func TestPrepareLeavesCoincidienceBeginAndEndOfSlices(t *testing.T) {
-	slices := []Slice{{1, 2}, {2, 3}}
+	slices := []slice.Slice{{1, 2}, {2, 3}}
 
 	err := HasIntersection(slices)
 
@@ -130,15 +131,15 @@ func TestPrepareLeavesNotIntersectedSlices(t *testing.T) {
 	var Tx Transaction
 
 	TxInput1 := Input{Output: Output{
-		Slice: Slice{1, 2},
+		Slice: slice.Slice{1, 2},
 	}}
 
 	TxInput2 := Input{Output: Output{
-		Slice: Slice{4, 19},
+		Slice: slice.Slice{4, 19},
 	}}
 
 	TxInput3 := Input{Output: Output{
-		Slice: Slice{22, 23},
+		Slice: slice.Slice{22, 23},
 	}}
 
 	Tx.Inputs = append(Tx.Inputs, TxInput1)
@@ -156,7 +157,7 @@ func TestPrepareLeavesNotIntersectedSlices(t *testing.T) {
 func TestFillGapsOneSlice(t *testing.T) {
 
 	oneSlice := func(b uint32, e uint32) string {
-		slices := []Slice{{Begin: b, End: e}}
+		slices := []slice.Slice{{Begin: b, End: e}}
 		return fmt.Sprint(FillGaps(slices))
 	}
 
@@ -167,9 +168,9 @@ func TestFillGapsOneSlice(t *testing.T) {
 	// Slice at the end
 	assert.Equal(t, "[{0 16777200} {16777200 16777215}]", oneSlice(16777200, 16777215))
 
-	///
+	// /
 	twoSlices := func(b1 uint32, e1 uint32, b2 uint32, e2 uint32) string {
-		slices := []Slice{
+		slices := []slice.Slice{
 			{b1, e1},
 			{b2, e2},
 		}
@@ -184,7 +185,7 @@ func TestFillGapsOneSlice(t *testing.T) {
 
 	// Fill gaps between three slices
 	threeSlices := func(b1 uint32, e1 uint32, b2 uint32, e2 uint32, b3 uint32, e3 uint32) string {
-		slices := []Slice{
+		slices := []slice.Slice{
 			{b1, e1},
 			{b2, e2},
 			{b3, e3},
@@ -195,5 +196,5 @@ func TestFillGapsOneSlice(t *testing.T) {
 	assert.Equal(t, "[{0 10} {10 200} {200 500} {500 3000} {3000 16777215}]", threeSlices(0, 10, 200, 500, 3000, 16777215))
 
 	// Return just one slice is source collection is empty
-	assert.Equal(t, "[{0 16777215}]", fmt.Sprint(FillGaps([]Slice{})))
+	assert.Equal(t, "[{0 16777215}]", fmt.Sprint(FillGaps([]slice.Slice{})))
 }
