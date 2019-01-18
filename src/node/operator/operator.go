@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/BANKEX/plasma-research/src/node/ethereum/plasmacontract"
+	"github.com/BANKEX/plasma-research/src/contracts/api"
 	"github.com/BANKEX/plasma-research/src/node/types"
 
 	"github.com/BANKEX/plasma-research/src/node/blockchain"
@@ -112,7 +112,7 @@ func (o *Operator) GetStatus(c *gin.Context) {
 func (o *Operator) GetConfig(c *gin.Context) {
 	info := types.OperatorInfo{}
 	info.Config = o.cfg
-	info.ABI = store.StoreABI
+	info.ABI = api.BankexPlasmaABI
 	c.JSON(http.StatusOK, info)
 }
 
