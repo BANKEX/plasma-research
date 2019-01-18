@@ -1,9 +1,10 @@
 package completer
 
 import (
+	"strings"
+
 	"github.com/BANKEX/plasma-research/src/node/verifier/cli/options"
 	"github.com/c-bata/go-prompt"
-	"strings"
 )
 
 func Completer(d prompt.Document) []prompt.Suggest {

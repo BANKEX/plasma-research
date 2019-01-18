@@ -39,5 +39,5 @@ var PlasmaOptions = []prompt.Suggest{
 	{Text: "transfer", Description: Plasma["transfer"]},
 	{Text: "utxo", Description: Plasma["utxo"]},
 	{Text: "exit", Description: Plasma["exit"]},
-	//{Text: "withdraw", Description: "ex: Withdraw eth from plasma"},
+	// {Text: "withdraw", Description: "ex: Withdraw eth from plasma"},
 }

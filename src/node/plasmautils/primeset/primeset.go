@@ -21,7 +21,6 @@ const ChunkSizeLog2 = 7
 const ChunkSize = 1 << ChunkSizeLog2
 
 func tailproof(proof *[]*crypto.Cipher, data []uint32, i int) {
-
 	r := 1
 	h := uint(0)
 	for r < ChunkSize {
@@ -45,7 +44,6 @@ func hashprimeset(data []uint32) *crypto.Cipher {
 	}
 	x := data[0]
 	return crypto.Hash([]uint8{byte(x >> 24), byte(x >> 16), byte(x >> 8), byte(x)})
-
 }
 
 func initFiles() {

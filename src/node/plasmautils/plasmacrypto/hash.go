@@ -22,7 +22,7 @@ func (s *Cipher) String() string {
 }
 
 func Hash(data []byte) *Cipher {
-	res := []byte{}
+	var res []byte
 	hash := sha3.NewKeccak256()
 	hash.Write(data)
 	res = hash.Sum(res)[0:HashSize]
@@ -30,7 +30,7 @@ func Hash(data []byte) *Cipher {
 }
 
 func Hash256(data []byte) *Cipher {
-	res := []byte{}
+	var res []byte
 	hash := sha3.NewKeccak256()
 	hash.Write(data)
 	res = hash.Sum(res)[:]

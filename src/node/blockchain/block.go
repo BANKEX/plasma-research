@@ -8,7 +8,7 @@ import (
 	"io"
 	"math/big"
 
-	. "github.com/BANKEX/plasma-research/src/node/alias"
+	"github.com/BANKEX/plasma-research/src/node/alias"
 	"github.com/BANKEX/plasma-research/src/node/plasmautils/plasmacrypto"
 	"github.com/BANKEX/plasma-research/src/node/plasmautils/primeset"
 	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
@@ -24,17 +24,17 @@ var WeiPerCoin uint = 1e11
 // UnsignedBlockHeader is a structure that signature is calculated for.
 type UnsignedBlockHeader struct {
 	BlockNumber    uint32         `json:"blockNumber"`
-	PreviousHash   Uint256        `json:"previousHash"`
+	PreviousHash   alias.Uint256        `json:"previousHash"`
 	MerkleRoot     SumTreeRoot    `json:"merkleRoot"`
-	RSAAccumulator Uint2048       `json:"rsaAccumulator"`
-	hash           Uint256        // private variable because it should not be serialized
+	RSAAccumulator alias.Uint2048       `json:"rsaAccumulator"`
+	hash           alias.Uint256        // private variable because it should not be serialized
 	merkleTree     *SumMerkleTree // private variable because it should not be serialized
 }
 
 // BlockHeader is a structure that gets sent to a smart contract.
 type BlockHeader struct {
 	UnsignedBlockHeader
-	Signature Signature `json:"signature"`
+	Signature alias.Signature `json:"signature"`
 }
 
 // Block is a complete block that gets uploaded to public storage.
@@ -45,7 +45,7 @@ type Block struct {
 
 // NewBlock creates a block from previous block metadata and an array of transaction.
 // This function will calculate merkle root, RSA accumulator, and sign the block.
-func NewBlock(key *ecdsa.PrivateKey, blockNumber uint32, previousHash Uint256, previousRSAAccumulator Uint2048, transactions []Transaction) (*Block, error) {
+func NewBlock(key *ecdsa.PrivateKey, blockNumber uint32, previousHash alias.Uint256, previousRSAAccumulator alias.Uint2048, transactions []Transaction) (*Block, error) {
 	block := Block{
 		BlockHeader: BlockHeader{
 			UnsignedBlockHeader: UnsignedBlockHeader{
@@ -78,7 +78,7 @@ func NewBlock(key *ecdsa.PrivateKey, blockNumber uint32, previousHash Uint256, p
 }
 
 // GetHash gets the hash of block header.
-func (b *Block) GetHash() Uint256 {
+func (b *Block) GetHash() alias.Uint256 {
 	return b.hash
 }
 
@@ -124,7 +124,7 @@ func (b *Block) CalculateMerkleRoot() error {
 // UpdateRSAAccumulator adds input ranges for all submitted transactions to the RSA accumulator.
 // Algorithm complexity is O(N*logN) for N transactions.
 // This function accepts previous accumulator as argument instead of mutating the block to avoid double invocation.
-func (b *Block) UpdateRSAAccumulator(previous Uint2048) {
+func (b *Block) UpdateRSAAccumulator(previous alias.Uint2048) {
 	acc := new(plasmacrypto.Accumulator).SetInt(new(big.Int).SetBytes(previous))
 	for _, t := range b.Transactions {
 		for _, i := range t.Inputs {
