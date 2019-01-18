@@ -1,7 +1,8 @@
-package transactionManager
+package blockPublicher
 
 import (
 	"bytes"
+	"crypto/ecdsa"
 	"encoding/hex"
 	"fmt"
 	"sync"
@@ -18,9 +19,10 @@ type TransactionManager struct {
 	lastHash         Uint256
 	lastAccumulator  Uint2048
 	mutex            sync.Mutex
+	key              *ecdsa.PrivateKey
 }
 
-func NewTransactionManager() *TransactionManager {
+func NewTransactionManager(key *ecdsa.PrivateKey) *TransactionManager {
 	result := TransactionManager{
 		utxoIndex:        map[string]*blockchain.Input{},
 		transactionQueue: make([]*blockchain.Transaction, 0),
@@ -28,6 +30,7 @@ func NewTransactionManager() *TransactionManager {
 		lastHash:         utils.Keccak256([]byte{}), // todo define genesis hash
 		lastAccumulator:  []byte{3},                 // todo define genesis accumulator
 		mutex:            sync.Mutex{},
+		key:              key,
 	}
 	return &result
 }
@@ -129,7 +132,7 @@ func (p *TransactionManager) AssembleDepositBlock(output blockchain.Output) (*bl
 }
 
 func (p *TransactionManager) assembleBlockFromTransactions(t []blockchain.Transaction) (*blockchain.Block, error) {
-	block, err := blockchain.NewBlock(p.lastBlock+1, p.lastHash, p.lastAccumulator, dereference(p.transactionQueue))
+	block, err := blockchain.NewBlock(p.key, p.lastBlock+1, p.lastHash, p.lastAccumulator, dereference(p.transactionQueue))
 	if err != nil {
 		return nil, err
 	}

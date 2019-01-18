@@ -60,13 +60,8 @@ func EncodeToRLP(obj interface{}) ([]byte, error) {
 }
 
 // Sign calculates an ECDSA signature.
-func Sign(data, key []byte) (signature []byte, error error) {
-	hash := crypto.Keccak256(data)
-	privateKey, err := crypto.ToECDSA(key)
-	if err != nil {
-		return nil, err
-	}
-	return crypto.Sign(hash, privateKey)
+func Sign(data []byte, key *ecdsa.PrivateKey) (signature []byte, error error) {
+	return crypto.Sign(crypto.Keccak256(data), key)
 }
 
 // VerifySignature checks that the given public key created signature over hash.

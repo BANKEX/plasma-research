@@ -2,14 +2,13 @@ package blockchain
 
 import (
 	"bytes"
+	"crypto/ecdsa"
 	"encoding/binary"
-	"encoding/hex"
 	"fmt"
 	"io"
 	"math/big"
 
 	. "github.com/BANKEX/plasma-research/src/node/alias"
-	"github.com/BANKEX/plasma-research/src/node/config"
 	"github.com/BANKEX/plasma-research/src/node/plasmautils/plasmacrypto"
 	"github.com/BANKEX/plasma-research/src/node/plasmautils/primeset"
 	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
@@ -46,7 +45,7 @@ type Block struct {
 
 // NewBlock creates a block from previous block metadata and an array of transaction.
 // This function will calculate merkle root, RSA accumulator, and sign the block.
-func NewBlock(blockNumber uint32, previousHash Uint256, previousRSAAccumulator Uint2048, transactions []Transaction) (*Block, error) {
+func NewBlock(key *ecdsa.PrivateKey, blockNumber uint32, previousHash Uint256, previousRSAAccumulator Uint2048, transactions []Transaction) (*Block, error) {
 	block := Block{
 		BlockHeader: BlockHeader{
 			UnsignedBlockHeader: UnsignedBlockHeader{
@@ -66,11 +65,6 @@ func NewBlock(blockNumber uint32, previousHash Uint256, previousRSAAccumulator U
 	}
 
 	err = block.calculateHash()
-	if err != nil {
-		return nil, err
-	}
-
-	key, err := hex.DecodeString(config.GetOperator().MainAccountPrivateKey[2:])
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +97,7 @@ func (b *Block) calculateHash() error {
 }
 
 // Sign signs the block with the specified private key.
-func (b *Block) Sign(key []byte) error {
+func (b *Block) Sign(key *ecdsa.PrivateKey) error {
 	signature, err := utils.Sign(b.GetHash(), key)
 	if err != nil {
 		return err
