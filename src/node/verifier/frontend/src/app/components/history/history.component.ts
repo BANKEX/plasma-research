@@ -20,7 +20,7 @@ export class HistoryComponent implements OnInit {
   ngOnInit() {
     this.h = [];
     this.getInfo();
-    timer(10000, 1000).pipe(
+    timer(10000, 10000).pipe(
       take(1000)).subscribe(x => {
       this.h = [];
       this.getInfo();
@@ -28,12 +28,19 @@ export class HistoryComponent implements OnInit {
   }
 
   getInfo() {
-    this.http.get('http://localhost:8080/operations').subscribe((data: any) => {
+    this.http.get('http://localhost:8080/history').subscribe((data: any) => {
       for (let i = 0; i < data.Events.length; i++) {
         this.h.push(data.Events[i]);
       }
-      console.log(this.h);
     });
+  }
+
+  date(timestamp: number): string {
+    timestamp = timestamp * 1000;
+    const date: number = new Date(timestamp).getDate();
+    const month: number = new Date(timestamp).getMonth() + 1;
+    const year: number = new Date(timestamp).getFullYear();
+    return month + '/' + date + '/' + year;
   }
 
 }

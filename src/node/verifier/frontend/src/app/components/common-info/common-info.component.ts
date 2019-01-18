@@ -27,7 +27,10 @@ export class CommonInfoComponent implements OnInit {
     this.http.get('http://localhost:8080/common').subscribe((data: any) => {
       this.cI.contractAddress = data.contract_address;
       this.cI.contractBalance = data.contract_balance;
-      this.cI.plasmaBalance = data.plasma_balance;
+      this.cI.verifierPlasmaBalance = data.verifier_plasma_balance;
+      this.cI.verifierEtherBalance = data.verifier_ether_balance;
+      this.cI.latestBlock = data.latest_block;
+      this.cI.verifierInputs = data.verifier_inputs;
     });
   }
 

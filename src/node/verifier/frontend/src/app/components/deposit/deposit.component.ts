@@ -18,7 +18,6 @@ export class DepositComponent implements OnInit {
   // TODO: add catching error
   deposit() {
     this.http.post('http://localhost:8080/deposit', JSON.stringify(this.dep)).subscribe((data: any) => {
-      console.log(data);
     });
   }
 

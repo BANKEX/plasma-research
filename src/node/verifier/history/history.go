@@ -6,6 +6,17 @@ import (
 
 var DBInstance = make([]ClientOperation, 0)
 
+type Event struct {
+	Sum           string `json:"sum"`
+	Who           string `json:"who"`
+	Date          int64  `json:"date"`
+	OperationType string `json:"operation_type"`
+}
+
+type HistoryResponse struct {
+	Events []*Event
+}
+
 type ClientOperation struct {
 	Sum           *big.Int
 	Date          int64

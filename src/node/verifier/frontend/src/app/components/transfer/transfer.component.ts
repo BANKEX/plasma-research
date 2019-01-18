@@ -15,7 +15,6 @@ export class TransferComponent implements OnInit {
 
   transfer() {
     this.http.post('http://localhost:8080/transfer', JSON.stringify(this.tx)).subscribe((data: any) => {
-      console.log(data);
     });
   }
 

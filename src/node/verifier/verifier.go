@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/BANKEX/plasma-research/src/node/types"
+	"github.com/BANKEX/plasma-research/src/node/verifier/history"
 	"github.com/gin-gonic/contrib/static"
 	"io"
 	"io/ioutil"
@@ -17,6 +18,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/BANKEX/plasma-research/src/node/ethereum/deposit"
 	"github.com/BANKEX/plasma-research/src/node/utils"
@@ -143,7 +145,7 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 				}
 			case "balance", "bal":
 				if len(arguments) == 3 {
-					balanceFloat, err := GetETHAccountBalance(arguments[2])
+					balanceFloat, err := GetEtherAccountBalance(arguments[2])
 					if err != nil {
 						fmt.Println(err)
 					} else {
@@ -157,7 +159,7 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 			case "ownerBalance", "ob":
 				if len(arguments) == 2 {
 					fmt.Println(v.cfg.VerifierEthereumAddress)
-					balanceFloat, err := GetETHAccountBalance(v.cfg.VerifierEthereumAddress)
+					balanceFloat, err := GetEtherAccountBalance(v.cfg.VerifierEthereumAddress)
 					if err != nil {
 						fmt.Println(err)
 					} else {
@@ -282,21 +284,18 @@ func (v *Verifier) CLIToolExecutor(userText string) {
 }
 
 func (v *Verifier) ServerStart(r *gin.Engine) error {
-	r.GET("/etherBalance", v.EthereumBalance)
-	r.GET("/verifiersAmount", v.VerifiersAmountHandler)
-	r.GET("/totalBalance", v.TotalBalanceHandler)
-	r.GET("/contractAddress", v.PlasmaContractAddress)
-	r.GET("/deposit/:sum", v.DepositHandler)
-	r.POST("/transfer/:address/:sum", v.TransferHandler)
-	r.GET("/plasmaBalance", v.PlasmaBalance)
-	r.GET("/exit", v.ExitHandler)
-	r.GET("/latestBlock", v.LatestBlockHandler)
+
+	r.POST("/deposit", v.DepositHandler)
+	r.POST("/transfer", v.TransferHandler)
+	r.POST("/exit", v.ExitHandler)
+	r.GET("/common", v.CommonInfoHandler)
+	r.GET("/history", v.HistoryAllHandler)
 
 	dir, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
 	}
-	pathToStatic := dir + "/src/node/verifier/frontend"
+	pathToStatic := dir + "/src/node/verifier/frontend_old"
 
 	r.Use(static.Serve("/", static.LocalFile(pathToStatic, true)))
 
@@ -308,43 +307,19 @@ func (v *Verifier) ServerStart(r *gin.Engine) error {
 	return nil
 }
 
-func (v *Verifier) EthereumBalance(c *gin.Context) {
-	response := ethereum.GetBalance(v.cfg.VerifierEthereumAddress)
-	c.JSON(http.StatusOK, gin.H{
-		"balance": response,
-	})
-}
+func (v *Verifier) DepositHandler(c *gin.Context) {
 
-func (v *Verifier) PlasmaBalance(c *gin.Context) {
+	body := c.Request.Body
+	x, _ := ioutil.ReadAll(body)
 
-	st := make([]blockchain.Input, 0)
+	e := new(history.Event)
 
-	resp, err := http.Get(v.cfg.OperatorHost + "/utxo/" + v.cfg.VerifierEthereumAddress)
-	if err != nil {
-		log.Println(err)
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Println(err)
-	}
-	err = json.Unmarshal(body, &st)
-
+	err := json.Unmarshal([]byte(x), e)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	c.JSON(http.StatusOK, st)
-}
-
-func (v *Verifier) PlasmaContractAddress(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"address": v.cfg.PlasmaContractAddress,
-	})
-}
-
-func (v *Verifier) DepositHandler(c *gin.Context) {
-	value, ok := big.NewInt(0).SetString(c.Param("sum"), 10)
+	value, ok := big.NewInt(0).SetString(e.Sum, 10)
 	if !ok {
 		fmt.Println(fmt.Errorf("given value not integer"))
 	}
@@ -359,17 +334,74 @@ func (v *Verifier) DepositHandler(c *gin.Context) {
 			"error": err,
 		})
 	}
+
+	t := time.Now().Unix()
+
+	history.Log(value, t, "", "Deposit")
+
 	c.JSON(http.StatusOK, gin.H{
 		"txHash": result,
 	})
+
+	c.Next()
+	return
 }
 
 func (v *Verifier) TransferHandler(c *gin.Context) {
-	address, _ := hex.DecodeString(c.Param("address")[2:])
-	usum, _ := strconv.Atoi(c.Param("sum"))
+
+	body := c.Request.Body
+	x, err := ioutil.ReadAll(body)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
+	e := new(history.Event)
+
+	err = json.Unmarshal([]byte(x), e)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
+
+	value, ok := big.NewInt(0).SetString(e.Sum, 10)
+	if !ok {
+		log.Println(fmt.Errorf("given value not integer"))
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": fmt.Errorf("given value not integer"),
+		})
+	}
+	t := time.Now().Unix()
+
+	history.Log(value, t, e.Who, "Transfer")
+
+	address, err := hex.DecodeString(e.Who)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
+	usum, err := strconv.Atoi(e.Sum)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
 	sum := uint32(usum)
+
 	in := new(blockchain.Input)
-	c.BindJSON(&in)
+	err = c.BindJSON(&in)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
 
 	uTx := blockchain.Transaction{
 		UnsignedTransaction: blockchain.UnsignedTransaction{
@@ -398,76 +430,189 @@ func (v *Verifier) TransferHandler(c *gin.Context) {
 
 	key, err := hex.DecodeString(v.cfg.VerifierPrivateKey)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
 	}
 	fmt.Println("Tx")
 	fmt.Println(len(uTx.Outputs[0].Owner))
 
-	uTx.Sign(key)
+	err = uTx.Sign(key)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
 
 	fmt.Println("Signature")
 	fmt.Println(len(uTx.Signatures))
 
 	b := new(bytes.Buffer)
-	json.NewEncoder(b).Encode(uTx)
-	res, _ := http.Post(v.cfg.OperatorHost+"/tx", "application/json; charset=utf-8", b)
-	io.Copy(os.Stdout, res.Body)
+
+	err = json.NewEncoder(b).Encode(uTx)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
+
+	res, err := http.Post(v.cfg.OperatorHost+"/tx", "application/json; charset=utf-8", b)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
+	_, err = io.Copy(os.Stdout, res.Body)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"status": res.Body,
 	})
+
+	c.Next()
+	return
 }
 
 func (v *Verifier) ExitHandler(c *gin.Context) {
+	e := new(history.Event)
+
+	value, ok := big.NewInt(0).SetString(e.Sum, 10)
+	if !ok {
+		log.Println(fmt.Errorf("given value not integer"))
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": fmt.Errorf("given value not integer"),
+		})
+	}
+	t := time.Now().Unix()
+
+	history.Log(value, t, e.Who, "Exit")
+
 	c.JSON(http.StatusOK, gin.H{
 		"status": "ok",
 	})
 }
+func (v *Verifier) CommonInfoHandler(c *gin.Context) {
 
-func (v *Verifier) LatestBlockHandler(c *gin.Context) {
+	st := make([]blockchain.Input, 0)
 
-	st := types.LastBlock{}
-	resp, err := http.Get(v.cfg.OperatorHost + "/status")
+	resp, err := http.Get(v.cfg.OperatorHost + "/utxo/" + v.cfg.VerifierEthereumAddress)
 	if err != nil {
 		log.Println(err)
 	}
 	defer resp.Body.Close()
+
 	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
+	err = json.Unmarshal(body, &st)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
+
+	respInputs := make([]types.InputResponse, 0)
+
+	for i := range st {
+		in := types.InputResponse{}
+		in.OutputResponse.Owner = hex.EncodeToString(st[i].Owner)
+		in.OutputResponse.Slice.Begin = st[i].Slice.Begin
+		in.OutputResponse.Slice.End = st[i].Slice.End
+		in.TxIndex = st[i].TxIndex
+		in.BlockIndex = st[i].BlockIndex
+		in.OutputIndex = st[i].OutputIndex
+
+		respInputs = append(respInputs, in)
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
+	contractBalance, err := GetEtherAccountBalance(v.cfg.PlasmaContractAddress)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
+
+	verifierEtherBalance, err := GetEtherAccountBalance(v.cfg.VerifierEthereumAddress)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
+
+	verifierPlasmaBalance, err := v.getBalance(v.cfg.VerifierEthereumAddress)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
+
+	lb := types.LastBlock{}
+	respTwo, err := http.Get(v.cfg.OperatorHost + "/status")
 	if err != nil {
 		log.Println(err)
 	}
-	err = json.Unmarshal(body, &st)
+	defer resp.Body.Close()
+	bodyTwo, err := ioutil.ReadAll(respTwo.Body)
 
 	if err != nil {
-
-		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+	}
+	err = json.Unmarshal(bodyTwo, &lb)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
 	}
 
-	c.JSON(http.StatusOK, st.LastBlock)
-}
-
-func (v *Verifier) VerifiersAmountHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"verifiers_amount": "2",
-	})
-}
-
-func (v *Verifier) TotalBalanceHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"balance": 1677721600000000000,
+		"contract_address":        v.cfg.PlasmaContractAddress,
+		"contract_balance":        contractBalance,
+		"verifier_ether_balance":  verifierEtherBalance,
+		"verifier_plasma_balance": verifierPlasmaBalance,
+		"latest_block":            lb.LastBlock,
+		"verifier_inputs":         respInputs,
 	})
 }
 
 func (v *Verifier) HistoryAllHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"test": "0",
-	})
-}
+	o := history.GetAllOperations()
 
-func (v *Verifier) HistoryTxHandler(c *gin.Context) {
+	events := make([]history.Event, 0)
+
+	for _, a := range o {
+		event := history.Event{}
+		event.Who = a.Who
+		event.Sum = a.Sum.String()
+		event.Date = a.Date
+		event.OperationType = a.OperationType
+		events = append(events, event)
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"verifiers_amount": "0",
+		"Events": events,
 	})
+	c.Next()
+	return
 }
 
 func (v *Verifier) getTransactionHistory(address string) ([]blockchain.Input, error) {
@@ -541,7 +686,10 @@ func (v *Verifier) sendToOperatorPlasmaTx(in *blockchain.Input, sum uint32, addr
 	if err != nil {
 		return nil, err
 	}
-	res, _ := http.Post(v.cfg.OperatorHost+"/tx", "application/json; charset=utf-8", b)
+	res, err := http.Post(v.cfg.OperatorHost+"/tx", "application/json; charset=utf-8", b)
+	if err != nil {
+		return nil, err
+	}
 	_, err = io.Copy(os.Stdout, res.Body)
 	if err != nil {
 		return nil, err
@@ -559,24 +707,12 @@ func findTransaction(slice []blockchain.Input, block, tx uint32, out byte) *bloc
 	return nil
 }
 
-func GetETHAccountBalance(address string) (float64, error) {
+func GetEtherAccountBalance(address string) (float64, error) {
 
-	client, err := ethclient.Dial("https://mainnet.infura.io")
+	b, err := strconv.ParseFloat(ethereum.GetBalance(address), 64)
 	if err != nil {
 		return 0, err
 	}
 
-	ctx := context.Background()
-
-	account := common.HexToAddress(address)
-
-	balance, err := client.BalanceAt(ctx, account, nil)
-	if err != nil {
-		return 0, err
-	}
-	ethBalance, _ := strconv.ParseFloat(balance.String(), 64)
-
-	balanceFloat := ethBalance / math.Pow(10, 18)
-
-	return balanceFloat, err
+	return b / math.Pow(10, 18), err
 }

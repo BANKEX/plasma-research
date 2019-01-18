@@ -13,7 +13,6 @@ export class ExitComponent implements OnInit {
 
   exit() {
     this.http.post('http://localhost:8080/exit', null).subscribe((data: any) => {
-      console.log(data);
     });
   }
 
