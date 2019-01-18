@@ -10,8 +10,8 @@ import (
 
 	"github.com/BANKEX/plasma-research/src/node/plasmautils/plasmacrypto"
 	"github.com/BANKEX/plasma-research/src/node/plasmautils/primeset"
-	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
 	"github.com/BANKEX/plasma-research/src/node/types"
+	"github.com/BANKEX/plasma-research/src/node/types/slice"
 	"github.com/BANKEX/plasma-research/src/node/utils"
 	"github.com/ethereum/go-ethereum/crypto"
 )

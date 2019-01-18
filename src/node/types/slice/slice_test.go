@@ -1,4 +1,4 @@
-package test
+package slice
 
 import (
 	"math/big"
@@ -6,14 +6,13 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
-	"github.com/BANKEX/plasma-research/src/node/plasmautils/testtools"
 	"github.com/snjax/gmp"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSlice(t *testing.T) {
-	s := &slice.Slice{Begin: 1, End: 8}
-	ttl.Assert(t, reflect.DeepEqual(s.GetAlignedSlices(), []uint32{16777216, 8388608, 4194304}), "Wrong prime number generation")
+	s := &Slice{Begin: 1, End: 8}
+	assert.True(t, reflect.DeepEqual(s.GetAlignedSlices(), []uint32{16777216, 8388608, 4194304}), "Wrong prime number generation")
 }
 
 func TestInclusionProof(t *testing.T) {

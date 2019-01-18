@@ -9,7 +9,7 @@ import (
 
 	"github.com/BANKEX/plasma-research/src/node/utils"
 
-	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
+	"github.com/BANKEX/plasma-research/src/node/types/slice"
 	"github.com/stretchr/testify/assert"
 )
 
