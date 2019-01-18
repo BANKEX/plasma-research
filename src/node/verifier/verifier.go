@@ -47,12 +47,12 @@ func NewVerifier(cfg *Config) (*Verifier, error) {
 
 	eth, err := ethereum.NewEthereum(cfg.GethHost, plasmaContractAddress)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to build ethereum: %s", err)
 	}
 
 	key, err := crypto.HexToECDSA(cfg.VerifierPrivateKey[2:])
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to decode key: %s", err)
 	}
 
 	return &Verifier{
@@ -346,7 +346,6 @@ func (v *Verifier) EthereumBalance(c *gin.Context) {
 }
 
 func (v *Verifier) PlasmaBalance(c *gin.Context) {
-
 	st := make([]blockchain.Input, 0)
 
 	resp, err := req.Get(v.cfg.OperatorHost + "/utxo/" + v.cfg.VerifierEthereumAddress)
@@ -515,7 +514,6 @@ func (v *Verifier) getBalance(address string) (sum uint32, err error) {
 }
 
 func (v *Verifier) sendToOperatorPlasmaTx(in *blockchain.Input, sum uint32, address []byte) (*http.Response, error) {
-
 	uTx := blockchain.Transaction{
 		UnsignedTransaction: blockchain.UnsignedTransaction{
 			Inputs: []blockchain.Input{*in},
