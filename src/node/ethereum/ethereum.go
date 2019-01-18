@@ -3,6 +3,7 @@ package ethereum
 import (
 	"context"
 	"crypto/ecdsa"
+	"fmt"
 	"math/big"
 
 	"github.com/BANKEX/plasma-research/src/contracts/api"
@@ -27,12 +28,12 @@ type Ethereum struct {
 func NewEthereum(endpoint string, plasmaContractAddress common.Address) (*Ethereum, error) {
 	client, err := ethclient.Dial(endpoint)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to connect to ethereum endpoint: %s", err)
 	}
 
 	contract, err := api.NewBankexPlasma(plasmaContractAddress, client)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to create contract instance: %s", err)
 	}
 
 	return &Ethereum{
