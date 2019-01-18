@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/BANKEX/plasma-research/src/contracts/api"
 	"github.com/BANKEX/plasma-research/src/node/config"
-	"github.com/BANKEX/plasma-research/src/node/ethereum/plasmacontract"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -94,7 +94,7 @@ func (m *EventMonitor) processBlock(blockNumber uint64) error {
 }
 
 func (m *EventMonitor) processLogs(logs []types.Log) error {
-	contractAbi, err := abi.JSON(strings.NewReader(store.StoreABI))
+	contractAbi, err := abi.JSON(strings.NewReader(api.BankexPlasmaABI))
 	if err != nil {
 		return err
 	}

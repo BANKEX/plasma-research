@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/BANKEX/plasma-research/src/contracts/api"
 	"github.com/BANKEX/plasma-research/src/node/blockchain"
 	"github.com/BANKEX/plasma-research/src/node/config"
-	"github.com/BANKEX/plasma-research/src/node/ethereum/plasmacontract"
 	"github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
 	"github.com/BANKEX/plasma-research/src/node/transactionManager"
 	"github.com/ethereum/go-ethereum"
@@ -54,7 +54,7 @@ func GetEvent() bool {
 		log.Fatal(err)
 	}
 
-	contractAbi, err := abi.JSON(strings.NewReader(string(store.StoreABI)))
+	contractAbi, err := abi.JSON(strings.NewReader(string(api.BankexPlasmaABI)))
 	if err != nil {
 		log.Fatal(err)
 	}

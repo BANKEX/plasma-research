@@ -5,7 +5,7 @@ import (
 	"crypto/ecdsa"
 	"math/big"
 
-	"github.com/BANKEX/plasma-research/src/node/ethereum/plasmacontract"
+	"github.com/BANKEX/plasma-research/src/contracts/api"
 	"github.com/BANKEX/plasma-research/src/node/utils"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -21,7 +21,7 @@ const (
 type Ethereum struct {
 	client                *ethclient.Client
 	plasmaContractAddress common.Address
-	plasmaContract        *store.Store
+	plasmaContract        *api.BankexPlasma
 }
 
 func NewEthereum(endpoint string, plasmaContractAddress common.Address) (*Ethereum, error) {
@@ -30,7 +30,7 @@ func NewEthereum(endpoint string, plasmaContractAddress common.Address) (*Ethere
 		return nil, err
 	}
 
-	contract, err := store.NewStore(plasmaContractAddress, client)
+	contract, err := api.NewBankexPlasma(plasmaContractAddress, client)
 	if err != nil {
 		return nil, err
 	}
