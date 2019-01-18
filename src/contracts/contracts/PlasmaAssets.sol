@@ -20,7 +20,7 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
 
     address constant public MAIN_COIN_ASSET_ID = address(0);
     address constant public ERC721_ASSET_ID = address(1);
-    uint256 constant public ASSET_DECIMALS_TRUNCATION = 10e13; //TODO: will be different for tokens
+    uint256 constant public ASSET_DECIMALS_TRUNCATION = 1e13; //TODO: will be different for tokens
     uint32 constant public PLASMA_ASSETS_TOTAL_SIZE = 2 ** 24 - 1;
 
     bytes32 private _expectedTokenAndTokenIdHash;
@@ -87,6 +87,7 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
     // Deposits
 
     function deposit() public payable {
+        // TODO: it's may overflows if value be grater than 1e78
         uint64 amount = uint64(msg.value / ASSET_DECIMALS_TRUNCATION);
         (uint64 intervalId, uint64 begin, uint64 end) = _assetLists[MAIN_COIN_ASSET_ID].append(amount);
 
@@ -99,11 +100,12 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
     function depositERC20(IERC20 token, uint256 amountArg) public {
         require(_assetLists[address(token)].isInitialized(), "Operator should add this token first");
 
+        // TODO: it's may overflows if value be grater than 1e78
         uint64 amount = uint64(amountArg / ASSET_DECIMALS_TRUNCATION);
         (uint64 intervalId, uint64 begin, uint64 end) = _assetLists[address(token)].append(amount);
 
         uint256 preBalance = token.balanceOf(address(this));
-        token.safeTransferFrom(msg.sender, address(this), amount);
+        token.safeTransferFrom(msg.sender, address(this), amount * ASSET_DECIMALS_TRUNCATION);
         uint256 deposited = token.balanceOf(address(this)).sub(preBalance);
 
         emit ERC20Deposited(address(token), msg.sender, deposited);
@@ -214,6 +216,7 @@ contract PlasmaAssets is Ownable, PlasmaBlocks {
         return true;
     }
 
+    // TODO: why its commented?
     // function withdrawalChallangeExistance(
     //   ExitState state,
     //   SumMerkleProof txProof,
