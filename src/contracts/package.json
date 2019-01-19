@@ -31,6 +31,7 @@
   "scripts": {
     "test": "scripts/test.sh",
     "coverage": "scripts/coverage.sh",
+    "debugger": "node $NODE_DEBUG_OPTION ./node_modules/.bin/truffle test --network ganache ./test/PlasmaAssets.js",
     "dist": "truffle-flattener ./contracts/BankexPlasma.sol > BankexPlasma.full.sol && solcjs --bin --abi --optimize BankexPlasma.full.sol && mv BankexPlasma_full_sol_BankexPlasma.bin BankexPlasma.full.bin && mv BankexPlasma_full_sol_BankexPlasma.abi BankexPlasma.full.abi && rm BankexPlasma_full_* && mv *.full.* dist",
     "lint:js": "eslint .",
     "lint:js:fix": "eslint . --fix",
