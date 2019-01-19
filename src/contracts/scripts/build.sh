@@ -17,5 +17,5 @@ accounts=(
 	--account="0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501209,1000000000000000000000000"
 )
 
-node_modules/.bin/ganache-cli --db="./data/" --gasLimit 0xfffffffffff --host 0.0.0.0 --port "$ganache_port" "${accounts[@]}" &
+node_modules/.bin/ganache-cli --db="./data/" --gasLimit 0xfffffffffff --host 0.0.0.0 --port "$ganache_port" "${accounts[@]}" --networkId 5777 &
 node_modules/.bin/truffle migrate --network=ganache
