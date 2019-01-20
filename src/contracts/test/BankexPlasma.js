@@ -2,7 +2,7 @@ const { BN, ether, balance } = require('openzeppelin-test-helpers');
 const BankexPlasma = artifacts.require('BankexPlasma');
 const Token = artifacts.require('Erc20Mock');
 
-contract('PlasmaBlocks', function (accounts) {
+contract('BankexPlasma', function (accounts) {
     let owner = accounts[0];
     let user = accounts[2];
 
