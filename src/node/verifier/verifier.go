@@ -295,7 +295,7 @@ func (v *Verifier) ServerStart(r *gin.Engine) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	pathToStatic := dir + "/src/node/verifier/frontend_old"
+	pathToStatic := dir + "/src/node/verifier/frontend"
 
 	r.Use(static.Serve("/", static.LocalFile(pathToStatic, true)))
 
