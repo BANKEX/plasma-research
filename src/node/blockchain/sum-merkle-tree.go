@@ -6,7 +6,7 @@ import (
 
 	. "github.com/BANKEX/plasma-research/src/node/alias"
 	. "github.com/BANKEX/plasma-research/src/node/plasmautils/slice"
-	"github.com/ethereum/go-ethereum/crypto/sha3"
+	"golang.org/x/crypto/sha3"
 )
 
 type SumMerkleNode struct {
@@ -73,7 +73,7 @@ type OwnedSlice struct {
 }
 
 func Hash(a, b Uint160) Uint160 {
-	hash := sha3.NewKeccak256()
+	hash := sha3.NewLegacyKeccak256()
 	var buf []byte
 	hash.Write(append(a, b...))
 	buf = hash.Sum(buf)
@@ -81,7 +81,7 @@ func Hash(a, b Uint160) Uint160 {
 }
 
 func Hash4(x1, x2, x3, x4 []byte) Uint160 {
-	hash := sha3.NewKeccak256()
+	hash := sha3.NewLegacyKeccak256()
 	var buf []byte
 	hash.Write(append(append(append(x1, x2...), x3...), x4...))
 	buf = hash.Sum(buf)
